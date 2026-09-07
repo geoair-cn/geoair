@@ -588,8 +588,8 @@ public class OracleAdvDDLOpt extends AbstractExecAdvDDLOpt {
     }
     @Override
     protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
-        // Oracle: CREATE TABLE target AS SELECT * FROM source
-        return StrUtil.format("CREATE TABLE {} AS SELECT * FROM {}",
+        // 通用流程已先创建空表，此处只复制数据。
+        return StrUtil.format("INSERT INTO {} SELECT * FROM {}",
                 dstTableName, srcTableName);
     }
 

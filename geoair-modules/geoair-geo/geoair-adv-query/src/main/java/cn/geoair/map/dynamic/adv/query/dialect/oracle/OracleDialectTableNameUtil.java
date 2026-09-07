@@ -45,12 +45,12 @@ public class OracleDialectTableNameUtil extends AbstractExecDialectTableUtil {
         if (StrUtil.isEmpty(fieldName)) {
             return fieldName;
         }
-        // 如果已经包含引号，直接返回
-        if (fieldName.startsWith(FIELD_QUOTE_PREFIX) && fieldName.endsWith(FIELD_QUOTE_SUFFIX)) {
-            return fieldName;
+        String identifier = fieldName;
+        if (identifier.startsWith(FIELD_QUOTE_PREFIX) && identifier.endsWith(FIELD_QUOTE_SUFFIX)
+                && identifier.length() >= 2) {
+            identifier = identifier.substring(1, identifier.length() - 1).replace("\"\"", "\"");
         }
-        // Oracle字段名默认转为大写（不加引号时），加双引号则保持原样
-        return FIELD_QUOTE_PREFIX + fieldName + FIELD_QUOTE_SUFFIX;
+        return FIELD_QUOTE_PREFIX + identifier.replace("\"", "\"\"") + FIELD_QUOTE_SUFFIX;
     }
 
     @Override

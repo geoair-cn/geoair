@@ -24,6 +24,7 @@ import cn.hutool.db.dialect.DialectName;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -81,6 +82,10 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         if (StrUtil.isEmpty(dstTableName) || StrUtil.isEmpty(srcTableName)) {
             throw new IllegalArgumentException("源表名和目标表名不能为空");
         }
+        if (!dIsTableExists(srcTableName)) {
+            throw new IllegalArgumentException("源表不存在，无法复制：" + srcTableName);
+        }
+        assertCopyTargetNotExists(dstTableName);
         String qualifiedDstTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, dstTableName);
         String qualifiedSrcTableName =
@@ -89,9 +94,8 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         if (dataSync) {
             // 复制表结构及数据
             String createSql = buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
-            dExecuteDDL(createSql, dstTableName, "复制表结构");
             String copySql = buildCreateTableFromTableSql(qualifiedDstTableName, qualifiedSrcTableName);
-            dExecuteDDL(copySql, dstTableName, "复制数据");
+            dExecuteStatements(Arrays.asList(createSql, copySql), dstTableName, "复制表结构及数据");
         } else {
             // 仅复制表结构
             String createSql = buildCreateTableLikeSql(qualifiedDstTableName, qualifiedSrcTableName);
@@ -104,6 +108,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         if (StrUtil.isEmpty(dstTableName) || StrUtil.isEmpty(sql)) {
             throw new IllegalArgumentException("目标表名和SQL不能为空");
         }
+        assertCopyTargetNotExists(dstTableName);
         String qualifiedDstTableName =
                 dialectTableNameProcessor.tbGetTableNameWithSchema(dataSourceGetter, dstTableName);
 
@@ -115,6 +120,15 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
             // 仅根据SQL创建表结构（不插入数据）
             String createSql = buildCreateTableFromSqlWithNoDataSql(qualifiedDstTableName, sql);
             dExecuteDDL(createSql, dstTableName, "根据SQL复制表结构");
+        }
+    }
+
+    /**
+     * 复制表不允许复用已有目标表，避免各方言 IF NOT EXISTS 语义不同而产生重复写入。
+     */
+    private void assertCopyTargetNotExists(String dstTableName) {
+        if (dIsTableExists(dstTableName)) {
+            throw new IllegalStateException("目标表已存在，拒绝复制以避免重复写入：" + dstTableName);
         }
     }
 
@@ -431,28 +445,38 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         Connection connection = null;
         Statement statement = null;
         int result = 0;
+        boolean originalAutoCommit = true;
+        boolean manageTransaction = false;
         StopWatch stopWatch = new StopWatch();
         try {
             connection = dataSourceGetter.getConnection();
             if (connection == null) {
                 throw new IllegalStateException("无法获取数据库连接");
             }
-            connection.setAutoCommit(false);
+            originalAutoCommit = connection.getAutoCommit();
+            manageTransaction = originalAutoCommit;
+            if (manageTransaction) {
+                connection.setAutoCommit(false);
+            }
             statement = connection.createStatement();
             stopWatch.start();
             result = statement.executeUpdate(sql);
-            connection.commit();
+            if (manageTransaction) {
+                connection.commit();
+            }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), operation, sql, cost, result);
             log.debug("{}成功，表名: {}", operation, tableName);
         } catch (SQLException e) {
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), operation, sql, e);
-            rollbackConnection(connection, operation, tableName);
+            if (manageTransaction) {
+                rollbackConnection(connection, operation, tableName);
+            }
             log.error("{}失败，表名: {}, SQL: {}, 错误: {}", operation, tableName, sql, e.getMessage(), e);
             throw new RuntimeException(StrUtil.format("{}失败: {}", operation, e.getMessage()), e);
         } finally {
-            restoreAutoCommit(connection);
+            restoreAutoCommit(connection, originalAutoCommit);
             dataSourceGetter.closeResources(null, statement, connection);
         }
         return result;
@@ -471,27 +495,37 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         Connection connection = null;
         PreparedStatement statement = null;
         int result = 0;
+        boolean originalAutoCommit = true;
+        boolean manageTransaction = false;
         StopWatch stopWatch = new StopWatch();
         try {
             connection = dataSourceGetter.getConnection();
             if (connection == null) {
                 throw new IllegalStateException("无法获取数据库连接");
             }
-            connection.setAutoCommit(false);
+            originalAutoCommit = connection.getAutoCommit();
+            manageTransaction = originalAutoCommit;
+            if (manageTransaction) {
+                connection.setAutoCommit(false);
+            }
             statement = connection.prepareStatement(execSql);
             for (int i = 1; i <= jdbcParams.size(); i++) {
                 statement.setObject(i, jdbcParams.get(i - 1));
             }
             stopWatch.start();
             result = statement.executeUpdate();
-            connection.commit();
+            if (manageTransaction) {
+                connection.commit();
+            }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             // 带参数日志
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(), operation, execSql, jdbcParams, cost, result);
         } catch (SQLException e) {
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(this.getClass(), operation, execSql, jdbcParams, e);
-            rollbackConnection(connection, operation, tableName);
+            if (manageTransaction) {
+                rollbackConnection(connection, operation, tableName);
+            }
             log.error(
                     "{}失败，表名: {}, SQL: {}, 错误: {}",
                     operation,
@@ -501,7 +535,7 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
                     e);
             throw new RuntimeException(StrUtil.format("{}失败: {}", operation, e.getMessage()), e);
         } finally {
-            restoreAutoCommit(connection);
+            restoreAutoCommit(connection, originalAutoCommit);
             dataSourceGetter.closeResources(null, statement, connection);
         }
         return result;
@@ -518,14 +552,74 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
         }
     }
 
-    protected void restoreAutoCommit(Connection connection) {
+    /** 将连接恢复为调用前的自动提交状态，避免污染外部事务或连接池。 */
+    protected void restoreAutoCommit(Connection connection, boolean originalAutoCommit) {
         if (connection != null) {
             try {
-                connection.setAutoCommit(true);
+                if (connection.getAutoCommit() != originalAutoCommit) {
+                    connection.setAutoCommit(originalAutoCommit);
+                }
             } catch (SQLException e) {
                 log.warn("恢复自动提交模式失败", e);
             }
         }
+    }
+
+    /**
+     * 在同一 JDBC 连接上执行多个 DDL/DML 语句。
+     *
+     * <p>PostgreSQL、SQL Server 可由同一事务整体回滚；MySQL、Oracle 的部分 DDL 会隐式提交，
+     * 因数据库机制限制无法承诺跨语句原子性，但仍保证不会在不同连接之间拆分执行。</p>
+     */
+    @Override
+    public int dExecuteStatements(List<String> sqlStatements, String tableName, String operation) {
+        if (sqlStatements == null || sqlStatements.isEmpty()) {
+            throw new IllegalArgumentException("待执行 SQL 列表不能为空");
+        }
+        for (String sqlStatement : sqlStatements) {
+            if (StrUtil.isBlank(sqlStatement)) {
+                throw new IllegalArgumentException("待执行 SQL 不能包含空语句");
+            }
+        }
+        Connection connection = null;
+        Statement statement = null;
+        int result = 0;
+        boolean originalAutoCommit = true;
+        boolean manageTransaction = false;
+        StopWatch stopWatch = new StopWatch();
+        try {
+            connection = dataSourceGetter.getConnection();
+            if (connection == null) {
+                throw new IllegalStateException("无法获取数据库连接");
+            }
+            originalAutoCommit = connection.getAutoCommit();
+            manageTransaction = originalAutoCommit;
+            if (manageTransaction) {
+                connection.setAutoCommit(false);
+            }
+            statement = connection.createStatement();
+            stopWatch.start();
+            for (String sql : sqlStatements) {
+                result += statement.executeUpdate(sql);
+            }
+            if (manageTransaction) {
+                connection.commit();
+            }
+            stopWatch.stop();
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(
+                    this.getClass(), operation, String.join("; ", sqlStatements), stopWatch.getLastTaskTimeMillis(), result);
+        } catch (SQLException e) {
+            AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
+                    this.getClass(), operation, String.join("; ", sqlStatements), e);
+            if (manageTransaction) {
+                rollbackConnection(connection, operation, tableName);
+            }
+            throw new RuntimeException(StrUtil.format("{}失败: {}", operation, e.getMessage()), e);
+        } finally {
+            restoreAutoCommit(connection, originalAutoCommit);
+            dataSourceGetter.closeResources(null, statement, connection);
+        }
+        return result;
     }
 
     protected DataFieldsApo getMetadataFromSql(
@@ -679,14 +773,18 @@ public abstract class AbstractExecAdvDDLOpt implements IAdvDDLOpt {
     protected abstract String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql);
 
 
+    /** @deprecated 当前所有方言均未实现建表；保留以兼容既有 API。 */
+    @Deprecated
     @Override
     public void dCreateTable(String tableName, List<FieldBySchemaApo> fields, String primaryKey) {
-        throw new RuntimeException("暂时没有实现");
+        throw new UnsupportedOperationException("dCreateTable 当前未实现，请使用 dCopyTableBySql、dCopyTableByTableName 或执行显式 DDL");
     }
 
+    /** @deprecated 当前所有方言均未实现加字段；保留以兼容既有 API。 */
+    @Deprecated
     @Override
     public void dAddColumn(String tableName, FieldBySchemaApo field) {
-        throw new RuntimeException("暂时没有实现");
+        throw new UnsupportedOperationException("dAddColumn 当前未实现，请使用 dExecuteDDL 执行显式 ALTER TABLE");
     }
 
 

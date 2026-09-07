@@ -224,8 +224,17 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Connection connection = dataSourceGetter.getConnection();
+        boolean originalAutoCommit = true;
+        boolean manageTransaction = false;
         try {
-            connection.setAutoCommit(false);
+            if (connection == null) {
+                throw new IllegalStateException("无法获取数据库连接");
+            }
+            originalAutoCommit = connection.getAutoCommit();
+            manageTransaction = originalAutoCommit;
+            if (manageTransaction) {
+                connection.setAutoCommit(false);
+            }
 
             for (List<Object> idBatch : idBatches) {
                 String placeholders = idBatch.stream().map(id -> "?").collect(Collectors.joining(","));
@@ -234,7 +243,9 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
                 totalSuccess += batchSuccess;
             }
 
-            connection.commit();
+            if (manageTransaction) {
+                connection.commit();
+            }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
 
@@ -245,10 +256,12 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteError(
                     this.getClass(),
                     "bDeleteByPKs", StrUtil.format("表名：{}，总删除行数：{} ", tableName, totalSuccess), e);
-            rollbackConnection(connection);
+            if (manageTransaction) {
+                rollbackConnection(connection);
+            }
             throw new RuntimeException("批量主键删除失败，表名：" + tableName, e);
         } finally {
-            restoreAutoCommit(connection);
+            restoreAutoCommit(connection, originalAutoCommit);
             closeConnection(connection);
         }
     }
@@ -391,9 +404,18 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Connection connection = dataSourceGetter.getConnection();
+        boolean originalAutoCommit = true;
+        boolean manageTransaction = false;
 
         try {
-            connection.setAutoCommit(false);
+            if (connection == null) {
+                throw new IllegalStateException("无法获取数据库连接");
+            }
+            originalAutoCommit = connection.getAutoCommit();
+            manageTransaction = originalAutoCommit;
+            if (manageTransaction) {
+                connection.setAutoCommit(false);
+            }
             while (true) {
                 String whereClause = GirAdvSqlUtils.buildWhereClause(whereMap, dialectTableNameProcessor);
                 String execSql = buildDeleteBatchByConditionSql(quoteTableName, whereClause, batchSize);
@@ -404,17 +426,21 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
                     break;
                 }
             }
-            connection.commit();
+            if (manageTransaction) {
+                connection.commit();
+            }
             stopWatch.stop();
             long cost = stopWatch.getLastTaskTimeMillis();
             AdvLogSql.of(dataSourceGetter, getConfig()).logExecuteSql(this.getClass(),
                     "bDeleteByMap", StrUtil.format("表名：{}，总删除行数：{}，批次大小：{}", tableName, totalSuccess, batchSize), cost, totalSuccess);
             return totalSuccess;
         } catch (SQLException e) {
-            rollbackConnection(connection);
+            if (manageTransaction) {
+                rollbackConnection(connection);
+            }
             throw new RuntimeException("分批次条件删除失败，表名：" + tableName, e);
         } finally {
-            restoreAutoCommit(connection);
+            restoreAutoCommit(connection, originalAutoCommit);
             closeConnection(connection);
         }
     }
@@ -570,10 +596,13 @@ public abstract class AbstractExecAdvBaseDeleteOpt implements IAdvBaseDeleteOpt 
         }
     }
 
-    protected void restoreAutoCommit(Connection connection) {
+    /** 仅恢复本方法实际改变过的自动提交状态，避免干扰调用方事务。 */
+    protected void restoreAutoCommit(Connection connection, boolean originalAutoCommit) {
         if (connection != null) {
             try {
-                connection.setAutoCommit(true);
+                if (connection.getAutoCommit() != originalAutoCommit) {
+                    connection.setAutoCommit(originalAutoCommit);
+                }
             } catch (SQLException e) {
                 log.error("恢复自动提交失败", e);
             }

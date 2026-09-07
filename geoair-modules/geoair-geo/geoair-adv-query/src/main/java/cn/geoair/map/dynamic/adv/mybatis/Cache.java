@@ -10,8 +10,8 @@ import java.util.Map;
  * 使用 LRU 策略的有界缓存（默认最大 1024 条），当缓存满时淘汰最久未使用的条目。
  * 缓存键为包含 {@code <root>} 包装的完整 XML 字符串。
  *
- * <p>线程安全说明：本类不是线程安全的。在多线程环境中，应由外部（如 {@link DynamicSqlEngine}）
- * 保证同步访问。
+ * <p>线程安全说明：本类的读取和写入方法均已同步。由于访问顺序模式下的
+ * {@link LinkedHashMap#get(Object)} 也会调整节点顺序，因此不能仅同步写入操作。
  *
  * @author zhangjun
  */
@@ -32,7 +32,7 @@ public class Cache {
      * @param key XML 模板字符串
      * @return 缓存的 SqlNode，不存在时返回 null
      */
-    public SqlNode get(String key) {
+    public synchronized SqlNode get(String key) {
         return nodeCache.get(key);
     }
 
@@ -42,7 +42,7 @@ public class Cache {
      * @param key      XML 模板字符串
      * @param sqlNode  解析后的 SqlNode
      */
-    public void put(String key, SqlNode sqlNode) {
+    public synchronized void put(String key, SqlNode sqlNode) {
         nodeCache.put(key, sqlNode);
     }
 }

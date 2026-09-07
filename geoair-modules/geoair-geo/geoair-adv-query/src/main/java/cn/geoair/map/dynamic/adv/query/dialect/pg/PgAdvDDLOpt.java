@@ -726,31 +726,25 @@ public class PgAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
     @Override
     protected String buildCreateTableFromTableSql(String dstTableName, String srcTableName) {
-        // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS SELECT * FROM source
-//        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS SELECT * FROM {}",
-//                dstTableName, srcTableName);
         return StrUtil.format(
                 "INSERT INTO {} SELECT * FROM {}", dstTableName, srcTableName);
     }
 
     @Override
     protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
-        // PostgreSQL: CREATE TABLE IF NOT EXISTS target (LIKE source INCLUDING ALL)
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} (LIKE {} INCLUDING ALL)",
+        return StrUtil.format("CREATE TABLE {} (LIKE {} INCLUDING ALL)",
                 dstTableName, srcTableName);
     }
 
     @Override
     protected String buildCreateTableFromSqlSql(String dstTableName, String sql) {
-        // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...)
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({})",
+        return StrUtil.format("CREATE TABLE {} AS ({})",
                 dstTableName, sql);
     }
 
     @Override
     protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
-        // PostgreSQL: CREATE TABLE IF NOT EXISTS target AS (SELECT ...) WITH NO DATA
-        return StrUtil.format("CREATE TABLE IF NOT EXISTS {} AS ({}) WITH NO DATA",
+        return StrUtil.format("CREATE TABLE {} AS ({}) WITH NO DATA",
                 dstTableName, sql);
     }
 }

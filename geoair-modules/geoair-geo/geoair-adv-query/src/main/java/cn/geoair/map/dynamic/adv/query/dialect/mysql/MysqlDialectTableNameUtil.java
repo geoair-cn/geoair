@@ -38,10 +38,12 @@ public class MysqlDialectTableNameUtil extends AbstractExecDialectTableUtil {
         if (StrUtil.isEmpty(fieldName)) {
             return fieldName;
         }
-        if (fieldName.startsWith(FIELD_QUOTE_PREFIX) && fieldName.endsWith(FIELD_QUOTE_SUFFIX)) {
-            return fieldName;
+        String identifier = fieldName;
+        if (identifier.startsWith(FIELD_QUOTE_PREFIX) && identifier.endsWith(FIELD_QUOTE_SUFFIX)
+                && identifier.length() >= 2) {
+            identifier = identifier.substring(1, identifier.length() - 1).replace("``", "`");
         }
-        return FIELD_QUOTE_PREFIX + fieldName + FIELD_QUOTE_SUFFIX;
+        return FIELD_QUOTE_PREFIX + identifier.replace("`", "``") + FIELD_QUOTE_SUFFIX;
     }
 
     @Override

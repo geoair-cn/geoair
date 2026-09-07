@@ -2,10 +2,16 @@ package cn.geoair.map.dynamic.adv.mybatis;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 /**
@@ -22,7 +28,7 @@ public class DynamicSqlEngineTest {
         params.put("minId", 100);
 
         SqlMeta result = engine.parse(sql, params);
-        assertEquals("id > ?", result.getSql());
+        assertEquals(" id > ?", result.getSql());
         assertEquals(1, result.getJdbcParamValues().size());
         assertEquals(100, result.getJdbcParamValues().get(0));
     }
@@ -35,7 +41,7 @@ public class DynamicSqlEngineTest {
         params.put("maxId", 500);
 
         SqlMeta result = engine.parse(sql, params);
-        assertEquals("id > ?  and id < ?", result.getSql());
+        assertEquals(" id > ?   and id < ?", result.getSql());
         assertEquals(2, result.getJdbcParamValues().size());
         assertEquals(100, result.getJdbcParamValues().get(0));
         assertEquals(500, result.getJdbcParamValues().get(1));
@@ -74,6 +80,19 @@ public class DynamicSqlEngineTest {
         SqlMeta result = engine.parse(sql, params);
         assertTrue(result.getSql().contains("(?,?,?)"));
         assertEquals(3, result.getJdbcParamValues().size());
+    }
+
+    @Test
+    public void testParse_foreachDoesNotModifyCallerParams() {
+        String sql = "SELECT * FROM user WHERE id IN <foreach collection='ids' open='(' close=')' separator=',' item='item'>#{item}</foreach>";
+        Map<String, Object> sourceParams = new HashMap<>();
+        sourceParams.put("ids", new int[]{1, 2, 3});
+
+        SqlMeta result = engine.parse(sql, Collections.unmodifiableMap(sourceParams));
+
+        assertEquals(3, result.getJdbcParamValues().size());
+        assertEquals(1, sourceParams.size());
+        assertFalse(sourceParams.containsKey("__index_ids"));
     }
 
     @Test
@@ -145,5 +164,41 @@ public class DynamicSqlEngineTest {
         assertEquals("SELECT * FROM user WHERE id = ?", r2.getSql());
         assertEquals(1, r1.getJdbcParamValues().get(0));
         assertEquals(2, r2.getJdbcParamValues().get(0));
+    }
+
+    @Test
+    public void testCache_concurrentParse() throws Exception {
+        final DynamicSqlEngine concurrentEngine = new DynamicSqlEngine();
+        final int threadCount = 8;
+        final int parseCountPerThread = 160;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch startSignal = new CountDownLatch(1);
+
+        try {
+            Future<?>[] futures = new Future<?>[threadCount];
+            for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+                final int currentThreadIndex = threadIndex;
+                futures[threadIndex] = executorService.submit(() -> {
+                    startSignal.await();
+                    for (int index = 0; index < parseCountPerThread; index++) {
+                        int id = currentThreadIndex * parseCountPerThread + index;
+                        Map<String, Object> params = new HashMap<>();
+                        params.put("id", id);
+                        SqlMeta result = concurrentEngine.parse(
+                                "SELECT * FROM user WHERE id = #{id} /* " + id + " */", params);
+                        assertEquals("SELECT * FROM user WHERE id = ? /* " + id + " */", result.getSql());
+                        assertEquals(Collections.singletonList(id), result.getJdbcParamValues());
+                    }
+                    return null;
+                });
+            }
+
+            startSignal.countDown();
+            for (Future<?> future : futures) {
+                future.get(30, TimeUnit.SECONDS);
+            }
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 }

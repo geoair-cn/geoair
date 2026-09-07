@@ -53,6 +53,11 @@
       <version>${geoair.version}</version>
     </dependency>
     <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-file-jdbc</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-jdbc</artifactId>
       <version>${geotools.version}</version>

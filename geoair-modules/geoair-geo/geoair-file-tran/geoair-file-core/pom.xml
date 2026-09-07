@@ -77,6 +77,13 @@
       <version>${geotools.version}</version>
     </dependency>
     <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- 保留既有 JUnit 5 测试的编译依赖；当前 Surefire 版本执行新建的 JUnit 4 契约测试。 -->
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>${junit-jupiter.version}</version>

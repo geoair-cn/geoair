@@ -29,6 +29,23 @@ public interface IAdvDDLOpt extends IAdvConfigOpt {
     int dExecuteDDL(String sqlStatement, SqlParamMap sqlParam, String tableName, String operation);
 
     /**
+     * 在同一 JDBC 连接中按顺序执行多条 DDL 或 DML 语句。
+     *
+     * <p>当调用前连接处于自动提交模式时，实现会自行开启并结束事务；当调用方已经
+     * 开启事务时，不会擅自提交或回滚外层事务。是否能对 DDL 做整体回滚由数据库决定：
+     * PostgreSQL、SQL Server 的常见 DDL 支持事务，而 MySQL、Oracle 的 DDL 可能隐式提交。</p>
+     *
+     * @param sqlStatements 待执行的非空 SQL 列表
+     * @param tableName     关联表名，仅用于日志与异常定位
+     * @param operation     操作说明，仅用于日志与异常定位
+     * @return 各语句影响行数之和；驱动返回 {@code SUCCESS_NO_INFO} 时结果可能为负数
+     */
+    default int dExecuteStatements(List<String> sqlStatements, String tableName, String operation) {
+        throw new UnsupportedOperationException(
+                "当前 IAdvDDLOpt 实现未提供同连接多语句执行能力：" + getClass().getName());
+    }
+
+    /**
      * 删除表中所有数据
      *
      * @param tableNameWithSchema 表名
@@ -45,10 +62,9 @@ public interface IAdvDDLOpt extends IAdvConfigOpt {
      *                 - false: 仅复制表结构（不含数据）
      *
      * 注意事项：
-     * 1. 如果目标表已存在，操作会失败（除非使用 IF NOT EXISTS）
-     * 2. 复制表结构时使用 INCLUDING ALL，会包含：索引、约束、默认值、注释等
-     * 3. 主键约束不会被复制，需要单独处理
-     * 4. 跨schema复制时，需要确保源表可访问、目标schema存在
+     * 1. 目标表必须不存在；接口不会向既有表追加数据，避免重复复制
+     * 2. 字段结构会被复制；索引、约束、默认值和注释等对象的复制能力因数据库方言而异，不能依赖本接口保证
+     * 3. 跨schema复制时，需要确保源表可访问、目标schema存在
      */
     void dCopyTableByTableName(String dstTableName, String srcTableName, boolean dataSync);
 
@@ -67,7 +83,7 @@ public interface IAdvDDLOpt extends IAdvConfigOpt {
      * 2. 目标表会自动创建，但不会包含源表的索引、约束等信息
      * 3. 可以通过SQL的WHERE条件筛选需要同步的数据
      * 4. 如果dataSync=false，只会创建空表结构
-     * 5. 目标表已存在时会失败，建议先检查或先删除
+     * 5. 目标表必须不存在；接口不会复用或覆盖既有表
      *
      * 使用示例：
      * // 复制活跃用户数据
@@ -152,7 +168,9 @@ public interface IAdvDDLOpt extends IAdvConfigOpt {
      * @param tableName  表名
      * @param fields     字段定义列表
      * @param primaryKey 主键字段名
+     * @deprecated 当前所有方言均未实现该能力。请使用已有表复制 API 或执行显式 DDL；保留此方法仅为兼容既有调用。
      */
+    @Deprecated
     void dCreateTable(String tableName, List<FieldBySchemaApo> fields, String primaryKey);
 
     /**
@@ -168,7 +186,9 @@ public interface IAdvDDLOpt extends IAdvConfigOpt {
      *
      * @param tableName 表名
      * @param field     要添加的字段信息
+     * @deprecated 当前所有方言均未实现该能力。请执行显式 DDL；保留此方法仅为兼容既有调用。
      */
+    @Deprecated
     void dAddColumn(String tableName, FieldBySchemaApo field);
 
     /**
