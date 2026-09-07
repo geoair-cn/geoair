@@ -125,9 +125,11 @@ public class GeoFileTranImpl implements GeoFileTran {
 
                 @Override
                 public void setPageConfig(PageConfig pageConfig) {
-                    boolean parallelRead = reader.supportParallelPageRead();
-                    pageConfig.setParallelConsumeRecordIs(parallelRead);
-                    pageConfig.setParallelExecPageIs(parallelRead);
+                    // 分页任务会同时读取并写入；任一端不支持并发时都必须串行执行。
+                    boolean parallelPageProcess = reader.supportParallelPageRead()
+                            && writer.supportParallelPageWrite();
+                    pageConfig.setParallelConsumeRecordIs(parallelPageProcess);
+                    pageConfig.setParallelExecPageIs(parallelPageProcess);
                     pageConfig.setPageNumStartByZero(false);
                     pageConfig.setSaveResultListIs(false).setPageSize((long) context.getBatchSize());
                 }
@@ -145,13 +147,13 @@ public class GeoFileTranImpl implements GeoFileTran {
                         return list;
                     } catch (Exception e) {
                         onRecordFailure(result, e, "写入记录失败");
-                        if (!context.isSkipErrorRecord()) {
+                        if (context.isSkipErrorRecord()) {
                             totalCount.addAndGet(list.size());
                             updateProgress();
                             logBatchProgress();
                             return Collections.emptyList();
                         } else {
-                            throw new GeoFileWriteException("写入失败！");
+                            throw new GeoFileWriteException("写入失败！", e);
                         }
                     }
 
@@ -234,8 +236,14 @@ public class GeoFileTranImpl implements GeoFileTran {
         if (e == null) {
             return;
         }
-        if (result != null && !containsException(result, e)) {
-            result.getExceptions().add(e);
+        if (result != null) {
+            // 分页任务可能并行失败。异常集合由历史 API 暴露为 List，故在结果对象上加锁，
+            // 兼容调用方传入的任意 List 实现，并避免遍历/追加同时发生。
+            synchronized (result) {
+                if (!containsException(result, e)) {
+                    result.getExceptions().add(e);
+                }
+            }
         }
         if (exceptionConsumer != null) {
             try {
@@ -272,8 +280,10 @@ public class GeoFileTranImpl implements GeoFileTran {
 
     private void onRecordFailure(TranResult result, Exception e, String errorMsg) {
         failCount.incrementAndGet();
-        if (result.getErrorMsg() == null) {
-            result.setErrorMsg(errorMsg);
+        synchronized (result) {
+            if (result.getErrorMsg() == null) {
+                result.setErrorMsg(errorMsg);
+            }
         }
         handleException(result, e);
         if (!context.isSkipErrorRecord()) {

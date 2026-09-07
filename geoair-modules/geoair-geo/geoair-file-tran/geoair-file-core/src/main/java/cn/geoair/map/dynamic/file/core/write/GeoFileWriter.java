@@ -17,6 +17,19 @@ import java.util.List;
  */
 public interface GeoFileWriter extends Closeable {
 
+    /**
+     * 当前写入器是否可以由多个分页任务同时调用。
+     *
+     * <p>写入器通常会复用连接、事务或文件流，因此默认不支持并发写入。只有实现明确保证
+     * {@link #writeRows(List, ExceptionConsumer)} 以及相关资源均为线程安全时，才应覆盖并返回
+     * {@code true}。</p>
+     *
+     * @return 是否支持并发分页写入
+     */
+    default boolean supportParallelPageWrite() {
+        return false;
+    }
+
     // 链接信息
     void setLinkInfo(LinkInfo linkInfo);
 

@@ -161,7 +161,7 @@ public class PostgisGeoFileWriter implements GeoFileWriter {
             tranRows(row);
         }
         iAdvExecutor.bInsertIgnoreBatch(rows,
-                s -> s.setBatchSize(batchSize).setConflictKeys(ListUtil.of("fid")).setToUnderlineCase(false)
+                s -> s.setBatchSize(batchSize) .setToUnderlineCase(false)
                         .setTableName(linkInfo.getTableName()));
         stopWatch.stop();
         logger.info("批量写入 {} 条要素成功，耗时：{}秒", rows.size(), stopWatch.getTotalTimeSeconds());

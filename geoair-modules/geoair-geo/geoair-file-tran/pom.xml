@@ -43,7 +43,7 @@
     <module>geoair-file-oracle</module>
     <module>geoair-file-mysql</module>
     <module>geoair-file-shp</module>
-<!--    <module>geoair-file-test</module>-->
+    <module>geoair-file-test</module>
   </modules>
 
   <scm>
