@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.base.percent.GiProgressReporter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -12,6 +13,7 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MultiLayerTileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v2.ProgressTracker;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
@@ -24,6 +26,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
+import org.apache.spark.util.LongAccumulator;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
@@ -61,13 +64,38 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
 
     /** 执行 V3 多图层静态切片任务。 */
     public void doGenerate(MultiLayerTileSliceParameter parameter) throws Exception {
+        doGenerate(parameter, null);
+    }
+
+    /**
+     * 执行 V3 多图层静态切片任务，并按 Spark Stage 上报执行进度。
+     *
+     * <p>回调语义与 V2 保持一致：{@link GiProgressReporter#report(Number, Number)} 的
+     * {@code allCount/currentCount} 分别代表当前 Spark Stage 的总任务数和已结束任务数。
+     * 因此它反映的是分布式执行进度，而非单纯的要素数量进度。</p>
+     *
+     * @param parameter 切片参数
+     * @param percentReporter 可选进度上报器；传入 {@code null} 时仅输出日志
+     */
+    public void doGenerate(
+            MultiLayerTileSliceParameter parameter, GiProgressReporter percentReporter) throws Exception {
         validateParameter(parameter);
         createTableIfAbsent(parameter);
 
+        ProgressTracker tracker = ProgressTracker.init(sparkSession, 3, percentReporter);
+        LongAccumulator featuresRead = tracker.getFeaturesRead();
+
+        tracker.setStageName("读取并转换多图层数据");
         JavaPairRDD<String, V3TileFeatureGroup> allTileFeatures = null;
         for (MvtLayerSliceParameter layer : parameter.getLayers()) {
             TileSliceParameter readParameter = V3LegacyParameterAdapter.toReadParameter(parameter, layer);
-            JavaRDD<GirAdvOneRow> source = readLayer(readParameter);
+            JavaRDD<GirAdvOneRow> source = readLayer(readParameter)
+                    .map(row -> {
+                        if (row != null) {
+                            featuresRead.add(1L);
+                        }
+                        return row;
+                    });
             JavaPairRDD<String, V3TileFeatureGroup> current = source
                     .map(V3SparkTaskFunctions.newTransformFunction(readParameter))
                     .filter(row -> row != null)
@@ -77,11 +105,19 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         if (allTileFeatures == null) {
             return;
         }
+        tracker.completeStage("图层数: " + parameter.getLayers().size());
+
+        tracker.setStageName("聚合多图层瓦片");
         int partitionNum = Math.max(1, parameter.getReducePartitionNum());
         JavaPairRDD<String, V3TileFeatureGroup> aggregated = allTileFeatures.reduceByKey(
                 new V3SparkTaskFunctions.MergeTileFeatureGroupFunction(
                         parameter.getLayers(), parameter.getOutGridSrid()), partitionNum);
-        writeTiles(aggregated, parameter);
+        tracker.completeStage("目标分区: " + partitionNum);
+
+        tracker.setStageName("写入多图层瓦片");
+        writeTiles(aggregated, parameter, tracker);
+        tracker.completeStage();
+        tracker.printSummary();
         LOG.info("V3 多图层切片完成，tileSetName:{}，内部图层数:{}", parameter.getTileSetName(), parameter.getLayers().size());
     }
 
@@ -132,7 +168,11 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
 
     private void writeTiles(
             JavaPairRDD<String, V3TileFeatureGroup> aggregated,
-            MultiLayerTileSliceParameter parameter) {
+            MultiLayerTileSliceParameter parameter,
+            ProgressTracker tracker) {
+        final LongAccumulator tilesWritten = tracker.getTilesWritten();
+        final LongAccumulator batchesWritten = tracker.getBatchesWritten();
+        final LongAccumulator bytesWritten = tracker.getBytesWritten();
         aggregated.foreachPartition((VoidFunction<Iterator<Tuple2<String, V3TileFeatureGroup>>>) iterator -> {
             DataSourceConfig output = parameter.getOutputSource();
             String table = output.getTableNameForSql();
@@ -141,6 +181,7 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
                  PreparedStatement insert = connection.prepareStatement(insertSql(table))) {
                 connection.setAutoCommit(false);
                 int batchSize = 0;
+                long batchBytes = 0L;
                 try {
                     while (iterator.hasNext()) {
                         Tuple2<String, V3TileFeatureGroup> item = iterator.next();
@@ -148,17 +189,25 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
                         bindDelete(delete, item._1, pbf, parameter);
                         bindInsert(insert, item._1, pbf, parameter);
                         batchSize++;
+                        batchBytes += pbf.getData() == null ? 0L : pbf.getData().length;
                         if (batchSize >= WRITE_BATCH_SIZE) {
                             delete.executeBatch();
                             insert.executeBatch();
                             connection.commit();
+                            tilesWritten.add(batchSize);
+                            batchesWritten.add(1L);
+                            bytesWritten.add(batchBytes);
                             batchSize = 0;
+                            batchBytes = 0L;
                         }
                     }
                     if (batchSize > 0) {
                         delete.executeBatch();
                         insert.executeBatch();
                         connection.commit();
+                        tilesWritten.add(batchSize);
+                        batchesWritten.add(1L);
+                        bytesWritten.add(batchBytes);
                     }
                 } catch (Exception e) {
                     connection.rollback();
