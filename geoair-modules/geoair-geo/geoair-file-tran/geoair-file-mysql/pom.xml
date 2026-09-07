@@ -2,31 +2,56 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.geoair.devkit</groupId>
+        <artifactId>geoair-file-tran</artifactId>
+        <version>J8-dev-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
     <groupId>cn.geoair.devkit</groupId>
-    <artifactId>geoair-file-tran</artifactId>
     <version>J8-dev-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-  <artifactId>geoair-file-mysql</artifactId>
-  <packaging>jar</packaging>
-  <name>geoair-file-mysql</name>
-  <description>GeoAir 文件转换 MySQL 8 Spatial 支持</description>
-  <dependencies>
-    <dependency>
-      <groupId>cn.geoair.devkit</groupId>
-      <artifactId>geoair-file-jdbc</artifactId>
-      <version>${geoair.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools.jdbc</groupId>
-      <artifactId>gt-jdbc-mysql</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-    </dependency>
-  </dependencies>
+    <artifactId>geoair-file-mysql</artifactId>
+    <packaging>jar</packaging>
+    <name>geoair-file-mysql</name>
+    <description>GeoAir 文件转换 MySQL 8 Spatial 支持</description>
+    <url>https://github.com/geoair-cn/geoair</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>zhangfengji</name>
+            <email>zfj20250104@qq.com</email>
+            <organization>geoair</organization>
+            <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>https://github.com/geoair-cn/geoair.git</connection>
+        <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+        <url>https://github.com/geoair-cn/geoair</url>
+    </scm>
+    <dependencies>
+        <dependency>
+            <groupId>cn.geoair.devkit</groupId>
+            <artifactId>geoair-file-jdbc</artifactId>
+            <version>${geoair.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools.jdbc</groupId>
+            <artifactId>gt-jdbc-mysql</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+    </dependencies>
 </project>

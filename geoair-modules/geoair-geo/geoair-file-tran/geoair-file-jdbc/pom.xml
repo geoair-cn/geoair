@@ -9,10 +9,35 @@
     <version>J8-dev-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <version>J8-dev-SNAPSHOT</version>
   <artifactId>geoair-file-jdbc</artifactId>
   <packaging>jar</packaging>
   <name>geoair-file-jdbc</name>
   <description>GeoAir 文件转换 JDBC 空间方言公共层</description>
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>zfj20250104@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>https://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>cn.geoair.devkit</groupId>
