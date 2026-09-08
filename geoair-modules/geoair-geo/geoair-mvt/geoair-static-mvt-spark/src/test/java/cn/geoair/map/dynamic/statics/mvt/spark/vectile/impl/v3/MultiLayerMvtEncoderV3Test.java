@@ -62,6 +62,28 @@ public class MultiLayerMvtEncoderV3Test {
     }
 
     @Test
+    public void shouldAllowUncompressedPbfWhenConfigured() throws Exception {
+        MvtLayerSliceParameter roads = layer("roads", MvtLayerGeometryMode.ORIGINAL);
+        MultiLayerTileSliceParameter task = new MultiLayerTileSliceParameter()
+                .setOutGridSrid(3857)
+                .setTileSetName("base-map")
+                .setTileSizeLimitEnabled(false)
+                .setGzipPbf(false)
+                .setLayers(Arrays.asList(roads));
+        V3TileFeatureGroup group = new V3TileFeatureGroup();
+        group.setFeaturesByLayer(new java.util.LinkedHashMap<String, List<GirAdvOneRow>>());
+        group.getFeaturesByLayer().put("roads", Arrays.asList(row("road-1", "Road A",
+                geometryFactory.createPoint(new Coordinate(0, 0)))));
+
+        String tileId = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(1, 1, 2);
+        PbfInfo pbf = MultiLayerMvtEncoderV3.encode(tileId, group, task);
+
+        Assert.assertFalse("关闭 gzip 后不应保留 gzip 文件头", pbf.getData()[0] == (byte) 0x1F
+                && pbf.getData()[1] == (byte) 0x8B);
+        Assert.assertEquals(1, VectorTile.Tile.parseFrom(pbf.getData()).getLayersCount());
+    }
+
+    @Test
     public void shouldDropLowPriorityFeaturesWhenTotalTileSizeIsLimited() throws Exception {
         MvtLayerSliceParameter important = layer("important", MvtLayerGeometryMode.ORIGINAL).setPriority(10);
         MvtLayerSliceParameter optional = layer("optional", MvtLayerGeometryMode.ORIGINAL).setPriority(0);

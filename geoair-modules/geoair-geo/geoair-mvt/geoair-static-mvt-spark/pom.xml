@@ -125,6 +125,20 @@
       <version>${postgresql.version}</version>
     </dependency>
 
+    <!-- V3 可选 S3/MinIO 输出。 -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>${aws-java-sdk-s3.version}</version>
+    </dependency>
+
+    <!-- V3 MBTiles 归档输出。 -->
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>${sqlite-jdbc.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>

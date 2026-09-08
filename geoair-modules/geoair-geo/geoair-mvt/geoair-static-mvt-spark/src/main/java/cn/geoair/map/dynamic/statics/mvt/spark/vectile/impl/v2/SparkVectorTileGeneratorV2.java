@@ -12,8 +12,6 @@ import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.*;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.StatisticUtils;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.DataReadCommonUtils;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.unit.DataSizeUtil;
@@ -54,17 +52,17 @@ import java.util.concurrent.atomic.AtomicLong;
  * <p>
  * 相对于原版 {@code SparkVectorTileGenerator} 的优化：
  * <ul>
- *   <li>使用 {@link cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil.MapToTileFunction}
+ *   <li>使用 {@link V2SparkTaskFunctions.MapToTileFunction}
  *       （TileIterator 懒生成）替代 MapToTileFunction1（HashMap 全量收集）</li>
  *   <li>去掉 transform 阶段的 persist（一对一映射，不需要回溯）</li>
  *   <li>去掉 tileFeatures 的 persist（流式传递到 reduceByKey）</li>
  *   <li>去掉 tileFeatures.count()（避免强制物化膨胀数据）</li>
  *   <li>仅保留 rawFeatures 的 persist（唯一一次缓存）</li>
- *   <li>通过 {@link ProgressTracker} 实现基于 SparkListener 的进度跟踪</li>
+ *   <li>通过 {@link V2ProgressTracker} 实现基于 SparkListener 的进度跟踪</li>
  * </ul>
  *
- * @see ProgressTracker
- * @see SparkTaskFunctions.MapToTileFunctionSingleZoom
+ * @see V2ProgressTracker
+ * @see V2SparkTaskFunctions.MapToTileFunctionSingleZoom
  */
 public class SparkVectorTileGeneratorV2 implements Serializable {
 
@@ -96,7 +94,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
      */
     public void doGenerate(TileSliceParameter parameter, GiProgressReporter percentReporter) throws Exception {
         // ==================== 初始化进度跟踪 ====================
-        ProgressTracker tracker = ProgressTracker.init(sparkSession, 4,percentReporter);
+        V2ProgressTracker tracker = V2ProgressTracker.init(sparkSession, 4,percentReporter);
 
         // ==================== 打印参数 ====================
         JSONObject entries = JSONUtil.parseObj(parameter);
@@ -138,7 +136,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
 
         // 不 persist！一对一 map，流式传递到下游
         JavaRDD<GirAdvOneRow> transformedFeatures =
-                persistedFeaturesRDD.map(new SparkTaskSerializableUtil.TransformFeatureFunction(parameter));
+                persistedFeaturesRDD.map(new V2SparkTaskFunctions.TransformFeatureFunction(parameter));
 
         tracker.completeStage("要素: " + String.format("%,d", count));
 
@@ -148,7 +146,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
         // 使用 MapToTileFunction（TileIterator 懒生成，不 persist）
         JavaPairRDD<String, List<GirAdvOneRow>> tileFeatures =
                 transformedFeatures.flatMapToPair(
-                        new SparkTaskSerializableUtil.MapToTileFunction(parameter));
+                        new V2SparkTaskFunctions.MapToTileFunction(parameter));
 
         // 统计路径（可选）
         if (parameter.isStatisticsEnabled()) {
@@ -158,7 +156,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
         // 聚合：使用有界合并函数，避免 reduceByKey 阶段内存膨胀
         JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDD =
                 tileFeatures.reduceByKey(
-                        new SparkTaskFunctions.BoundedAggregateFunction(parameter),
+                        new V2SparkTaskFunctions.BoundedAggregateFunction(parameter),
                         DEFAULT_REDUCE_PARTITION);
 
         // 不调用 aggregatedRDD.count()！它会强制物化全部聚合结果，高密度瓦片会撑爆内存。
@@ -187,11 +185,11 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
             TileSliceParameter parameter,
             JavaRDD<GirAdvOneRow> transformedFeatures,
             long count,
-            ProgressTracker tracker) {
+            V2ProgressTracker tracker) {
 
         JavaPairRDD<String, List<GirAdvOneRow>> tileFeaturesByZoom =
                 transformedFeatures.flatMapToPair(
-                        new SparkTaskFunctions.MapToTileFunctionSingleZoom(parameter, parameter.getMaxZoom()));
+                        new V2SparkTaskFunctions.MapToTileFunctionSingleZoom(parameter, parameter.getMaxZoom()));
 
         TileSliceParameter copy = parameter.copy();
         copy.setFeatureLimit(1000)
@@ -201,7 +199,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
 
         JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDDByZoom =
                 tileFeaturesByZoom.reduceByKey(
-                        new SparkTaskSerializableUtil.AggregateAndLimitFeatureFunction(copy),
+                        new V2SparkTaskFunctions.AggregateAndLimitFeatureFunction(copy),
                         DEFAULT_REDUCE_PARTITION);
 
         PbfTargetInfo instance = PbfTargetInfo.getInstance();
@@ -209,7 +207,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
 
         JavaRDD<Tuple2<String, PbfInfo>> pbfRDD =
                 aggregatedRDDByZoom.map(
-                        new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, instance));
+                        new V2SparkTaskFunctions.GeneratePbfFunction(parameter, instance));
 
         JavaFutureAction<List<Tuple2<String, PbfInfo>>> listJavaFutureAction = pbfRDD.takeAsync(500);
         log.info("统计路径：抽样 500 个 PBF...");
@@ -236,7 +234,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
     private void streamWriteToPg(
             JavaPairRDD<String, List<GirAdvOneRow>> aggregatedRDD,
             TileSliceParameter parameter,
-            ProgressTracker tracker) {
+            V2ProgressTracker tracker) {
 
         // 从 tracker 提取累加器（LongAccumulator 可独立序列化，ProgressTracker 整体不行）
         final LongAccumulator accTilesWritten = tracker.getTilesWritten();
@@ -260,8 +258,8 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                     long partitionStartTime = System.currentTimeMillis();
 
                     try {
-                        SparkTaskSerializableUtil.GeneratePbfFunction pbfFunc =
-                                new SparkTaskSerializableUtil.GeneratePbfFunction(parameter, PbfTargetInfo.getInstance());
+                        V2SparkTaskFunctions.GeneratePbfFunction pbfFunc =
+                                new V2SparkTaskFunctions.GeneratePbfFunction(parameter, PbfTargetInfo.getInstance());
 
                         while (partitionIterator.hasNext()) {
                             Tuple2<String, List<GirAdvOneRow>> aggregatedTuple = partitionIterator.next();
@@ -387,13 +385,13 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
             throws Exception {
         if (isLabel) {
             if (tuple._2.getDataLabel() == null) return null;
-            return new SparkTaskSerializableUtil.BuildRowLabelFunction(parameter).call(tuple);
+            return new V2SparkTaskFunctions.BuildRowLabelFunction(parameter).call(tuple);
         } else if (isBoundary) {
             if (tuple._2.getDataBoundary() == null) return null;
-            return new SparkTaskSerializableUtil.BuildRowBoundaryFunction(parameter).call(tuple);
+            return new V2SparkTaskFunctions.BuildRowBoundaryFunction(parameter).call(tuple);
         } else {
             if (tuple._2.getData() == null) return null;
-            return new SparkTaskSerializableUtil.BuildRowFunction(parameter).call(tuple);
+            return new V2SparkTaskFunctions.BuildRowFunction(parameter).call(tuple);
         }
     }
 
@@ -459,14 +457,14 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
                 .filter(StrUtil::isNotBlank)
                 .orElse(parameter.getGeomFieldName());
 
-        List<Integer> pageNumbers = DataReadCommonUtils.buildPageNumberList(totalCount, maxPartionNum);
+        List<Integer> pageNumbers = V2DataReadUtils.buildPageNumberList(totalCount, maxPartionNum);
         Dataset<Integer> pageNumDs = sparkSession
                 .createDataset(pageNumbers, Encoders.INT())
                 .repartition(Math.min(pageNumbers.size(), maxPartionNum));
         JavaRDD<Integer> pageNumRdd = pageNumDs.javaRDD();
 
         return pageNumRdd.flatMap(
-                new SparkTaskSerializableUtil.IdPageFlatMapFunction(
+                new V2SparkTaskFunctions.IdPageFlatMapFunction(
                         parameter, parameter.getQueryStatement(), orderFieldName, countPerTask));
     }
 
@@ -483,7 +481,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
         }
 
         int maxPartionNum = Optional.ofNullable(parameter.getMaxPartionNum()).orElse(100);
-        List<String> partitionConditions = DataReadCommonUtils.buildBboxPartitionConditions(bBoxApo, maxPartionNum, parameter.getSourceDataSrid());
+        List<String> partitionConditions = V2DataReadUtils.buildBboxPartitionConditions(bBoxApo, maxPartionNum, parameter.getSourceDataSrid());
         log.info("BBox分片数量：" + partitionConditions.size());
 
         Dataset<String> partitionConditionsDs = sparkSession
@@ -492,7 +490,7 @@ public class SparkVectorTileGeneratorV2 implements Serializable {
         JavaRDD<String> partitionConditionRdd = partitionConditionsDs.javaRDD();
 
         return partitionConditionRdd.flatMap(
-                new SparkTaskSerializableUtil.BboxFlatMapFunction(
+                new V2SparkTaskFunctions.BboxFlatMapFunction(
                         parameter, parameter.getQueryStatement(), parameter.getGeomFieldName(), parameter.getSourceDataSrid()));
     }
 

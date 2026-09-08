@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author generated
  */
-public class ProgressTracker implements Serializable {
+public class V2ProgressTracker implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final int BAR_WIDTH = 20;
@@ -42,7 +42,7 @@ public class ProgressTracker implements Serializable {
     // ===================== SparkListener（transient，仅 driver 侧使用，不参与闭包序列化）=====================
     private ProgressSparkListener listener;
 
-    private ProgressTracker(SparkSession sparkSession, int totalStages, GiProgressReporter percentReporter) {
+    private V2ProgressTracker(SparkSession sparkSession, int totalStages, GiProgressReporter percentReporter) {
         this.startTime = System.currentTimeMillis();
         this.totalStages = totalStages;
 
@@ -55,12 +55,12 @@ public class ProgressTracker implements Serializable {
         sparkSession.sparkContext().addSparkListener(listener);
     }
 
-    public static ProgressTracker init(SparkSession sparkSession, int totalStages) {
-        return new ProgressTracker(sparkSession, totalStages, null);
+    public static V2ProgressTracker init(SparkSession sparkSession, int totalStages) {
+        return new V2ProgressTracker(sparkSession, totalStages, null);
     }
 
-    public static ProgressTracker init(SparkSession sparkSession, int totalStages, GiProgressReporter percentReporter) {
-        return new ProgressTracker(sparkSession, totalStages, percentReporter);
+    public static V2ProgressTracker init(SparkSession sparkSession, int totalStages, GiProgressReporter percentReporter) {
+        return new V2ProgressTracker(sparkSession, totalStages, percentReporter);
     }
 
     // ===================== Driver 侧 API =====================
