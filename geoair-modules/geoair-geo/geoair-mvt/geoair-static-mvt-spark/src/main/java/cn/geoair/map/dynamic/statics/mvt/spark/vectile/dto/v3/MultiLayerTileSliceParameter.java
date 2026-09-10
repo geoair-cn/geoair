@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3;
 
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base32;
@@ -36,9 +35,9 @@ public class MultiLayerTileSliceParameter implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 写入瓦片缓存表的数据源。
+     * V3 输出介质配置，统一承载 PostgreSQL、本地目录和 S3 所需的输出参数。
      */
-    private DataSourceConfig outputSource;
+    private V3TileOutputConfig outputConfig = new V3TileOutputConfig();
 
     /**
      * 输出记录的图层集合名称，同时写入 layer_name 字段。
@@ -74,6 +73,12 @@ public class MultiLayerTileSliceParameter implements Serializable {
      * 单个最终 PBF 的总大小限制，例如 2MB。
      */
     private String tileSizeLimit = "2MB";
+
+    /**
+     * 最终 PBF 是否使用 gzip 压缩，默认开启以保持 V3 原有输出行为。
+     * 关闭时，tileSizeLimit 按未压缩的最终 PBF 大小计算。
+     */
+    private boolean gzipPbf = true;
 
     /**
      * Spark reduce 分区数。

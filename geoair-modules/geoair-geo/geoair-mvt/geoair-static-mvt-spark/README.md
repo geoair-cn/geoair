@@ -1,6 +1,6 @@
 # geoair-static-mvt-spark
 
-`geoair-static-mvt-spark` 是 GeoAir 的 Spark 离线矢量瓦片生成模块。它从数据库分批读取空间要素，按瓦片范围切分并编码为标准 Mapbox Vector Tile（MVT / PBF），再写入 PostgreSQL 瓦片缓存表。
+`geoair-static-mvt-spark` 是 GeoAir 的 Spark 离线矢量瓦片生成模块。它从数据库分批读取空间要素，按瓦片范围切分并编码为标准 Mapbox Vector Tile（MVT / PBF），再写入 PostgreSQL、目录、S3、MBTiles 或 PMTiles。
 
 模块提供三个彼此独立的生成链路：
 
@@ -108,6 +108,7 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MultiLayerTileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerGeometryMode;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3TileOutputConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.SparkVectorTileGeneratorV3;
 import org.apache.spark.sql.SparkSession;
 
@@ -146,7 +147,7 @@ MvtLayerSliceParameter labels = new MvtLayerSliceParameter()
         .setGeometryMode(MvtLayerGeometryMode.CENTROID);
 
 MultiLayerTileSliceParameter task = new MultiLayerTileSliceParameter()
-        .setOutputSource(output)
+        .setOutputConfig(V3TileOutputConfig.postgresql(output))
         .setTileSetName("base_map")
         .setEdition("2026-09")
         .setOutGridSrid(3857)
@@ -168,6 +169,33 @@ try {
 }
 ```
 
+### V3 输出介质
+
+V3 的所有输出参数统一配置在 `V3TileOutputConfig`；不再使用顶层 `outputSource`。其中 PostgreSQL、目录和 S3 可直接写入；MBTiles、PMTiles 则先由 Spark 并行写入中间目录，再由 Driver 单进程归档，避免多个 executor 并发写单个文件。
+
+```java
+// 本地或共享目录：z/x/y.pbf
+task.setOutputConfig(V3TileOutputConfig.localDirectory("/mnt/tiles/base-map"));
+
+// S3 / MinIO
+task.setOutputConfig(V3TileOutputConfig.s3("geoair-tiles", "base-map/v1")
+        .setS3Endpoint("http://minio.example.com:9000")
+        .setS3Region("us-east-1"));
+
+// 标准 MBTiles：中间目录的 Y 默认是 XYZ，归档时自动转换为 MBTiles 所需 TMS
+task.setOutputConfig(V3TileOutputConfig.mbtiles(
+        "/mnt/staging/base-map", "/mnt/archive/base-map.mbtiles"));
+
+// PMTiles V3：中间目录和最终 .pmtiles 都必须由 Driver 可访问
+task.setOutputConfig(V3TileOutputConfig.pmtiles(
+        "/mnt/staging/base-map", "/mnt/archive/base-map.pmtiles"));
+
+// 默认 gzip；如对接端明确要求原始 MVT PBF，可在任务入口关闭。
+task.setGzipPbf(false);
+```
+
+MBTiles、PMTiles 为保证主流客户端互操作性，仅支持 `outGridSrid = 3857`。在 Spark 集群模式，`localDirectory` 和归档的 `stagingDirectory` 必须是每个 executor 与 Driver 都可见的共享挂载路径。
+
 ### V3 的图层几何模式
 
 | 枚举值 | 写入 PBF 的几何 | 典型用途 |
@@ -186,7 +214,7 @@ V3 依次在两个层面控制内存与输出大小：
 
 `priority` 越大，图层越优先保留。建议将道路、行政区等基础要素设为较高值，标注、辅助面或低价值专题设为较低值。
 
-## 输出表与查询语义
+## PostgreSQL 输出表与查询语义
 
 若输出表不存在，模块会自动创建包含以下字段的缓存表：
 
@@ -215,7 +243,7 @@ V3 重跑时会按照 `z + x + y + grid_srid + tileSetName + edition` 删除既�
 
 ## 与 Tippecanoe 的定位
 
-Tippecanoe 更适合将大规模 GeoJSON、CSV、FlatGeobuf 等文件离线编译为 MBTiles，并拥有成熟的低层级制图取舍策略。GeoAir V3 更适合直接从业务数据库、多个 SQL 或多个数据源构建瓦片，并直接写入已有 PostgreSQL 服务链路。
+Tippecanoe 更适合将大规模 GeoJSON、CSV、FlatGeobuf 等文件离线编译为 MBTiles，并拥有成熟的低层级制图取舍策略。GeoAir V3 更适合直接从业务数据库、多个 SQL 或多个数据源构建瓦片，并可输出到数据库、目录、对象存储或离线归档。
 
 如果目标是一次性生产独立离线底图文件，并且优先追求极致的低层级视觉质量，Tippecanoe 通常更合适；如果需要接入 GeoAir 的数据库、版本、服务和 Spark 集群体系，优先使用本模块。
 

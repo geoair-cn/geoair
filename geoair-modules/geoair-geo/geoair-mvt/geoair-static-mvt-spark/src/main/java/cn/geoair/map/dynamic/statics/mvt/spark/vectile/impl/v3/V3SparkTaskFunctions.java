@@ -1,10 +1,18 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3;
 
+import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
+import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
+import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
+import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.SparkTaskSerializableUtil;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.IdUtil;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import scala.Tuple2;
@@ -21,6 +29,59 @@ import java.util.Map;
 final class V3SparkTaskFunctions {
 
     private V3SparkTaskFunctions() {
+    }
+
+    /** V3 图层分页读取任务。 */
+    static class IdPageFlatMapFunction implements FlatMapFunction<Integer, GirAdvOneRow> {
+        private static final long serialVersionUID = 1L;
+        private final TileSliceParameter parameter;
+        private final String queryStatement;
+        private final String orderFieldName;
+        private final int countPerTask;
+
+        IdPageFlatMapFunction(TileSliceParameter parameter, String queryStatement,
+                String orderFieldName, int countPerTask) {
+            this.parameter = parameter;
+            this.queryStatement = queryStatement;
+            this.orderFieldName = orderFieldName;
+            this.countPerTask = countPerTask;
+        }
+
+        @Override
+        public Iterator<GirAdvOneRow> call(Integer pageNum) {
+            DataSourceConfig source = parameter.getInputSource();
+            IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource(source.toDataSource());
+            String orderSql = executor.pBuildSqlWithOrder(queryStatement,
+                    ListUtil.of(OrderApo.create(orderFieldName, AdvEnumsOrder.升序)));
+            return executor.bSelectList(executor.pBuildPageSql(orderSql, countPerTask, pageNum, true)).iterator();
+        }
+    }
+
+    /** V3 图层 BBOX 分片读取任务。 */
+    static class BboxFlatMapFunction implements FlatMapFunction<String, GirAdvOneRow> {
+        private static final long serialVersionUID = 1L;
+        private final TileSliceParameter parameter;
+        private final String queryStatement;
+        private final String geomFieldName;
+        private final int sourceDataSrid;
+
+        BboxFlatMapFunction(TileSliceParameter parameter, String queryStatement,
+                String geomFieldName, int sourceDataSrid) {
+            this.parameter = parameter;
+            this.queryStatement = queryStatement;
+            this.geomFieldName = geomFieldName;
+            this.sourceDataSrid = sourceDataSrid;
+        }
+
+        @Override
+        public Iterator<GirAdvOneRow> call(String condition) {
+            String[] coords = condition.split(",");
+            String sql = V3DataReadUtils.buildBboxQuerySql(queryStatement, geomFieldName,
+                    Double.parseDouble(coords[0]), Double.parseDouble(coords[2]),
+                    Double.parseDouble(coords[1]), Double.parseDouble(coords[3]), sourceDataSrid);
+            IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource(parameter.getInputSource().toDataSource());
+            return executor.bSelectList(sql).iterator();
+        }
     }
 
     /** 将一个 V3 图层的要素按瓦片映射为图层分组 value。 */
@@ -79,9 +140,24 @@ final class V3SparkTaskFunctions {
         }
     }
 
-    /** 复用已有且经过验证的坐标转换函数，V3 的聚合和编码仍完全独立。 */
-    static SparkTaskSerializableUtil.TransformFeatureFunction newTransformFunction(
-            TileSliceParameter parameter) {
-        return new SparkTaskSerializableUtil.TransformFeatureFunction(parameter);
+    /** V3 图层要素的坐标转换任务。 */
+    static class TransformFeatureFunction
+            implements org.apache.spark.api.java.function.Function<GirAdvOneRow, GirAdvOneRow> {
+        private static final long serialVersionUID = 1L;
+        private final TileSliceParameter parameter;
+
+        TransformFeatureFunction(TileSliceParameter parameter) {
+            this.parameter = parameter;
+        }
+
+        @Override
+        public GirAdvOneRow call(GirAdvOneRow row) {
+            row.put(VecConstant.FeatureRowID, IdUtil.fastSimpleUUID());
+            return VectorTileCommonUtils.transformSingleFeature(row, parameter);
+        }
+    }
+
+    static TransformFeatureFunction newTransformFunction(TileSliceParameter parameter) {
+        return new TransformFeatureFunction(parameter);
     }
 }

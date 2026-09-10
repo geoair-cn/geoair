@@ -1,4 +1,4 @@
-package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
+package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v1;
 
 import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 import cn.hutool.core.util.StrUtil;
@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** 数据读取通用工具类 抽离ID分页/BBox分片的通用逻辑 */
-public class DataReadCommonUtils {
+/** V1 切片链路专用的数据读取辅助方法。 */
+public class V1DataReadUtils {
 
     /** 构建ID分页的页码列表 */
     public static List<Integer> buildPageNumberList(long totalCount, int maxPartionNum) {

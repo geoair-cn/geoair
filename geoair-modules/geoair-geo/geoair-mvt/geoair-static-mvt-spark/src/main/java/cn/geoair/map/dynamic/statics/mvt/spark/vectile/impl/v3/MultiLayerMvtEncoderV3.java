@@ -40,7 +40,7 @@ public final class MultiLayerMvtEncoderV3 {
      * @param tileId Bing QuadKey
      * @param group 按内部图层归集的要素
      * @param parameter V3 任务参数
-     * @return 可直接持久化的 gzip PBF
+     * @return 可直接持久化的 PBF；是否 gzip 由 {@link MultiLayerTileSliceParameter#gzipPbf} 决定
      */
     public static PbfInfo encode(
             String tileId, V3TileFeatureGroup group, MultiLayerTileSliceParameter parameter) throws Exception {
@@ -109,7 +109,8 @@ public final class MultiLayerMvtEncoderV3 {
                 }
             }
         }
-        return AdvMvtDensityUtils.gZip(encoder.encode());
+        byte[] pbf = encoder.encode();
+        return parameter.isGzipPbf() ? AdvMvtDensityUtils.gZip(pbf) : pbf;
     }
 
     private static Geometry getOutputGeometry(

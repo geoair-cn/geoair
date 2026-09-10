@@ -1,4 +1,4 @@
-package cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils;
+package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v1;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -12,6 +12,7 @@ import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.PbfTargetInfo;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
@@ -31,7 +32,8 @@ import scala.Tuple2;
 
 /** 生成可序列化的spark的任务 */
 
-public class SparkTaskSerializableUtil implements Serializable {
+/** V1 切片链路专用的 Spark 可序列化任务集合。 */
+public class V1SparkTaskFunctions implements Serializable {
     public static GiLogger log = GirLoggerFactory.getLogger();
     // 序列化ID（必须）
     private static final long serialVersionUID = 1L;
@@ -132,7 +134,7 @@ public class SparkTaskSerializableUtil implements Serializable {
 
             // 构建BBox查询SQL
             String bboxQuerySql =
-                    DataReadCommonUtils.buildBboxQuerySql(
+                    V1DataReadUtils.buildBboxQuerySql(
                             queryStatement, geomFieldName, xmin, ymin, xmax, ymax, sourceDataSrid);
 
             // 读取当前分片数据
