@@ -37,7 +37,7 @@ public final class HttpTileRequestUtils {
     private static final CloseableHttpClient HTTP_CLIENT;
 
     public static final String DEFAULT_USER_AGENT =
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36";
     public static final String DEFAULT_ACCEPT = "image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8";
     public static final String DEFAULT_ACCEPT_LANGUAGE = "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7";
     /** 禁止自动解压未知大小的 HTTP 内容；图片本身已是压缩格式。 */

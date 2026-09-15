@@ -13,7 +13,7 @@ import java.util.Set;
 public class Version {
 
     /** 当前构建标识。 */
-    private static final String VERSION = "J8-dev-SNAPSHOT";
+    private static final String VERSION = "J8.1.6";
 
     /**
      * 获取当前模块版本标识。

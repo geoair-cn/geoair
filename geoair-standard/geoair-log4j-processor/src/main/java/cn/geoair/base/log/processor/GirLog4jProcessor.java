@@ -30,7 +30,7 @@ import java.util.Set;
  * {@code --add-opens jdk.compiler/com.sun.tools.javac.*=ALL-UNNAMED}，失败时本处理器会输出明确的编译错误提示。
  *
  * @author geoair
- * @since J8-dev-SNAPSHOT
+ * @since J8.1.6
  * @see GirLog4j
  */
 public class GirLog4jProcessor extends AbstractProcessor {

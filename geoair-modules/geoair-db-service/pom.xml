@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-modules</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-db-service</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-db-service</name>
 

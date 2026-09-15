@@ -5,12 +5,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-framework</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-base-parent</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.6</version>
   <packaging>pom</packaging>
   <name>geoair-base-parent</name>
   <description>GeoAir 通用父 POM，统一提供构建约定与第三方依赖版本约束</description>

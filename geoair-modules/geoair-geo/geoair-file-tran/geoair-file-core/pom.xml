@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-file-tran</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.6</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-file-core</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.6</version>
   <packaging>jar</packaging>
   <name>geoair-file-core</name>
 
@@ -41,7 +41,7 @@
   </scm>
   <properties>
     <java.version>8</java.version>
-    <geoair.version>J8-dev-SNAPSHOT</geoair.version>
+    <geoair.version>J8.1.6</geoair.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>

@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  * </ul>
  *
  * @author geoair
- * @since J8-dev-SNAPSHOT
+ * @since J8.1.6
  * @see GiLogger
  * @see GirLoggerFactory
  */
