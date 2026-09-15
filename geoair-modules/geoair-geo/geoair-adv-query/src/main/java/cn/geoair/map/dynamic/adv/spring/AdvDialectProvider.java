@@ -17,15 +17,23 @@ import javax.sql.DataSource;
  */
 public interface AdvDialectProvider {
 
-    /** 返回全局唯一且稳定的方言标识，例如 {@code postgresql}、{@code kingbase}。 */
+    /**
+     * 返回全局唯一且稳定的方言标识，例如 {@code postgresql}、{@code kingbase}。
+     */
     String getDialectId();
 
-    /** 返回与当前方言对应的 Hutool 方言；Hutool 未定义时可返回 {@code null}。 */
+    /**
+     * 返回与当前方言对应的 Hutool 方言；Hutool 未定义时可返回 {@code null}。
+     */
     DialectName getDialectName();
 
-    /** 根据 JDBC {@code DatabaseMetaData#getDatabaseProductName()} 的值判断是否适用。 */
+    /**
+     * 根据 JDBC {@code DatabaseMetaData#getDatabaseProductName()} 的值判断是否适用。
+     */
     boolean supportsProductName(String databaseProductName);
 
-    /** 创建已初始化的数据源执行器。 */
+    /**
+     * 创建已初始化的数据源执行器。
+     */
     IAdvExecutor create(DataSource dataSource, String dataSourceName);
 }

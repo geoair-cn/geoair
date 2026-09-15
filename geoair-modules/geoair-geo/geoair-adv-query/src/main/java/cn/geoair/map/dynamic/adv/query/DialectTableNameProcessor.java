@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
+import cn.geoair.map.dynamic.adv.query.enums.AdvOperatorEnums;
 
 /**
  * 数据库方言表名处理器接口 定义表名、Schema相关的通用操作规范，适配不同数据库方言实现 约定 ：以tb开头
@@ -147,6 +148,13 @@ public interface DialectTableNameProcessor {
      * @return noPageSql  LIMIT ? OFFSET ?
      */
     String tbBuildPageSql(String noPageSql);
+
+    /**
+     * 返回当前方言的条件操作符 SQL；方言可在这里改写或拒绝不兼容操作符。
+     */
+    default String tbGetOperatorSql(AdvOperatorEnums operator) {
+        return operator.getSqlValue();
+    }
 
 
 }
