@@ -436,7 +436,8 @@ public class GirAdvSqlComposer {
             }
             String placeholders = String.join(", ", Collections.nCopies(collection.size(), "?"));
             params.addAll(collection);
-            return columnPart + " " + operator.getSqlValue() + " (" + placeholders + ")";
+            return columnPart + " " + dialectProcessor.tbGetOperatorSql(operator)
+                    + " (" + placeholders + ")";
         }
 
         // BETWEEN / NOT BETWEEN
@@ -447,24 +448,24 @@ public class GirAdvSqlComposer {
             }
             params.add(between[0]);
             params.add(between[1]);
-            return columnPart + " " + operator.getSqlValue() + " ? AND ?";
+            return columnPart + " " + dialectProcessor.tbGetOperatorSql(operator) + " ? AND ?";
         }
 
         // EXISTS / NOT EXISTS
         if (operator == AdvOperatorEnums.EXISTS || operator == AdvOperatorEnums.NOT_EXISTS) {
-            return operator.getSqlValue() + " (" + value + ")";
+            return dialectProcessor.tbGetOperatorSql(operator) + " (" + value + ")";
         }
 
         // LIKE / ILIKE
         if (operator.isLike()) {
             String formattedValue = formatLikeValue(operator, String.valueOf(value));
             params.add(formattedValue);
-            return columnPart + " " + operator.getSqlValue() + " ?";
+            return columnPart + " " + dialectProcessor.tbGetOperatorSql(operator) + " ?";
         }
 
         // 普通比较操作符
         params.add(value);
-        return columnPart + " " + operator.getSqlValue() + " ?";
+        return columnPart + " " + dialectProcessor.tbGetOperatorSql(operator) + " ?";
     }
 
     /**

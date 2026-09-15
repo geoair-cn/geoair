@@ -18,6 +18,7 @@ public class AdvExecutorFactoryTest {
         assertEquals("sqlserver", AdvExecutorFactory.resolveDialectIdByProductName("Microsoft SQL Server"));
         assertEquals("oracle", AdvExecutorFactory.resolveDialectIdByProductName("Oracle"));
         assertEquals("dm", AdvExecutorFactory.resolveDialectIdByProductName("DM DBMS"));
+        assertEquals("sqlite", AdvExecutorFactory.resolveDialectIdByProductName("SQLite"));
     }
 
     @Test
@@ -26,5 +27,9 @@ public class AdvExecutorFactoryTest {
 
         assertNotNull(provider);
         assertEquals("kingbase", provider.getDialectId());
+
+        AdvDialectProvider sqliteProvider = AdvExecutorFactory.getProvider("SQLITE");
+        assertNotNull(sqliteProvider);
+        assertEquals("sqlite", sqliteProvider.getDialectId());
     }
 }

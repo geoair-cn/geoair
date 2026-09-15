@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# 本地模块梳理与已知问题文档
+/geoair-map-tile-fuser/docs/KNOWN_ISSUES_AND_DESIGN_REVIEW.md
+
 ### STS ###
 .apt_generated
 .classpath

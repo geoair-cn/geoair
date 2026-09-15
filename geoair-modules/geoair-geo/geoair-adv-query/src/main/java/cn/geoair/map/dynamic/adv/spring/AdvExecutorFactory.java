@@ -44,6 +44,7 @@ public class AdvExecutorFactory {
         registerProvider(new SqlServerAdvDialectProvider());
         registerProvider(new OracleAdvDialectProvider());
         registerProvider(new DmAdvDialectProvider());
+        registerProvider(new SqliteAdvDialectProvider());
     }
 
     /**

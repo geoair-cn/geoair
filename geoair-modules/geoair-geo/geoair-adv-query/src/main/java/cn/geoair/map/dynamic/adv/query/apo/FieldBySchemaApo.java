@@ -112,6 +112,8 @@ public class FieldBySchemaApo implements Serializable {
         switch (dialectName) {
             case MYSQL:
                 return MysqlType.getByUdtName(udtName);
+            case SQLITE3:
+                return SqliteType.getByUdtName(udtName);
             case ORACLE:
             case DM:
                 return OracleType.getByUdtName(udtName);
