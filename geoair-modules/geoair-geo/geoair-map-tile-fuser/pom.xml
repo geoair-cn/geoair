@@ -114,6 +114,21 @@
             <version>${sqlite-jdbc.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- HttpClient 的静态初始化在独立单元测试环境中需要 JCL；业务应用通常由 Spring JCL 提供。 -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

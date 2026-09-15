@@ -49,13 +49,19 @@ public class TileTaskExecutor {
 
     // 任务类型
     private final TaskType taskType;
+    private final String originalCacheName;
+    private final CachedTileGetter originalGridTileGetter;
 
     public TileTaskExecutor(TileTaskConfig config) {
+        if (config == null) {
+            throw new IllegalArgumentException("瓦片任务配置不能为空");
+        }
         this.config = config;
         this.layerName = config.getLayerName();
         this.zoom = config.getZoom();
         this.geometry4326 = config.getGeometry4326();
         this.format = config.getFormat();
+        this.taskType = config.getTaskType();
 
         this.pxyLayerInfo = GirFuser.getPxyLayerInfo(layerName);
         if (this.pxyLayerInfo == null) {
@@ -64,8 +70,22 @@ public class TileTaskExecutor {
         }
         this.googleGridIs = pxyLayerInfo.isWebMercatorGrid();
 
-        // 根据配置判断任务类型
-        this.taskType = config.getTaskType();
+        if (isOriginalGridTask(taskType)) {
+            String configuredCacheName = config.getOriginalCacheName();
+            this.originalCacheName = configuredCacheName == null || configuredCacheName.trim().isEmpty()
+                    ? layerName + ORIGINAL_GRID_SUFFIX
+                    : configuredCacheName;
+            // 原始网格任务必须在启动前得到强类型且真正启用的缓存 Getter。
+            this.originalGridTileGetter = TileGetterFactory.createRequiredCached(
+                    pxyLayerInfo, null, originalCacheName);
+        } else {
+            this.originalCacheName = null;
+            this.originalGridTileGetter = null;
+        }
+    }
+
+    private static boolean isOriginalGridTask(TaskType taskType) {
+        return taskType == TaskType.ORIGINAL_CHECK_REPAIR || taskType == TaskType.ORIGINAL_PRE_CACHE;
     }
 
     /**
@@ -439,25 +459,13 @@ public class TileTaskExecutor {
      * 处理原始网格预缓存瓦片
      */
     private void processOriginalPreCacheTile(int z, int x, int y, AtomicLong success, AtomicLong fail) {
-        String originalCacheName = config.getOriginalCacheName();
-        if (originalCacheName == null || originalCacheName.isEmpty()) {
-            originalCacheName = layerName + ORIGINAL_GRID_SUFFIX;
-        }
-
         try {
             // 保持既有预缓存坐标语义，但按图层实际网格计算翻转行号。
             int reversedY = FuserCacheUtils.getStoreY(z, y, true, FuserCacheUtils.getCacheGridSrid(pxyLayerInfo));
 
-            // 获取原始网格的TileGetter
-            CachedTileGetter layerTileGetter = (CachedTileGetter) TileGetterFactory.create(
-                    pxyLayerInfo,
-                    null,
-                    originalCacheName
-            );
-
             // 生成原始网格瓦片
-            Resource tileResource = layerTileGetter.getTileResource(z, x, reversedY);
-            byte[] imageBytes = tileResource.getByteData();
+            Resource tileResource = originalGridTileGetter.getTileResource(z, x, reversedY);
+            byte[] imageBytes = tileResource == null ? null : tileResource.getByteData();
 
             if (imageBytes != null && imageBytes.length > 0) {
                 success.incrementAndGet();
@@ -478,22 +486,12 @@ public class TileTaskExecutor {
     private void processOriginalCheckAndRepairTile(int z, int x, int y,
                                                    AtomicLong checked, AtomicLong repaired,
                                                    AtomicLong fail, AtomicLong skipped) {
-        String originalCacheName = config.getOriginalCacheName();
-        if (originalCacheName == null || originalCacheName.isEmpty()) {
-            originalCacheName = layerName + ORIGINAL_GRID_SUFFIX;
-        }
-
         try {
             // 保持既有预缓存坐标语义，但按图层实际网格计算翻转行号。
             int reversedY = FuserCacheUtils.getStoreY(z, y, true, FuserCacheUtils.getCacheGridSrid(pxyLayerInfo));
 
             // 获取原始网格的TileCache
-            CachedTileGetter layerTileGetter = (CachedTileGetter) TileGetterFactory.create(
-                    pxyLayerInfo,
-                    null,
-                    originalCacheName
-            );
-            TileCache tileCache = layerTileGetter.getTileCache();
+            TileCache tileCache = originalGridTileGetter.getTileCache();
 
             // 只检查已存在的瓦片
             if (!tileCache.exists(originalCacheName, z, x, reversedY, format)) {
@@ -519,8 +517,8 @@ public class TileTaskExecutor {
                 tileCache.delete(originalCacheName, z, x, reversedY, format);
 
                 // 重新生成
-                Resource tileResource = layerTileGetter.getTileResource(z, x, reversedY);
-                byte[] newImageBytes = tileResource.getByteData();
+                Resource tileResource = originalGridTileGetter.getTileResource(z, x, reversedY);
+                byte[] newImageBytes = tileResource == null ? null : tileResource.getByteData();
                 if (newImageBytes != null && newImageBytes.length > 0) {
                     repaired.incrementAndGet();
                     log.debug("原始网格瓦片重新切片成功: z={}, x={}, y={}", z, x, y);
