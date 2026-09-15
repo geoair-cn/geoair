@@ -282,7 +282,7 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
      * @param outputFormat 输出格式
      * @param deleteCache  是否删除缓存
      */
-    private TileResponse buildTileResponse(String layerName, Integer z, Integer x, Integer y,
+    public TileResponse buildTileResponse(String layerName, Integer z, Integer x, Integer y,
                                            BoundingBox bounds, String outputFormat, boolean deleteCache, int requestGridSrid) {
         try {
             GiMimeType fromFormat = GutilMimeType.fromFormat(outputFormat);
