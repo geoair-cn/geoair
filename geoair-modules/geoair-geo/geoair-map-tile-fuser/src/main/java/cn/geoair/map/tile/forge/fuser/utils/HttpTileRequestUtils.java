@@ -9,8 +9,10 @@ import cn.geoair.web.mime.GiMimeType;
 import cn.hutool.core.io.unit.DataSizeUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -36,8 +38,12 @@ public final class HttpTileRequestUtils {
     private static final PoolingHttpClientConnectionManager CONNECTION_MANAGER = new PoolingHttpClientConnectionManager();
     private static final CloseableHttpClient HTTP_CLIENT;
 
-    public static final String DEFAULT_USER_AGENT =
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36";
+    /**
+     * 服务端瓦片客户端的默认标识。不能伪装成浏览器，否则 OSM 等公共瓦片服务可能直接拒绝请求。
+     * 生产环境建议通过 {@value #USER_AGENT_SYSTEM_PROPERTY} 配置带联系地址的应用标识。
+     */
+    public static final String DEFAULT_USER_AGENT = "AtlasTileClient/1.0";
+    public static final String USER_AGENT_SYSTEM_PROPERTY = "map.tile.user-agent";
     public static final String DEFAULT_ACCEPT = "image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8";
     public static final String DEFAULT_ACCEPT_LANGUAGE = "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7";
     /** 禁止自动解压未知大小的 HTTP 内容；图片本身已是压缩格式。 */
@@ -98,19 +104,19 @@ public final class HttpTileRequestUtils {
 
     public static Map<String, String> buildDefaultHeaders() {
         Map<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", DEFAULT_USER_AGENT);
+        headers.put("User-Agent", resolveUserAgent());
         headers.put("Accept", DEFAULT_ACCEPT);
         headers.put("Accept-Language", DEFAULT_ACCEPT_LANGUAGE);
         headers.put("Accept-Encoding", DEFAULT_ACCEPT_ENCODING);
-        headers.put("Cache-Control", "no-cache");
-        headers.put("Pragma", "no-cache");
-        headers.put("Sec-Ch-Ua", "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"");
-        headers.put("Sec-Ch-Ua-Mobile", "?0");
-        headers.put("Sec-Ch-Ua-Platform", "\"Windows\"");
-        headers.put("Sec-Fetch-Dest", "image");
-        headers.put("Sec-Fetch-Mode", "no-cors");
-        headers.put("Sec-Fetch-Site", "cross-site");
         return headers;
+    }
+
+    private static String resolveUserAgent() {
+        String configuredUserAgent = System.getProperty(USER_AGENT_SYSTEM_PROPERTY);
+        if (configuredUserAgent == null || configuredUserAgent.trim().isEmpty()) {
+            return DEFAULT_USER_AGENT;
+        }
+        return configuredUserAgent.trim();
     }
 
     public static Map<String, String> buildHeaders(Map<String, String> customHeaders) {
@@ -227,6 +233,11 @@ public final class HttpTileRequestUtils {
         }
         try (CloseableHttpResponse response = HTTP_CLIENT.execute(request)) {
             int statusCode = response.getStatusLine().getStatusCode();
+            String blockedReason = getBlockedReason(response);
+            if (blockedReason != null) {
+                log.warn("瓦片服务返回访问拦截图，按 HTTP 403 处理: {} - 原因: {}", url, blockedReason);
+                return TileFetchResult.failure(403);
+            }
             if (statusCode < 200 || statusCode >= 300) {
                 return TileFetchResult.failure(statusCode);
             }
@@ -242,6 +253,11 @@ public final class HttpTileRequestUtils {
             BufferedImage image = TileImageUtils.readImage(encodedBytes);
             if (image == null) {
                 return TileFetchResult.failure(statusCode);
+            }
+            if (isOpenStreetMapTileUrl(url) && (image.getWidth() != 256 || image.getHeight() != 256)) {
+                log.warn("OSM 返回的图片不是 256x256 标准瓦片，按访问拦截图处理: {} - 实际尺寸: {}x{}",
+                        url, image.getWidth(), image.getHeight());
+                return TileFetchResult.failure(403);
             }
             String internalName = srcFormat != null ? srcFormat.getInternalName() : "png";
             byte[] normalizedBytes = TileImageUtils.writeImage(image, internalName);
@@ -272,6 +288,25 @@ public final class HttpTileRequestUtils {
         } catch (URISyntaxException e) {
             return false;
         }
+    }
+
+    private static boolean isOpenStreetMapTileUrl(String url) {
+        try {
+            String host = new URI(url).getHost();
+            return host != null && ("tile.openstreetmap.org".equalsIgnoreCase(host)
+                    || host.toLowerCase().endsWith(".tile.openstreetmap.org"));
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
+    private static String getBlockedReason(HttpResponse response) {
+        Header blockedHeader = response.getFirstHeader("x-blocked");
+        if (blockedHeader == null || blockedHeader.getValue() == null
+                || blockedHeader.getValue().trim().isEmpty()) {
+            return null;
+        }
+        return blockedHeader.getValue().trim();
     }
 
     private static boolean isNonRetryableClientError(int statusCode) {
