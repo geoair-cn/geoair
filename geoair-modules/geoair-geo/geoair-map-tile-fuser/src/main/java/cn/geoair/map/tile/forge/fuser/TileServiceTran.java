@@ -257,7 +257,7 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
 
     // ==================== 核心处理方法 ====================
 
-    private TileResponse buildConvertedTileResponse(String layerName, Integer z, Integer x, Integer y,
+    public TileResponse buildConvertedTileResponse(String layerName, Integer z, Integer x, Integer y,
                                                      String outputFormat, boolean deleteCache, boolean googleTo4326) {
         int requestGridSrid = googleTo4326 ? 4326 : 3857;
         try {
