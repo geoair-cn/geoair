@@ -11,7 +11,7 @@ public class NotOptTileCache implements TileCache {
 
     @Override
     public byte[] get(String layerName, int z, int x, int y, GiMimeType format) {
-        return new byte[0];
+        return null;
     }
 
     @Override

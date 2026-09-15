@@ -184,6 +184,19 @@ public enum SrcType implements GiVisualValuable<String> {
                 .toArray(SrcType[]::new);
     }
 
+    /**
+     * 获取所有已实现类型的编码文本，供配置校验等场景展示。
+     * 内容直接由枚举生成，避免调用方重复维护类型列表。
+     *
+     * @return 以逗号分隔的类型编码
+     */
+    public static String getImplementedCodesText() {
+        return Arrays.stream(values())
+                .filter(type -> !type.isDeprecated())
+                .map(SrcType::getCode)
+                .collect(Collectors.joining(", "));
+    }
+
     // ==================== 判断方法 ====================
 
     /**

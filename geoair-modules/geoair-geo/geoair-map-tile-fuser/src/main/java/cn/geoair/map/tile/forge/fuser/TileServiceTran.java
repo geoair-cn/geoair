@@ -258,7 +258,7 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
 
     // ==================== 核心处理方法 ====================
 
-    private TileResponse buildConvertedTileResponse(String layerName, Integer z, Integer x, Integer y,
+    public TileResponse buildConvertedTileResponse(String layerName, Integer z, Integer x, Integer y,
                                                      String outputFormat, boolean deleteCache, boolean googleTo4326) {
         int requestGridSrid = googleTo4326 ? 4326 : 3857;
         try {
@@ -283,7 +283,7 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
      * @param outputFormat 输出格式
      * @param deleteCache  是否删除缓存
      */
-    private TileResponse buildTileResponse(String layerName, Integer z, Integer x, Integer y,
+    public TileResponse buildTileResponse(String layerName, Integer z, Integer x, Integer y,
                                            BoundingBox bounds, String outputFormat, boolean deleteCache, int requestGridSrid) {
         try {
             GiMimeType fromFormat = GutilMimeType.fromFormat(outputFormat);
