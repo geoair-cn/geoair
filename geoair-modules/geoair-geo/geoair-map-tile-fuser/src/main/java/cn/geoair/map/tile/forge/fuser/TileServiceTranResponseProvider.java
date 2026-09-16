@@ -10,6 +10,21 @@ import cn.geoair.map.dynamic.tools.simple.response.TileResponseProvider;
  */
 public interface TileServiceTranResponseProvider extends TileResponseProvider {
 
+    default TileResponse sameGridRequestForTileResponse(
+            String layerName, Integer z, Integer x, Integer y) {
+        return sameGridRequestForTileResponse(layerName, z, x, y, "image/png");
+    }
+
+    default TileResponse sameGridRequestForTileResponse(
+            String layerName, Integer z, Integer x, Integer y, String outputFormat) {
+        return TileResponse.error("Same-grid passthrough is not supported by this provider");
+    }
+
+    default TileResponse sameGridRequestDelCacheForTileResponse(
+            String layerName, Integer z, Integer x, Integer y, String outputFormat) {
+        return TileResponse.error("Same-grid passthrough is not supported by this provider");
+    }
+
     TileResponse googleServiceTo4326RequestForTileResponse(String layerName, Integer z, Integer x, Integer y);
 
     TileResponse googleServiceTo4326RequestForTileResponse(

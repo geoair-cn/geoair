@@ -20,7 +20,7 @@ public class GridInitUtils {
     static GridSubset WORLD_GRID_3857 = GridSubsetFactory.
             createGridSubSet(
                     defaultGridsets.
-                            worldMercatorWGS84Quad(),
+                            worldEpsg3857(),
                     BoundingBox.WORLD3857,
                     0,
                     21);

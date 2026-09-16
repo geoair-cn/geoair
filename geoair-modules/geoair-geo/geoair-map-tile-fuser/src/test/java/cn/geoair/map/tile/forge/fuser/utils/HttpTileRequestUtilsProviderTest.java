@@ -118,10 +118,11 @@ public class HttpTileRequestUtilsProviderTest {
 
         System.out.println("Requesting " + provider + ": " + url);
         System.out.println("Proxy: http://" + PROXY_HOST + ":" + PROXY_PORT);
-        System.out.println("User-Agent: " + HttpTileRequestUtils.DEFAULT_USER_AGENT);
+        System.out.println("User-Agent: "
+                + HttpTileRequestUtils.buildDefaultHeaders().get("User-Agent"));
 
         Resource resource = HttpTileRequestUtils.requestTile(
-                url, proxy, TIMEOUT_MILLIS, null, provider + " default-user-agent test");
+                url, proxy, TIMEOUT_MILLIS, null, provider + " effective-user-agent test");
         Assert.assertNotNull(provider + " tile request failed", resource);
 
         byte[] tileBytes = resource.getByteData();
