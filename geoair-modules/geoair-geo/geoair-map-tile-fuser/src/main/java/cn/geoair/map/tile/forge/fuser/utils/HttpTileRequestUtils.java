@@ -40,10 +40,12 @@ public final class HttpTileRequestUtils {
 
     /**
      * 服务端瓦片客户端的默认标识。不能伪装成浏览器，否则 OSM 等公共瓦片服务可能直接拒绝请求。
-     * 生产环境建议通过 {@value #USER_AGENT_SYSTEM_PROPERTY} 配置带联系地址的应用标识。
+     * 生产环境可通过 JVM 参数 {@value #USER_AGENT_SYSTEM_PROPERTY} 或环境变量
+     * {@value #USER_AGENT_ENVIRONMENT_VARIABLE} 配置带联系地址的应用标识，JVM 参数优先。
      */
     public static final String DEFAULT_USER_AGENT = "AtlasTileClient/1.0";
     public static final String USER_AGENT_SYSTEM_PROPERTY = "map.tile.user-agent";
+    public static final String USER_AGENT_ENVIRONMENT_VARIABLE = "MAP_TILE_USER_AGENT";
     public static final String DEFAULT_ACCEPT = "image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8";
     public static final String DEFAULT_ACCEPT_LANGUAGE = "zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7";
     /** 禁止自动解压未知大小的 HTTP 内容；图片本身已是压缩格式。 */
@@ -113,10 +115,14 @@ public final class HttpTileRequestUtils {
 
     private static String resolveUserAgent() {
         String configuredUserAgent = System.getProperty(USER_AGENT_SYSTEM_PROPERTY);
-        if (configuredUserAgent == null || configuredUserAgent.trim().isEmpty()) {
-            return DEFAULT_USER_AGENT;
+        if (configuredUserAgent != null && !configuredUserAgent.trim().isEmpty()) {
+            return configuredUserAgent.trim();
         }
-        return configuredUserAgent.trim();
+        configuredUserAgent = System.getenv(USER_AGENT_ENVIRONMENT_VARIABLE);
+        if (configuredUserAgent != null && !configuredUserAgent.trim().isEmpty()) {
+            return configuredUserAgent.trim();
+        }
+        return DEFAULT_USER_AGENT;
     }
 
     public static Map<String, String> buildHeaders(Map<String, String> customHeaders) {
