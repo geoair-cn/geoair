@@ -1,7 +1,5 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3;
 
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,26 +29,19 @@ public class MvtLayerSliceParameter implements Serializable {
     /** MVT PBF 内部图层名称，必须在一个任务内唯一。 */
     private String layerName;
 
-    /** 本图层的数据输入源。 */
-    private DataSourceConfig inputSource;
+    /** 本图层的数据输入配置，可选择 JDBC 或 GeoJSON。 */
+    private V3LayerInputConfig inputConfig;
 
     /** 几何字段名称。 */
-    private String geomFieldName;
+    private String geomFieldName = "geometry";
 
     /** 唯一标识字段名称。 */
     private String idFieldName;
 
-    /** 查询语句。 */
-    private String queryStatement;
-
-    /** 源数据的 SRID，默认 Web Mercator。 */
-    private int sourceDataSrid = 3857;
-
-    /** 数据读取策略。 */
-    private ReadStrategy readStrategy = ReadStrategy.ID_PAGE;
-
-    /** 最大读取分区数；为空时使用 V3 的默认值。 */
-    private Integer maxPartionNum = 20;
+    /**
+     * 源数据 SRID。未设置时 JDBC 默认使用 3857，GeoJSON 按 RFC 7946 默认使用 4326。
+     */
+    private Integer sourceDataSrid;
 
     /** 最小切片级别；为空时继承任务级别。 */
     private Integer minZoom;
@@ -93,6 +84,14 @@ public class MvtLayerSliceParameter implements Serializable {
 
     /** 写入 PBF 时采用的几何表达方式。 */
     private MvtLayerGeometryMode geometryMode = MvtLayerGeometryMode.ORIGINAL;
+
+    /** 返回当前输入类型对应的有效源数据 SRID。 */
+    public int resolveSourceDataSrid() {
+        if (sourceDataSrid != null) {
+            return sourceDataSrid;
+        }
+        return inputConfig != null && inputConfig.getInputType() == V3TileInputType.GEOJSON ? 4326 : 3857;
+    }
 
 
 

@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** V3 多图层切片专用的数据读取辅助方法。 */
-final class V3DataReadUtils {
+public final class V3DataReadUtils {
 
     private V3DataReadUtils() {
     }
 
-    static List<Integer> buildPageNumberList(long totalCount, int maxPartionNum) {
+    public static List<Integer> buildPageNumberList(long totalCount, int maxPartionNum) {
         int countPerTask = (int) Math.round((float) totalCount / maxPartionNum);
         countPerTask = countPerTask <= 0 ? 1000 : countPerTask;
         List<Integer> pageNumbers = new ArrayList<>();
@@ -24,7 +24,7 @@ final class V3DataReadUtils {
         return pageNumbers;
     }
 
-    static List<String> buildBboxPartitionConditions(BBoxApo bBoxApo, int maxPartionNum, int sourceSrid) {
+    public static List<String> buildBboxPartitionConditions(BBoxApo bBoxApo, int maxPartionNum, int sourceSrid) {
         double xmin = bBoxApo.getMinx();
         double xmax = 1.0001 * bBoxApo.getMaxx();
         double ymin = bBoxApo.getMiny();
@@ -41,7 +41,7 @@ final class V3DataReadUtils {
         return conditions;
     }
 
-    static String buildBboxQuerySql(String queryStatement, String geomFieldName, double xmin, double ymin, double xmax, double ymax, int sourceSrid) {
+    public static String buildBboxQuerySql(String queryStatement, String geomFieldName, double xmin, double ymin, double xmax, double ymax, int sourceSrid) {
         String bbox = StrUtil.format("public.ST_MakeEnvelope({}, {}, {}, {}, {})", xmin, ymin, xmax, ymax, sourceSrid);
         return StrUtil.format("select * from {} as ttt where  ST_Intersects( ttt.{}, {})", queryStatement, geomFieldName, bbox);
     }
