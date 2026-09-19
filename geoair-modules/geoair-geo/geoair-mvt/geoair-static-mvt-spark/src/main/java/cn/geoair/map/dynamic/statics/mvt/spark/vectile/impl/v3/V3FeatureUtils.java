@@ -10,11 +10,9 @@ import org.locationtech.jts.geom.Point;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -150,10 +148,17 @@ final class V3FeatureUtils {
     }
 
     /**
-     * 按空间密度丢弃要素：低密度区域的要素优先保留，高密度区域先丢。
+     * 按空间密度丢弃要素：低密度格子整格保留，高密度格子削到同一个上限。
      * <p>
-     * 排序比较器的次关键字（用于同密度时的稳定排序）<b>只计算一次并缓存</b>：
-     * 该关键字含几何 WKT 序列化，若放在比较器里现算，要素一多排序本身就会成为瓶颈。
+     * <b>不能按"密度升序排序后取前 N 个"</b>：名额用尽时，排在后面的高密度格子会被整格丢弃。
+     * 密度网格只有 10×10，一格就是瓦片的十分之一宽，地图上就是成片的空白块 ——
+     * 和"低密度优先"本想避免的空洞是同一个后果。
+     * <p>
+     * 改为给每个格子求一个保留上限（取满足总量不超限的最大值）：稀疏格子一个不丢，
+     * 密集格子按同一上限削，任何格子都不会整片消失，效果就是把密度拉平。
+     * <p>
+     * 格子内部按要素身份排名取最小的若干个，与聚合阶段安全阀的抽样口径一致；
+     * 若改成按几何 WKT 排序取前缀，格子内会变成"按经度方向截断"，多出一层方向性偏差。
      */
     static List<GirAdvOneRow> filterBySpatialDensity(
             List<GirAdvOneRow> rows, int limit, String geomField, String idField,
@@ -168,39 +173,131 @@ final class V3FeatureUtils {
             return new ArrayList<>(rows.subList(0, limit));
         }
 
-        Map<String, Integer> density = new HashMap<>();
-        List<RowWithCell> entries = new ArrayList<>(rows.size());
+        Map<String, List<GirAdvOneRow>> cells = new HashMap<>();
         for (GirAdvOneRow row : rows) {
             Geometry geometry = row.getGeometry(geomField);
             String cellId = cellId(geometry, envelope, cellWidth, cellHeight);
-            density.merge(cellId, 1, Integer::sum);
-            entries.add(new RowWithCell(row, cellId));
+            cells.computeIfAbsent(cellId, key -> new ArrayList<>()).add(row);
         }
-        // 关键字在这里一次性算好，比较器只做字符串比较
-        for (RowWithCell entry : entries) {
-            entry.sortKey = featureKey(entry.row, geomField, idField);
-        }
-        entries.sort(Comparator
-                .comparingInt((RowWithCell entry) -> density.getOrDefault(entry.cellId, 1))
-                .thenComparing(entry -> entry.sortKey));
 
-        List<GirAdvOneRow> result = new ArrayList<>(limit);
-        for (int i = 0; i < limit; i++) {
-            result.add(entries.get(i).row);
+        int cap = resolveCellCap(cells, limit);
+        List<GirAdvOneRow> result = new ArrayList<>(Math.min(limit, rows.size()));
+        for (List<GirAdvOneRow> cell : cells.values()) {
+            if (cell.size() <= cap) {
+                result.addAll(cell);
+            } else {
+                result.addAll(selectByCellRank(cell, cap, geomField, idField));
+            }
         }
         return result;
     }
 
-    /** 稳定排序用的要素关键字：优先 id 字段，其次几何 WKT，最后随机兜底 */
-    private static String featureKey(GirAdvOneRow row, String geomField, String idField) {
+    /**
+     * 求「每格保留 {@code min(格内要素数, cap)} 个」意义下、总量不超过 {@code limit} 的最大 cap。
+     * <p>格子数远小于要素数，二分代价可以忽略。连 cap=1 都超限（格子数比 limit 还多）时返回 1
+     * 并接受略微超出 —— 总比让一部分格子整片消失好。
+     */
+    private static int resolveCellCap(Map<String, List<GirAdvOneRow>> cells, int limit) {
+        int max = 0;
+        for (List<GirAdvOneRow> cell : cells.values()) {
+            max = Math.max(max, cell.size());
+        }
+        int low = 1;
+        int high = max;
+        while (low < high) {
+            int mid = low + (high - low + 1) / 2;
+            if (cappedTotal(cells, mid) <= limit) {
+                low = mid;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return low;
+    }
+
+    private static long cappedTotal(Map<String, List<GirAdvOneRow>> cells, int cap) {
+        long total = 0L;
+        for (List<GirAdvOneRow> cell : cells.values()) {
+            total += Math.min(cell.size(), cap);
+        }
+        return total;
+    }
+
+    /** 格子内部按身份排名取最小的 {@code keep} 个 */
+    private static List<GirAdvOneRow> selectByCellRank(
+            List<GirAdvOneRow> cell, int keep, String geomField, String idField) {
+        List<RankedRow> ranked = new ArrayList<>(cell.size());
+        for (GirAdvOneRow row : cell) {
+            ranked.add(new RankedRow(identityRank(row, geomField, idField), row));
+        }
+        ranked.sort(null);
+        List<GirAdvOneRow> result = new ArrayList<>(keep);
+        for (int i = 0; i < keep; i++) {
+            result.add(ranked.get(i).row);
+        }
+        return result;
+    }
+
+    /**
+     * 取一行的身份标识：优先图层配置的 id 字段，取不到时退回该行第一个非几何字段。
+     * <p>刻意不用几何字段做身份：{@code Geometry.hashCode} 虽有稳定的结构哈希，但要遍历全部
+     * 坐标，而所有调用点都在削减热路径上，一个复杂多边形就足以拖垮整条链路。
+     */
+    static Object resolveIdentity(GirAdvOneRow row, String geomField, String idField) {
         if (idField != null && !idField.trim().isEmpty()) {
             Object id = row.get(idField);
             if (id != null) {
-                return String.valueOf(id);
+                return id;
             }
         }
-        Geometry geometry = row.getGeometry(geomField);
-        return geometry == null ? UUID.randomUUID().toString() : geometry.toText();
+        for (Map.Entry<String, Object> entry : row.entrySet()) {
+            if (geomField != null && geomField.equals(entry.getKey())) {
+                continue;
+            }
+            if (entry.getValue() != null) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+    /** 要素的身份排名；取不到身份值时排到最后，优先被削掉 */
+    static int identityRank(GirAdvOneRow row, String geomField, String idField) {
+        Object identity = resolveIdentity(row, geomField, idField);
+        return identity == null ? Integer.MAX_VALUE : spread(identity.hashCode());
+    }
+
+    /**
+     * 把身份哈希做一次雪崩混合（Murmur3 finalizer）。
+     * <p>不能直接用 {@code hashCode()}：数据源的 id 常常逐个递增（GeoJSON 的 {@code gid}
+     * 就是 805022、805023 这样连着编的），直接用得到的是连着的一段，抽出来照样是连片要素。
+     */
+    static int spread(int hash) {
+        int h = hash;
+        h ^= (h >>> 16);
+        h *= 0x85ebca6b;
+        h ^= (h >>> 13);
+        h *= 0xc2b2ae35;
+        h ^= (h >>> 16);
+        return h & Integer.MAX_VALUE;
+    }
+
+    /** 身份排名与行的组合，用于按排名取最小的若干个 */
+    static final class RankedRow implements Comparable<RankedRow> {
+
+        final int rank;
+
+        final GirAdvOneRow row;
+
+        RankedRow(int rank, GirAdvOneRow row) {
+            this.rank = rank;
+            this.row = row;
+        }
+
+        @Override
+        public int compareTo(RankedRow other) {
+            return Integer.compare(rank, other.rank);
+        }
     }
 
     /** 计算要素中心所在的网格编号；几何不可用时归入统一的异常格 */
@@ -212,18 +309,5 @@ final class V3FeatureUtils {
         int xGrid = (int) Math.floor((center.x - envelope.getMinX()) / cellWidth);
         int yGrid = (int) Math.floor((center.y - envelope.getMinY()) / cellHeight);
         return xGrid + "#" + yGrid;
-    }
-
-    /** 要素 + 所属网格 + 预计算的排序关键字 */
-    private static final class RowWithCell {
-
-        private final GirAdvOneRow row;
-        private final String cellId;
-        private String sortKey;
-
-        private RowWithCell(GirAdvOneRow row, String cellId) {
-            this.row = row;
-            this.cellId = cellId;
-        }
     }
 }

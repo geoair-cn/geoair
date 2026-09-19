@@ -126,19 +126,16 @@ public class V3TileFeatureGroup implements Serializable {
      */
     private static List<GirAdvOneRow> selectByIdentity(
             List<GirAdvOneRow> features, int keep, MvtLayerSliceParameter layer) {
-        List<RankedRow> ranked = new ArrayList<>(features.size());
+        String geomField = layer.getGeomFieldName();
+        String idField = layer.getIdFieldName();
+        List<V3FeatureUtils.RankedRow> ranked = new ArrayList<>(features.size());
         int resolved = 0;
         for (GirAdvOneRow row : features) {
-            Object identity = resolveIdentity(row, layer);
-            int rank;
-            if (identity == null) {
-                // 没有身份值：排在最后，优先被削掉
-                rank = Integer.MAX_VALUE;
-            } else {
-                rank = spread(identity.hashCode());
+            int rank = V3FeatureUtils.identityRank(row, geomField, idField);
+            if (rank != Integer.MAX_VALUE) {
                 resolved++;
             }
-            ranked.add(new RankedRow(rank, row));
+            ranked.add(new V3FeatureUtils.RankedRow(rank, row));
         }
         if (resolved == 0) {
             return sampleEvenly(features, keep);
@@ -157,61 +154,6 @@ public class V3TileFeatureGroup implements Serializable {
             sampled.add(ranked.get(i).row);
         }
         return sampled;
-    }
-
-    /**
-     * 把身份哈希做一次雪崩混合（Murmur3 finalizer），让连续输入的哈希值落到互不相邻的位置。
-     */
-    private static int spread(int hash) {
-        int h = hash;
-        h ^= (h >>> 16);
-        h *= 0x85ebca6b;
-        h ^= (h >>> 13);
-        h *= 0xc2b2ae35;
-        h ^= (h >>> 16);
-        return h & Integer.MAX_VALUE;
-    }
-
-    /** 身份哈希与行的组合，用于按哈希取最小的 N 个。 */
-    private static final class RankedRow implements Comparable<RankedRow> {
-        private final int rank;
-        private final GirAdvOneRow row;
-
-        private RankedRow(int rank, GirAdvOneRow row) {
-            this.rank = rank;
-            this.row = row;
-        }
-
-        @Override
-        public int compareTo(RankedRow other) {
-            return Integer.compare(rank, other.rank);
-        }
-    }
-
-    /**
-     * 取一行的身份标识：优先图层配置的 id 字段，取不到时退回该行第一个非几何字段。
-     * <p>刻意不用几何字段做身份：JTS 的 {@code Geometry.hashCode} 确实是稳定的结构哈希，
-     * 但它需要遍历全部坐标，而本方法处在 {@code reduceByKey} 热路径上会被反复调用，
-     * 一个稍微复杂的多边形就足以把整条聚合链路拖垮。
-     */
-    private static Object resolveIdentity(GirAdvOneRow row, MvtLayerSliceParameter layer) {
-        String idField = layer.getIdFieldName();
-        if (idField != null && !idField.isEmpty()) {
-            Object value = row.get(idField);
-            if (value != null) {
-                return value;
-            }
-        }
-        String geomField = layer.getGeomFieldName();
-        for (Map.Entry<String, Object> entry : row.entrySet()) {
-            if (geomField != null && geomField.equals(entry.getKey())) {
-                continue;
-            }
-            if (entry.getValue() != null) {
-                return entry.getValue();
-            }
-        }
-        return null;
     }
 
     /**
