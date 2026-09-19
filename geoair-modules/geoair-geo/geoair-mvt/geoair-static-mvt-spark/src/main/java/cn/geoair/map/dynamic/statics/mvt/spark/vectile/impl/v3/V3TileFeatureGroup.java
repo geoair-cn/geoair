@@ -121,8 +121,8 @@ public class V3TileFeatureGroup implements Serializable {
      * 常常是逐个递增的（GeoJSON 的 {@code gid} 就是 805022、805023 这样连着编的），
      * 直接取模得到的是"一段一段"的区间，配上按位置顺序编号的数据，抽出来照样是连片的要素，
      * 等于没修。混合之后连续输入才会落到互不相邻的位置。
-     * <p>整层都取不到身份值时（没有 id 字段、也不是属性字段能充当的），没有任何可依据的区分度，
-     * 退回按位置等间隔 —— 那是有偏差的，但至少能削得下去。
+     * <p>整层都取不到身份值、或取到的身份值几乎没有区分度（排名全挤在一起）时，
+     * 按身份选取会退化成按位置取前缀，故退回等间隔 —— 那同样有偏差，但至少能削得下去。
      */
     private static List<GirAdvOneRow> selectByIdentity(
             List<GirAdvOneRow> features, int keep, MvtLayerSliceParameter layer) {
@@ -144,6 +144,14 @@ public class V3TileFeatureGroup implements Serializable {
             return sampleEvenly(features, keep);
         }
         ranked.sort(null);
+        long span = (long) ranked.get(keep - 1).rank - (long) ranked.get(0).rank;
+        if (span < keep) {
+            // 前 keep 个的排名挤在一起，说明身份值几乎没有区分度（例如第一个字段大面积取到
+            // 同一个空串 —— GeoJSON 里属性为 null 时就是空串）。这时"取最小的 N 个"会退化成
+            // 按位置取前缀，重新制造出成片空洞，改用等间隔兜底。
+            // 正常情况身份哈希均匀，前 keep 个的跨度是 keep 的上万倍，不会走到这里。
+            return sampleEvenly(features, keep);
+        }
         List<GirAdvOneRow> sampled = new ArrayList<>(keep);
         for (int i = 0; i < keep; i++) {
             sampled.add(ranked.get(i).row);
