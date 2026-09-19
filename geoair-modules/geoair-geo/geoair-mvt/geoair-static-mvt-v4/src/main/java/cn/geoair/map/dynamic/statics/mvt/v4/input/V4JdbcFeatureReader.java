@@ -93,11 +93,12 @@ public final class V4JdbcFeatureReader implements V4FeatureReader {
         int partitionNum = Math.max(1,
                 Optional.ofNullable(jdbc.getMaxPartitionNum()).orElse(DEFAULT_PARTITION));
         int sourceSrid = layer.resolveSourceDataSrid();
+        String fromSource = toFromSource(query);
         List<String> conditions = V3DataReadUtils.buildBboxPartitionConditions(
                 extent, partitionNum, sourceSrid);
         for (String condition : conditions) {
             String[] coords = condition.split(",");
-            String sql = V3DataReadUtils.buildBboxQuerySql(query, layer.getGeomFieldName(),
+            String sql = V3DataReadUtils.buildBboxQuerySql(fromSource, layer.getGeomFieldName(),
                     Double.parseDouble(coords[0]), Double.parseDouble(coords[2]),
                     Double.parseDouble(coords[1]), Double.parseDouble(coords[3]), sourceSrid);
             List<GirAdvOneRow> rows = executor.bSelectList(sql);
@@ -110,5 +111,30 @@ public final class V4JdbcFeatureReader implements V4FeatureReader {
                 }
             }
         }
+    }
+
+    /**
+     * 把 {@code queryStatement} 转成可以接在 {@code FROM} 后面的表表达式。
+     *
+     * <p>{@link V3DataReadUtils#buildBboxQuerySql} 的写法是
+     * {@code select * from {queryStatement} as ttt where ST_Intersects(...)}，
+     * 也就是它把入参当成<b>表名</b>。但管理端下发的 {@code queryStatement} 是一条完整的
+     * {@code SELECT}（{@code TileParameterBuilder.resolveQueryStatement} 生成
+     * {@code SELECT * FROM schema.table}，用户也可以填自定义 SQL），
+     * 直接拼进去会得到 {@code select * from SELECT * FROM ... as ttt} —— 实测 PostgreSQL 报
+     * "语法错误 在 SELECT 或附近的"。（V3 的 {@code BboxFunction} 有同样的问题，
+     * 只是管理端固定用 {@code ID_PAGE}，这条路径没被跑到过。）
+     *
+     * <p>因此这里判断一下：是查询就套一层括号变成派生表，是裸表名就原样传下去。</p>
+     */
+    private static String toFromSource(String queryStatement) {
+        String trimmed = queryStatement == null ? "" : queryStatement.trim();
+        boolean isQuery = trimmed.regionMatches(true, 0, "select", 0, 6)
+                || trimmed.regionMatches(true, 0, "with", 0, 4);
+        if (!isQuery) {
+            return trimmed;
+        }
+        String body = trimmed.endsWith(";") ? trimmed.substring(0, trimmed.length() - 1) : trimmed;
+        return "(" + body + ")";
     }
 }
