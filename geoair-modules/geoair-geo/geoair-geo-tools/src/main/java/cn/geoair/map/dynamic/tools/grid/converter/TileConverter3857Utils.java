@@ -388,7 +388,7 @@ public class TileConverter3857Utils extends TileConverterCommon {
     }
 
     public static void Test4326() {
-        Wgs84EqualAxisTileUtils converter = new Wgs84EqualAxisTileUtils(ToolsConfig.of());
+        Wgs84SeparateAxisTileUtils converter = new Wgs84SeparateAxisTileUtils(ToolsConfig.of());
         TileLevelMetadata metadata1 = converter.getTileLevelMetadata(10);
         System.out.println(metadata1);
 

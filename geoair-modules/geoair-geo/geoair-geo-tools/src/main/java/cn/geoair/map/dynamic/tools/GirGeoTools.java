@@ -10,7 +10,6 @@ import cn.geoair.map.dynamic.tools.grid.GirBingMapQuadKeyOpt;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.bing.BingMapQuadKeyUtils;
 import cn.geoair.map.dynamic.tools.grid.converter.TileConverter3857Utils;
-import cn.geoair.map.dynamic.tools.grid.converter.Wgs84EqualAxisTileUtils;
 import cn.geoair.map.dynamic.tools.grid.converter.Wgs84SeparateAxisTileUtils;
 import cn.geoair.map.dynamic.tools.measure.GirGeoMeasureOpt;
 import cn.geoair.map.dynamic.tools.measure.GirGeoMeasureUtils;
@@ -131,11 +130,27 @@ public class GirGeoTools implements GirGeoToolsInterface {
         return GirCoordinateUtils.getInstance(advToolsConfig);
     }
 
+    /**
+     * 取 EPSG:4326 经纬度瓦片网格。
+     *
+     * <p>返回标准网格：{@code 2^z} 列 × {@code 2^(z-1)} 行，纬度覆盖 {@code ±90°}，
+     * 与 WMTS 的 EPSG:4326 矩阵集一致。</p>
+     *
+     * <p>该方法历史上返回的是 {@code Wgs84EqualAxisTileUtils}（把纬度裁剪到 Web Mercator
+     * 有效纬度 ±85.0511287798，且反算范围时会产出不存在的行号）。该实现已废弃并改为继承
+     * {@link Wgs84SeparateAxisTileUtils}，两条入口现在指向同一套网格。</p>
+     */
     @Override
     public GirTileConverterOpt getTileGrid4326Opt() {
-        return Wgs84EqualAxisTileUtils.getInstance(advToolsConfig);
+        return Wgs84SeparateAxisTileUtils.getInstance(advToolsConfig);
     }
 
+    /**
+     * 取 EPSG:4326 经纬度瓦片网格（非等轴入口，与 {@link #getTileGrid4326Opt()} 等价）。
+     *
+     * <p>该入口原先用于区分非等轴网格，合并后与 {@link #getTileGrid4326Opt()} 返回同一套
+     * 网格。既有调用点只用到其中的 XYZ/TMS 行号换算，行数与纬度覆盖无关，行为不变。</p>
+     */
     @Override
     public GirTileConverterOpt getTileGrid4326SeparateOpt() {
         return Wgs84SeparateAxisTileUtils.getInstance(advToolsConfig);
