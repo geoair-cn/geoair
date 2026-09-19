@@ -24,10 +24,14 @@ import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
 import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Set;
 
 /**
@@ -94,6 +98,7 @@ public final class MultiLayerMvtEncoderV3 {
         byte[] encoded = encodeWithTileLimit(features, envelope, zxy.getZ(), parameter);
         return new PbfInfo().setData(encoded).setZoom(zxy.getZ()).setGridSrid(parameter.getOutGridSrid());
     }
+
 
     /**
      * 按图层施加单瓦片要素数限制：先按空间密度合并，仍超限再按密度丢弃，最后才按顺序截断。
@@ -209,7 +214,8 @@ public final class MultiLayerMvtEncoderV3 {
             }
         }
         for (int round = 0; bytes.length > limit && round < MAX_TRIM_ROUNDS; round++) {
-            if (!trimLowestPriorityLayer(features, candidates, limit, bytes.length)) {
+            if (!trimLowestPriorityLayer(features, candidates, limit, bytes.length,
+                    envelope, isGeographicGrid(parameter.getOutGridSrid()))) {
                 break;
             }
             bytes = encodeAll(features, envelope, zoom, parameter, maxExtraSimplify, true, true);
@@ -230,6 +236,10 @@ public final class MultiLayerMvtEncoderV3 {
      * <p>
      * <b>每层都有下限</b>（见 {@link #resolveTrimFloor}）：削减到下限即停止，绝不把图层削空。
      * 这是刻意的取舍——地图上少一片数据的观感问题，比瓦片稍微大一点严重得多。
+     * <p>
+     * <b>截到下限只是"不削空"，不足以保证"没空洞"</b>：削掉的是哪一批要素由
+     * {@link #selectForTrim} 决定，取列表前 N 个会把整片区域一次抹掉，
+     * 反倒制造出这里想避免的空洞。
      *
      * @return 是否确实削减了要素；所有图层都为空或都已到下限时返回 false
      */
@@ -237,7 +247,9 @@ public final class MultiLayerMvtEncoderV3 {
             Map<String, List<GirAdvOneRow>> features,
             List<MvtLayerSliceParameter> candidates,
             long limit,
-            int currentBytes) {
+            int currentBytes,
+            Envelope envelope,
+            boolean isGeographic) {
         for (MvtLayerSliceParameter layer : candidates) {
             List<GirAdvOneRow> rows = features.get(layer.getLayerName());
             if (rows == null || rows.isEmpty()) {
@@ -255,10 +267,34 @@ public final class MultiLayerMvtEncoderV3 {
                 keep = rows.size() - 1;
             }
             keep = Math.max(keep, floor);
-            features.put(layer.getLayerName(), new ArrayList<>(rows.subList(0, keep)));
+            features.put(layer.getLayerName(), selectForTrim(rows, keep, layer, envelope, isGeographic));
             return true;
         }
         return false;
+    }
+
+    /**
+     * 从要素列表里挑出这一轮要保留的 {@code keep} 个。
+     * <p>
+     * 开启 {@code dropDensestAsNeeded} 时按<b>空间密度</b>挑：低密度区域先留、高密度区域先丢，
+     * 也就是 tippecanoe {@code --drop-densest-as-needed} 的语义。走的是与图层要素上限
+     * 同一条实现（{@link V3FeatureUtils#filterBySpatialDensity}），两处口径一致，
+     * 不会出现"按要素上限削出来是均匀的、按大小超限削出来是成片空洞的"这种自相矛盾。
+     * <p>
+     * 开启了 {@code dropSmallestAsNeeded} 时保持原行为：列表在进循环前已按屏幕占用升序排过，
+     * 取前缀就是"先丢最小的"。两个开关都开时以它为准，避免改动既有产物。
+     */
+    private static List<GirAdvOneRow> selectForTrim(
+            List<GirAdvOneRow> rows,
+            int keep,
+            MvtLayerSliceParameter layer,
+            Envelope envelope,
+            boolean isGeographic) {
+        if (!layer.isDropSmallestAsNeeded() && layer.isDropDensestAsNeeded()) {
+            return V3FeatureUtils.filterBySpatialDensity(
+                    rows, keep, layer.getGeomFieldName(), layer.getIdFieldName(), envelope, isGeographic);
+        }
+        return new ArrayList<>(rows.subList(0, keep));
     }
 
     /**
@@ -516,35 +552,88 @@ public final class MultiLayerMvtEncoderV3 {
         }
     }
 
+    /**
+     * 把互相靠近的点并成多点要素。
+     * <p>
+     * <b>必须用空间网格，不能逐对比较。</b>原实现对每个锚点扫描它之后的全部要素、每次重新取几何；
+     * 而 {@code GirAdvOneRow.getGeometry} 每次都重新解析 WKT/GeoJSON/WKB、不缓存，于是总代价是
+     * {@code n²/2} 次<b>几何解析</b>——76 万点时不是"慢"，是永远跑不完。
+     * <p>
+     * 这里改成：几何只解析一次 → 点要素按边长 {@code = tolerance} 的网格分桶 → 每个锚点只查
+     * 本格与相邻 8 格。该格边长下，同格内任意两点的 |Δx|、|Δy| 都小于 tolerance、必然同簇；
+     * 而与锚点在容差内的点也必定落在锚点所在格或相邻格，所以 9 格是完备的。
+     * 候选仍按下标升序合并，多点内的坐标顺序、成簇结果与原实现逐位一致。
+     */
     private static List<GirAdvOneRow> clusterRows(
             List<GirAdvOneRow> rows, MvtLayerSliceParameter layer, Envelope envelope, double tolerance) {
-        List<GirAdvOneRow> result = new ArrayList<>(rows.size());
-        // alreadyClustered 中记录已经并入某组并被产出的要素，避免重复产出
-        boolean[] consumed = new boolean[rows.size()];
-        for (int i = 0; i < rows.size(); i++) {
+        int size = rows.size();
+        String geomField = layer.getGeomFieldName();
+
+        // 1. 几何只解析一次，缓存坐标与"是否点要素"
+        double[] xs = new double[size];
+        double[] ys = new double[size];
+        boolean[] pointLike = new boolean[size];
+        for (int i = 0; i < size; i++) {
+            Geometry geometry = rows.get(i).getGeometry(geomField);
+            pointLike[i] = isPointLike(geometry);
+            if (pointLike[i]) {
+                Coordinate coordinate = geometry.getCoordinate();
+                xs[i] = coordinate.x;
+                ys[i] = coordinate.y;
+            }
+        }
+
+        // 2. 点要素分桶（每桶内下标天然升序）
+        Map<Long, List<Integer>> buckets = new HashMap<>();
+        for (int i = 0; i < size; i++) {
+            if (pointLike[i]) {
+                buckets.computeIfAbsent(cellKey(xs[i], ys[i], tolerance), key -> new ArrayList<>())
+                        .add(i);
+            }
+        }
+
+        // 3. 按原顺序生成簇
+        boolean[] consumed = new boolean[size];
+        List<GirAdvOneRow> result = new ArrayList<>(size);
+        List<Integer> candidates = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
             if (consumed[i]) {
                 continue;
             }
             GirAdvOneRow anchor = rows.get(i);
-            Geometry anchorGeometry = anchor.getGeometry(layer.getGeomFieldName());
-            if (!isPointLike(anchorGeometry)) {
+            if (!pointLike[i]) {
                 // 非点要素不参与聚合，保持原样
                 result.add(anchor);
                 continue;
             }
             List<Coordinate> clusterCoordinates = new ArrayList<>();
-            clusterCoordinates.add(anchorGeometry.getCoordinate());
+            clusterCoordinates.add(new Coordinate(xs[i], ys[i]));
             consumed[i] = true;
-            for (int j = i + 1; j < rows.size(); j++) {
+
+            candidates.clear();
+            long gx = cellIndex(xs[i], tolerance);
+            long gy = cellIndex(ys[i], tolerance);
+            for (long x2 = gx - 1; x2 <= gx + 1; x2++) {
+                for (long y2 = gy - 1; y2 <= gy + 1; y2++) {
+                    List<Integer> bucket = buckets.get(mixCell(x2, y2));
+                    if (bucket == null) {
+                        continue;
+                    }
+                    for (int j : bucket) {
+                        // 与原实现一致：只并"下标更大、且尚未被合并"的点
+                        if (j > i && !consumed[j]) {
+                            candidates.add(j);
+                        }
+                    }
+                }
+            }
+            Collections.sort(candidates);
+            for (int j : candidates) {
                 if (consumed[j]) {
                     continue;
                 }
-                Geometry candidate = rows.get(j).getGeometry(layer.getGeomFieldName());
-                if (!isPointLike(candidate)) {
-                    continue;
-                }
-                if (isEnvelopeWithin(anchorGeometry.getCoordinate(), candidate.getCoordinate(), tolerance)) {
-                    clusterCoordinates.add(candidate.getCoordinate());
+                if (isEnvelopeWithin(xs[i], ys[i], xs[j], ys[j], tolerance)) {
+                    clusterCoordinates.add(new Coordinate(xs[j], ys[j]));
                     consumed[j] = true;
                 }
             }
@@ -555,7 +644,7 @@ public final class MultiLayerMvtEncoderV3 {
             // 用锚点要素作为属性模板；该构造函数会一并复制 TypeHandler 注册表，
             // 保证合并后的行仍能按方言正确解析几何值
             GirAdvOneRow merged = GirAdvOneRow.ofByMap(anchor);
-            merged.put(layer.getGeomFieldName(), toMultiPoint(clusterCoordinates));
+            merged.put(geomField, toMultiPoint(clusterCoordinates));
             result.add(merged);
         }
         return result;
@@ -568,23 +657,41 @@ public final class MultiLayerMvtEncoderV3 {
         return geometry instanceof Point || geometry instanceof MultiPoint;
     }
 
-    private static boolean isEnvelopeWithin(Coordinate anchor, Coordinate candidate, double tolerance) {
-        return Math.abs(anchor.x - candidate.x) <= tolerance
-                && Math.abs(anchor.y - candidate.y) <= tolerance;
+    /** 网格边长取 tolerance，保证"同格必然同簇" */
+    private static long cellIndex(double value, double cellSize) {
+        return (long) Math.floor(value / cellSize);
+    }
+
+    private static long cellKey(double x, double y, double cellSize) {
+        return mixCell(cellIndex(x, cellSize), cellIndex(y, cellSize));
+    }
+
+    /**
+     * 把两个格号拼成一个 long 键。
+     * <p>坐标量级下格号一定落在 int 范围（3857 最坏约 1.4e8，经纬度更小），
+     * 所以高低 32 位互不影响。
+     */
+    private static long mixCell(long gx, long gy) {
+        return (gx << 32) ^ (gy & 0xffffffffL);
+    }
+
+    private static boolean isEnvelopeWithin(double ax, double ay, double bx, double by, double tolerance) {
+        return Math.abs(ax - bx) <= tolerance && Math.abs(ay - by) <= tolerance;
     }
 
     private static MultiPoint toMultiPoint(List<Coordinate> coordinates) {
-        // 聚合后的坐标必须去重，否则 JTS 会认为多点退化
+        // 聚合后的坐标必须去重，否则 JTS 会认为多点退化。
+        // 改用哈希判重并保留首次出现顺序：原来是"逐个与已收集坐标比对"，O(k²)，
+        // 一个簇并进来几万个点时它自己就会先爆掉。
+        // 注：±0.0 在 equals2D 下相等、但 doubleToLongBits 不同，先归一化再入集合，
+        // 保证判重语义与原来的 equals2D 一致。
+        Set<Coordinate> seen = new HashSet<>(Math.max(16, coordinates.size() * 2));
         List<Coordinate> distinct = new ArrayList<>(coordinates.size());
         for (Coordinate coordinate : coordinates) {
-            boolean duplicated = false;
-            for (Coordinate exist : distinct) {
-                if (exist.equals2D(coordinate)) {
-                    duplicated = true;
-                    break;
-                }
-            }
-            if (!duplicated) {
+            Coordinate key = new Coordinate(
+                    coordinate.x == 0D ? 0D : coordinate.x,
+                    coordinate.y == 0D ? 0D : coordinate.y);
+            if (seen.add(key)) {
                 distinct.add(coordinate);
             }
         }
@@ -599,6 +706,10 @@ public final class MultiLayerMvtEncoderV3 {
      * 返回按屏幕占用升序排列的要素副本。
      * <p>
      * 占用按要素外接矩形与瓦片范围的比例衡量：面取面积比，线取对角线比，点全部并列（保持原顺序）。
+     * <p>
+     * 关键字先整体算好再排序：{@link Location#score} 要取几何、做 JTS 计算，写在比较器里
+     * 会被每个要素重复算约 log n 次。排序用稳定排序、同分保持原顺序，与逐次现算关键字的
+     * 旧写法结果逐位一致（只省算力，不改顺序）。
      */
     private static List<GirAdvOneRow> sortedByScreenSize(
             List<GirAdvOneRow> rows, MvtLayerSliceParameter layer, Envelope envelope) {
@@ -606,8 +717,21 @@ public final class MultiLayerMvtEncoderV3 {
             return rows;
         }
         Location location = new Location(envelope);
-        List<GirAdvOneRow> copy = new ArrayList<>(rows);
-        copy.sort(Comparator.comparingDouble(row -> location.score(row, layer)));
+        int size = rows.size();
+        double[] scores = new double[size];
+        for (int i = 0; i < size; i++) {
+            scores[i] = location.score(rows.get(i), layer);
+        }
+        // Arrays.sort 是稳定排序，与原来 List.sort 的稳定性、比较规则（Double.compare）一致
+        Integer[] order = new Integer[size];
+        for (int i = 0; i < size; i++) {
+            order[i] = i;
+        }
+        Arrays.sort(order, (left, right) -> Double.compare(scores[left], scores[right]));
+        List<GirAdvOneRow> copy = new ArrayList<>(size);
+        for (int index : order) {
+            copy.add(rows.get(index));
+        }
         return copy;
     }
 

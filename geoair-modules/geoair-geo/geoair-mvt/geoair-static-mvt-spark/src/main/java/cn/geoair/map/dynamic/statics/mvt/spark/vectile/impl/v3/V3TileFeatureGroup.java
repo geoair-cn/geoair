@@ -43,7 +43,7 @@ public class V3TileFeatureGroup implements Serializable {
      * <p>
      * 此方法始终创建新列表，不修改 Spark 上游 RDD 的 value，避免不同 stage 重试时发生副作用。
      * <p>
-     * <b>这里只做"防 OOM 的兜底截断"，不做要素数限制与密度裁剪。</b>
+     * <b>这里只做"防 OOM 的兜底削减"（按身份哈希抽样），不做要素数限制与密度裁剪。</b>
      * 该方法在 {@code reduceByKey} 中会被逐次调用（同一瓦片的第 N 条记录就调用 N-1 次），
      * 任何带排序或几何序列化的处理放到这里都会被放大成平方级开销；真正的要素数限制、
      * 密度合并与丢弃统一放在编码前做一次（见 {@code MultiLayerMvtEncoderV3}）。
@@ -88,8 +88,20 @@ public class V3TileFeatureGroup implements Serializable {
     }
 
     /**
-     * 聚合阶段的安全阀：要素数明显超过图层声明的安全上限时直接截断，防止 executor OOM。
-     * <p>只截断不排序，且只在超过「上限 × {@value #CAP_TRIGGER_FACTOR}」时才执行，避免每合并一次就拷贝一遍列表。
+     * 聚合阶段的安全阀：要素数明显超过图层声明的安全上限时削减到上限，防止 executor OOM。
+     * <p>只在超过「上限 × {@value #CAP_TRIGGER_FACTOR}」时才执行，避免每合并一次就拷贝一遍列表。
+     * <p><b>削减必须按要素身份、且必须取身份哈希最小的 N 个，不能按位置也不能按比例过滤。</b>
+     * 本方法处在 {@code reduceByKey} 里，同一块瓦片每来一批记录就调用一次：
+     * <ul>
+     *   <li>按位置（取前缀、等间隔）时，两次调用之间列表还在增长，等于把同一批要素反复重采样，
+     *       早到达的被反复砍到、晚到达的只碰上一两次，最终只剩尾部数据。实测低层级
+     *       （一块瓦片七十余万要素）触发近百次后，被削空的是一条完整的纬度带，地图上就是一大块空白。</li>
+     *   <li>按比例过滤（保留哈希值小于阈值的）时，上一轮保下来的要素必然仍在阈值内，削减量只落在
+     *       新来的要素上，列表长度削不下去；实测会一路涨到触发点、削不动，最后仍退回等间隔。</li>
+     * </ul>
+     * 取最小的 N 个则每轮都严格削到上限，反复调用收敛到「全局身份哈希最小的 N 个」，
+     * 与要素到达顺序无关，空间上就是均匀变稀。
+     * <p>这里也是 {@code reduceByKey} 的热路径，不碰几何、不做空间计算（见 {@link #merge} 的说明）。
      */
     private static List<GirAdvOneRow> capLayerFeatures(
             List<GirAdvOneRow> features, MvtLayerSliceParameter layer) {
@@ -100,6 +112,117 @@ public class V3TileFeatureGroup implements Serializable {
         if (features.size() <= hardLimit * CAP_TRIGGER_FACTOR) {
             return features;
         }
-        return new ArrayList<>(features.subList(0, hardLimit));
+        return selectByIdentity(features, hardLimit, layer);
+    }
+
+    /**
+     * 按要素身份选取，保留身份排名最靠前的 {@code keep} 个。
+     * <p>排名取身份哈希再做一次雪崩混合 —— 不能直接用 {@code hashCode()}：数据源的 id
+     * 常常是逐个递增的（GeoJSON 的 {@code gid} 就是 805022、805023 这样连着编的），
+     * 直接取模得到的是"一段一段"的区间，配上按位置顺序编号的数据，抽出来照样是连片的要素，
+     * 等于没修。混合之后连续输入才会落到互不相邻的位置。
+     * <p>整层都取不到身份值时（没有 id 字段、也不是属性字段能充当的），没有任何可依据的区分度，
+     * 退回按位置等间隔 —— 那是有偏差的，但至少能削得下去。
+     */
+    private static List<GirAdvOneRow> selectByIdentity(
+            List<GirAdvOneRow> features, int keep, MvtLayerSliceParameter layer) {
+        List<RankedRow> ranked = new ArrayList<>(features.size());
+        int resolved = 0;
+        for (GirAdvOneRow row : features) {
+            Object identity = resolveIdentity(row, layer);
+            int rank;
+            if (identity == null) {
+                // 没有身份值：排在最后，优先被削掉
+                rank = Integer.MAX_VALUE;
+            } else {
+                rank = spread(identity.hashCode());
+                resolved++;
+            }
+            ranked.add(new RankedRow(rank, row));
+        }
+        if (resolved == 0) {
+            return sampleEvenly(features, keep);
+        }
+        ranked.sort(null);
+        List<GirAdvOneRow> sampled = new ArrayList<>(keep);
+        for (int i = 0; i < keep; i++) {
+            sampled.add(ranked.get(i).row);
+        }
+        return sampled;
+    }
+
+    /**
+     * 把身份哈希做一次雪崩混合（Murmur3 finalizer），让连续输入的哈希值落到互不相邻的位置。
+     */
+    private static int spread(int hash) {
+        int h = hash;
+        h ^= (h >>> 16);
+        h *= 0x85ebca6b;
+        h ^= (h >>> 13);
+        h *= 0xc2b2ae35;
+        h ^= (h >>> 16);
+        return h & Integer.MAX_VALUE;
+    }
+
+    /** 身份哈希与行的组合，用于按哈希取最小的 N 个。 */
+    private static final class RankedRow implements Comparable<RankedRow> {
+        private final int rank;
+        private final GirAdvOneRow row;
+
+        private RankedRow(int rank, GirAdvOneRow row) {
+            this.rank = rank;
+            this.row = row;
+        }
+
+        @Override
+        public int compareTo(RankedRow other) {
+            return Integer.compare(rank, other.rank);
+        }
+    }
+
+    /**
+     * 取一行的身份标识：优先图层配置的 id 字段，取不到时退回该行第一个非几何字段。
+     * <p>刻意不用几何字段做身份：JTS 的 {@code Geometry.hashCode} 确实是稳定的结构哈希，
+     * 但它需要遍历全部坐标，而本方法处在 {@code reduceByKey} 热路径上会被反复调用，
+     * 一个稍微复杂的多边形就足以把整条聚合链路拖垮。
+     */
+    private static Object resolveIdentity(GirAdvOneRow row, MvtLayerSliceParameter layer) {
+        String idField = layer.getIdFieldName();
+        if (idField != null && !idField.isEmpty()) {
+            Object value = row.get(idField);
+            if (value != null) {
+                return value;
+            }
+        }
+        String geomField = layer.getGeomFieldName();
+        for (Map.Entry<String, Object> entry : row.entrySet()) {
+            if (geomField != null && geomField.equals(entry.getKey())) {
+                continue;
+            }
+            if (entry.getValue() != null) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 等间隔抽样：按 {@code step = size / keep} 每隔 step 个取一个，共取 {@code keep} 个。
+     * <p><b>只作兜底用</b>：身份键取不到值、或取值完全没有区分度时才会走到这里。它的选择依赖
+     * 列表位置，反复触发会累积偏差（见 {@link #capLayerFeatures}），但至少能保证削得下去。
+     * <p>不做排序、不碰几何，只要一次线性遍历。
+     *
+     * @param features 原列表
+     * @param keep     目标个数（应小于等于原列表长度）
+     * @return 抽样后的新列表
+     */
+    private static List<GirAdvOneRow> sampleEvenly(List<GirAdvOneRow> features, int keep) {
+        int size = features.size();
+        int step = Math.max(1, size / keep);
+        List<GirAdvOneRow> sampled = new ArrayList<>(keep);
+        for (int i = 0; i < size && sampled.size() < keep; i += step) {
+            sampled.add(features.get(i));
+        }
+        return sampled;
     }
 }
