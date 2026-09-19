@@ -34,6 +34,7 @@
   <modules>
     <module>geoair-real-mvt</module>
     <module>geoair-static-mvt-spark</module>
+    <module>geoair-static-mvt-v4</module>
     <module>geoair-mvt-tools</module>
   </modules>
 
