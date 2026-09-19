@@ -154,16 +154,25 @@ public final class MultiLayerMvtEncoderV3 {
     /**
      * 按 tippecanoe 的优化顺序逼近单个 PBF 的总大小限制。
      * <p>
-     * 原则是<b>先降精度、再减数量，并且绝不因为超限而丢弃整格瓦片</b>——
-     * 地图上出现空洞比瓦片稍微大一点糟糕得多。降级阶梯：
+     * 原则是<b>先降精度、再减数量；既不因为超限丢弃整格瓦片，也不因为超限改动属性</b>——
+     * 地图上出现空洞、或者点击查不到属性，都比瓦片稍微大一点糟糕得多。降级阶梯：
      * <ol>
      *   <li>逐级提升几何简化级别：只降精度，要素一个不丢；</li>
-     *   <li>裁掉属性：几何不动，只保留 id 与关键字段，要素仍在图上；</li>
      *   <li>几何降级：面/线转质心点、线抽稀到骨架；</li>
      *   <li>按图层优先级降要素数上限，直到降到该图层的下限；</li>
      *   <li>仍超限则接受当前结果并打 WARN——瓦片照样输出，不会变空。</li>
      * </ol>
-     * 只有"所有图层都没有要素"的瓦片才会返回空（天然无内容的瓦片），
+     * <p>
+     * <b>这里不做属性裁剪。</b>输出哪些字段完全由图层配置决定（{@code includeFields} /
+     * {@code excludeFields} / {@code sysIncludeFields}），超限不是改它的理由。
+     * tippecanoe 的降级手段（{@code --drop-densest-as-needed}、{@code --coalesce-*}、
+     * 逐级降低 detail 等）同样只动几何与要素数，从不自动裁属性；减属性是用户用
+     * {@code -x} / {@code -y} 自己做的决定，工具的职责只是执行这个决定。
+     * <p>
+     * 裁属性看着很划算（MVT 的属性是逐要素存 key-value，字段名要在每个要素里重复一遍，
+     * 删字段名的收益远大于删值），但它会让按属性的样式过滤失效、点击查不到内容，
+     * 而用户完全不知情。那属于改变用户看得见的行为，比瓦片大一点严重得多。
+     * <p>只有"所有图层都没有要素"的瓦片才会返回空（天然无内容的瓦片），
      * 那是数据本身就没有覆盖到，不是因为超限。
      */
     private static byte[] encodeWithTileLimit(
@@ -188,22 +197,15 @@ public final class MultiLayerMvtEncoderV3 {
             }
         }
 
-        // 第 2 级：裁属性。几何完全不动，要素一个不少，只是把属性收敛到关键字段。
-        bytes = encodeAll(features, envelope, zoom, parameter, maxExtraSimplify, true, false);
+        // 第 2 级：几何降级（面/线转质心点）。仍保留每个要素，只是表达变简单。
+        bytes = encodeAll(features, envelope, zoom, parameter, maxExtraSimplify, true);
         if (bytes.length <= limit) {
-            LOG.info("瓦片[{}]通过简化+精简属性达标（{} 字节，限制 {} 字节）", tileKey, bytes.length, limit);
-            return bytes;
-        }
-
-        // 第 3 级：几何降级（面/线转质心点）。仍保留每个要素，只是表达变简单。
-        bytes = encodeAll(features, envelope, zoom, parameter, maxExtraSimplify, true, true);
-        if (bytes.length <= limit) {
-            LOG.info("瓦片[{}]通过简化+精简属性+几何降级达标（{} 字节，限制 {} 字节）",
+            LOG.info("瓦片[{}]通过简化+几何降级达标（{} 字节，限制 {} 字节）",
                     tileKey, bytes.length, limit);
             return bytes;
         }
 
-        // 第 4 级：这才开始降要素数量。优先级低的图层先降，降到各自的下限为止。
+        // 第 3 级：这才开始降要素数量。优先级低的图层先降，降到各自的下限为止。
         List<MvtLayerSliceParameter> candidates = new ArrayList<>(parameter.getLayers());
         candidates.sort(Comparator.comparingInt(MvtLayerSliceParameter::getPriority));
         for (MvtLayerSliceParameter layer : candidates) {
@@ -218,13 +220,13 @@ public final class MultiLayerMvtEncoderV3 {
                     envelope, isGeographicGrid(parameter.getOutGridSrid()))) {
                 break;
             }
-            bytes = encodeAll(features, envelope, zoom, parameter, maxExtraSimplify, true, true);
+            bytes = encodeAll(features, envelope, zoom, parameter, maxExtraSimplify, true);
         }
 
-        // 第 5 级：仍超限也照样输出。这里只告警，不丢格、不清空，保证地图上没有空洞。
+        // 第 4 级：仍超限也照样输出。这里只告警，不丢格、不裁属性、不清空，保证地图上没有空洞。
         if (bytes.length > limit) {
             int encoded = countEncodedFeatures(features);
-            LOG.warn("瓦片[{}]经简化、精简属性、几何降级与要素裁剪后仍为 {} 字节（限制 {} 字节），"
+            LOG.warn("瓦片[{}]经简化、几何降级与要素裁剪后仍为 {} 字节（限制 {} 字节），"
                             + "保留 {} 个要素照常输出；如需更小请调低图层要素上限或加大简化等级",
                     tileKey, bytes.length, limit, encoded);
         }
@@ -318,16 +320,16 @@ public final class MultiLayerMvtEncoderV3 {
             int zoom,
             MultiLayerTileSliceParameter parameter,
             int extraSimplify) throws Exception {
-        return encodeAll(features, envelope, zoom, parameter, extraSimplify, false, false);
+        return encodeAll(features, envelope, zoom, parameter, extraSimplify, false);
     }
 
     /**
-     * 按图层编码全部要素，并支持超限时的降级表达。
+     * 按图层编码全部要素，并支持超限时的几何降级。
      *
-     * @param extraSimplify 在当前图层简化级别之上额外提升的级别
-     * @param trimAttributes 是否只保留关键字段（几何不变，要素不丢）
-     * @param degradeGeometry 是否把面/线降级为质心点（要素仍在图上，只是表达变简单）
+     * @param extraSimplify    在当前图层简化级别之上额外提升的级别
+     * @param degradeGeometry  是否把面/线降级为质心点（要素仍在图上，只是表达变简单）
      * @return 编码结果；所有图层都没有要素可写时返回空数组
+     * <p>属性始终按图层配置输出（{@link #getAttributes}），降级不改它。</p>
      */
     private static byte[] encodeAll(
             Map<String, List<GirAdvOneRow>> features,
@@ -335,7 +337,6 @@ public final class MultiLayerMvtEncoderV3 {
             int zoom,
             MultiLayerTileSliceParameter parameter,
             int extraSimplify,
-            boolean trimAttributes,
             boolean degradeGeometry) throws Exception {
         int buffer = parameter.getBuffer() == null ? DEFAULT_BUFFER : Math.max(0, parameter.getBuffer());
         VectorTileEncoder encoder = new VectorTileEncoder(EXTENT, buffer, false);
@@ -363,8 +364,7 @@ public final class MultiLayerMvtEncoderV3 {
                 if (screenGeometry == null || screenGeometry.isEmpty()) {
                     continue;
                 }
-                Map<String, Object> attributes = trimAttributes
-                        ? getKeyAttributes(row, layer) : getAttributes(row, layer);
+                Map<String, Object> attributes = getAttributes(row, layer);
                 if (layer.isGenerateIds()) {
                     encoder.addFeature(layer.getLayerName(), attributes, screenGeometry, nextFeatureId++);
                 } else {
@@ -402,30 +402,6 @@ public final class MultiLayerMvtEncoderV3 {
         }
         Geometry centroid = geometry.getCentroid();
         return centroid == null || centroid.isEmpty() ? geometry : centroid;
-    }
-
-    /**
-     * 超限降级时使用的精简属性：只保留 id 字段与图层声明的关键字段。
-     * <p>
-     * 几何完全不动、要素一个不丢，只是把属性收敛到最必要的几个，用来换体积。
-     * 若图层没有声明任何关键字段，则退化为"只保留 id"，仍然远小于全量属性。
-     */
-    private static Map<String, Object> getKeyAttributes(GirAdvOneRow row, MvtLayerSliceParameter layer) {
-        Map<String, Object> attributes = new HashMap<>();
-        Set<String> keyFields = layer.getSysIncludeFields();
-        if (keyFields != null && !keyFields.isEmpty()) {
-            for (String field : keyFields) {
-                if (field.equals(layer.getGeomFieldName())) {
-                    continue;
-                }
-                Object value = row.get(field);
-                attributes.put(field, value == null ? "" : value);
-            }
-        }
-        if (layer.getIdFieldName() != null && !layer.getIdFieldName().trim().isEmpty()) {
-            attributes.put(layer.getIdFieldName(), row.get(layer.getIdFieldName()));
-        }
-        return attributes;
     }
 
     /** 统计当前还剩多少个要素会被真正编码（几何为空的不计），仅用于日志说明 */
