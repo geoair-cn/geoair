@@ -31,9 +31,12 @@ import scala.Tuple2;
 import org.apache.spark.util.LongAccumulator;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +65,9 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
 
     private static final GiLogger LOG = GirLoggerFactory.getLogger();
     private transient SparkSession sparkSession;
+
+    /** 上一次执行的写出统计，由 {@link #doGenerate} 结束后填充 */
+    private V3TileWriteStats lastStats;
 
     public SparkVectorTileGeneratorV3(SparkSession sparkSession) {
         this.sparkSession = sparkSession;
@@ -132,7 +138,46 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
             tracker.completeStage();
         }
         tracker.printSummary();
-        LOG.info("V3 多图层切片完成，tileSetName:{}，内部图层数:{}", parameter.getTileSetName(), parameter.getLayers().size());
+        // 记录本次任务的写出统计，供使用方直接读取（无需再遍历目录或查表）
+        lastStats = new V3TileWriteStats(
+                tracker.getTilesWritten().value(),
+                tracker.getBytesWritten().value(),
+                tracker.getBatchesWritten().value(),
+                tracker.getFeaturesRead().value(),
+                archiveFileSize(parameter));
+        LOG.info("V3 多图层切片完成，tileSetName:{}，内部图层数:{}，{}",
+                parameter.getTileSetName(), parameter.getLayers().size(), lastStats);
+    }
+
+    /**
+     * 上一次执行（{@link #doGenerate}）的写出统计；任务结束后可直接读取。
+     * <p>
+     * 一个实例对应一次执行，并发任务请各自新建实例。
+     */
+    public V3TileWriteStats getLastStats() {
+        return lastStats;
+    }
+
+    /** 取归档文件大小（非归档输出返回 0），文件不存在时返回 0 */
+    private long archiveFileSize(MultiLayerTileSliceParameter parameter) {
+        V3TileOutputType outputType = resolveOutputType(parameter);
+        V3TileOutputConfig outputConfig = parameter.getOutputConfig();
+        String file = null;
+        if (outputType == V3TileOutputType.MBTILES) {
+            file = outputConfig.getMbtilesFile();
+        } else if (outputType == V3TileOutputType.PMTILES) {
+            file = outputConfig.getPmtilesFile();
+        }
+        if (file == null) {
+            return 0L;
+        }
+        try {
+            Path path = Paths.get(file);
+            return Files.exists(path) ? Files.size(path) : 0L;
+        } catch (IOException e) {
+            LOG.warn("读取归档文件大小失败: {} - {}", file, e.getMessage());
+            return 0L;
+        }
     }
 
     private void writeTiles(
@@ -167,6 +212,11 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
                     while (iterator.hasNext()) {
                         Tuple2<String, V3TileFeatureGroup> item = iterator.next();
                         PbfInfo pbf = MultiLayerMvtEncoderV3.encode(item._1, item._2, parameter);
+                        // 空瓦片不写：没有要素的瓦片应当表现为"不存在"，
+                        // 而不是一条 tile_data 为空的记录（会虚高瓦片数、干扰预览与统计）
+                        if (isBlankTile(pbf)) {
+                            continue;
+                        }
                         bindDelete(delete, item._1, pbf, parameter);
                         bindInsert(insert, item._1, pbf, parameter);
                         batchSize++;
@@ -221,8 +271,9 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
                 while (iterator.hasNext()) {
                     Tuple2<String, V3TileFeatureGroup> item = iterator.next();
                     PbfInfo pbf = MultiLayerMvtEncoderV3.encode(item._1, item._2, parameter);
-                    if (pbf == null || pbf.getData() == null) {
-                        throw new IllegalStateException("V3 多图层瓦片编码结果为空，tileId=" + item._1);
+                    if (isBlankTile(pbf)) {
+                        // 空瓦片不落盘，也不计入写出统计
+                        continue;
                     }
                     TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(item._1);
                     int outputY = getOutputY(zxy, pbf.getGridSrid(), outputConfig.getTileYAxis());
@@ -444,6 +495,15 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
     private static boolean isArchiveOutput(MultiLayerTileSliceParameter parameter) {
         V3TileOutputType outputType = resolveOutputType(parameter);
         return outputType == V3TileOutputType.MBTILES || outputType == V3TileOutputType.PMTILES;
+    }
+
+    /**
+     * 是否为"无内容"的瓦片。
+     * <p>编码器对没有要素可写的瓦片返回空数组，这类瓦片不应当落盘：
+     * 它们在产物里应当表现为"不存在"，写出一条空记录只会虚高瓦片数、干扰预览与统计。</p>
+     */
+    private static boolean isBlankTile(PbfInfo pbf) {
+        return pbf == null || pbf.getData() == null || pbf.getData().length == 0;
     }
 
     private static void validateTableName(String tableName) {

@@ -110,16 +110,20 @@ public class TileIterator
             return false;
         }
 
-        // 如果未初始化，先初始化当前 zoom
-        if (!initialized) {
-            initCurrentZoom();
-        }
-
-        // 检查当前位置是否有效
         while (hasNext) {
             if (currentZoom > maxZoom) {
                 hasNext = false;
                 return false;
+            }
+
+            // 当前层级还没算出瓦片范围时先算一次。
+            // 注意 initCurrentZoom() 遇到空范围会直接推进到下一层级并重置 initialized，
+            // 因此这里必须放在循环里反复初始化；否则后续层级会沿用上一层残留的
+            // xMin/xMax/currentX/currentY 做判断，导致整级瓦片被静默跳过
+            // （表现为"有些网格有内容、有些网格没有内容"）。
+            if (!initialized) {
+                initCurrentZoom();
+                continue;
             }
 
             if (currentX >= xMin && currentX <= xMax &&

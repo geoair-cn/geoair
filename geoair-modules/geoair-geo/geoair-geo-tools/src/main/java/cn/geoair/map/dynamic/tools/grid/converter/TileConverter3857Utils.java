@@ -76,36 +76,57 @@ public class TileConverter3857Utils extends TileConverterCommon {
             throw new IllegalArgumentException("地理范围Envelope不能为空");
         }
         validateXyz(z, 0, 0);
+
+        // 点、线等退化范围：加极小偏移，保证几何能落进某一个瓦片
+        Envelope envelope = tileBox;
+        if (envelope.isNull()
+                || Math.abs(envelope.getMaxX() - envelope.getMinX()) < POINT_OFFSET
+                || Math.abs(envelope.getMaxY() - envelope.getMinY()) < POINT_OFFSET) {
+            double centerX = (envelope.getMinX() + envelope.getMaxX()) / 2;
+            double centerY = (envelope.getMinY() + envelope.getMaxY()) / 2;
+            envelope = new Envelope(
+                    centerX - POINT_OFFSET,
+                    centerX + POINT_OFFSET,
+                    centerY - POINT_OFFSET,
+                    centerY + POINT_OFFSET);
+        }
+
+        // 夹到 Web Mercator 有效范围，避免越界坐标算出非法索引
+        double envMinX = clampDouble(envelope.getMinX(), -MAX_MERCATOR, MAX_MERCATOR);
+        double envMaxX = clampDouble(envelope.getMaxX(), -MAX_MERCATOR, MAX_MERCATOR);
+        double envMinY = clampDouble(envelope.getMinY(), -MAX_MERCATOR, MAX_MERCATOR);
+        double envMaxY = clampDouble(envelope.getMaxY(), -MAX_MERCATOR, MAX_MERCATOR);
+
         // 通过分辨率计算，geowebcache就是这样的计算方式
         TileLevelMetadata tileLevelMetadata = getTileLevelMetadata(z);
         double resolution = tileLevelMetadata.getResolution();
         double width = resolution * 256;
         double height = resolution * 256;
         double[] tileOrigin = {-20037508.3427892, 20037508.3427892};
-        long minX = (long) Math.floor((tileBox.getMinX() - tileOrigin[0]) / width);
-        long maxX = (long) Math.ceil(((tileBox.getMaxX() - tileOrigin[0]) / width));
-        long minY = (long) Math.floor((tileOrigin[1] - tileBox.getMaxY()) / height);
-        long maxY = (long) Math.ceil((tileOrigin[1] - tileBox.getMinY()) / height);
-//        long[] ret = {minX, minY, maxX - 1, maxY - 1, z};
-        RangeApo rangeApo = new RangeApo(minX, maxX, minY, maxY, z);
+        long minX = (long) Math.floor((envMinX - tileOrigin[0]) / width);
+        long maxX = (long) Math.ceil((envMaxX - tileOrigin[0]) / width);
+        long minY = (long) Math.floor((tileOrigin[1] - envMaxY) / height);
+        long maxY = (long) Math.ceil((tileOrigin[1] - envMinY) / height);
 
-        return rangeApo;
-//        System.out.println(rangeApo);
-//        double tileSize = 2 * MAX_MERCATOR / Math.pow(2, z);
-//        double tileXmin = Math.floor((tileBox.getMinX() + MAX_MERCATOR) / tileSize);
-//        double tileXmax = Math.ceil((tileBox.getMaxX() + MAX_MERCATOR) / tileSize);
-//        double tileYmin = Math.floor((MAX_MERCATOR - tileBox.getMaxY()) / tileSize);
-//        double tileYmax = Math.ceil((MAX_MERCATOR - tileBox.getMinY()) / tileSize);
-//
-//        // 3. 边界修正（确保瓦片索引在合法范围）
-//        int maxTileIndex = (1 << z) - 1;
-//        tileXmin = Math.max(0, Math.min(tileXmin, maxTileIndex));
-//        tileXmax = Math.max(0, Math.min(tileXmax, maxTileIndex));
-//        tileYmin = Math.max(0, Math.min(tileYmin, maxTileIndex));
-//        tileYmax = Math.max(0, Math.min(tileYmax, maxTileIndex));
+        // 边界修正：ceil 可能得到 2^z，必须夹回 [0, 2^z - 1]，
+        // 否则下游 xyzToQuadKey 会抛「X/Y坐标超出范围」。
+        long maxTileIndex = (1L << z) - 1;
+        minX = clampLong(minX, 0, maxTileIndex);
+        maxX = clampLong(maxX, 0, maxTileIndex);
+        minY = clampLong(minY, 0, maxTileIndex);
+        maxY = clampLong(maxY, 0, maxTileIndex);
 
-        // 4. 返回瓦片索引范围
-//        return new RangeApo(tileXmin, tileXmax, tileYmin, tileYmax, z);
+        return new RangeApo((int) minX, (int) maxX, (int) minY, (int) maxY, z);
+    }
+
+    /** 把数值限制在 [min, max] 区间内 */
+    private static double clampDouble(double value, double min, double max) {
+        return Math.max(min, Math.min(value, max));
+    }
+
+    /** 把瓦片索引限制在 [min, max] 区间内 */
+    private static long clampLong(long value, long min, long max) {
+        return Math.max(min, Math.min(value, max));
     }
 
     @Override

@@ -75,6 +75,20 @@ public class MultiLayerTileSliceParameter implements Serializable {
     private String tileSizeLimit = "2MB";
 
     /**
+     * MVT 瓦片缓冲区，单位为瓦片内部坐标（瓦片边长固定为 4096）。
+     * <p>缓冲区让跨越瓦片边界的要素在相邻瓦片中都有几何，避免线/面在地图拼接处出现断口。
+     * 对应 tippecanoe 的 {@code -b/--buffer}，默认 8（约 0.5 像素）。</p>
+     */
+    private Integer buffer = 8;
+
+    /**
+     * 超过 {@link #tileSizeLimit} 时的最大优化轮次。
+     * <p>每一轮先尝试提升简化级别，再按密度/大小裁剪要素；达到上限后直接接受当前结果，
+     * 避免在极端数据下反复重编码拖慢任务。</p>
+     */
+    private int tileSizeOptimizeRounds = 4;
+
+    /**
      * 最终 PBF 是否使用 gzip 压缩，默认开启以保持 V3 原有输出行为。
      * 关闭时，tileSizeLimit 按未压缩的最终 PBF 大小计算。
      */
