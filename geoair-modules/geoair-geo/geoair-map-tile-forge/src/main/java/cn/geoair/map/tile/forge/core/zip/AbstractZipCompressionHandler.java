@@ -138,6 +138,17 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 entry.setDataOffset(estimatedOffset);
             }
         }
+        // 压缩大小为 0 的条目在归档里没有数据区，直接返回空结果。
+        // 不加这一步会算出 end = dataOffset - 1，readRange 判断 start > end 后抛「无效的范围」，
+        // 一个正常的空文件条目就会把整个瓦片请求带崩。
+        if (entry.getCompressedSize() <= 0) {
+            if (entry.getUncompressedSize() > 0) {
+                throw new IOException("条目数据不完整，压缩大小:" + entry.getCompressedSize()
+                        + ", 声明解压后大小:" + entry.getUncompressedSize());
+            }
+            return new byte[0];
+        }
+
         byte[] compressedData = readRange(source, entry.getDataOffset(), entry.getDataOffset() + entry.getCompressedSize() - 1);
         return entry.getDecompressionHandler().decompress(compressedData, entry.getUncompressedSize());
     }
