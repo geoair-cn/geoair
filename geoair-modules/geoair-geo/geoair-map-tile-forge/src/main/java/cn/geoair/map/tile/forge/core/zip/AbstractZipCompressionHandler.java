@@ -10,6 +10,7 @@ import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 import cn.geoair.map.tile.forge.core.zip.model.LocalFileHeader;
+import cn.geoair.map.tile.forge.core.utils.LocalWriteUtils;
 import cn.hutool.core.io.unit.DataSizeUtil;
 
 
@@ -19,6 +20,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
@@ -1360,13 +1362,23 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     private static void byteToLocal(String localOutputPath, byte[] fileData) throws IOException {
-        Files.createDirectories(Paths.get(localOutputPath).getParent());
-        try (OutputStream out = new FileOutputStream(localOutputPath)) {
-            out.write(fileData);
+        Path targetPath = Paths.get(localOutputPath);
+        Files.createDirectories(targetPath.getParent());
+        // 先写临时文件再整体替换。之前是直接往目标路径写， FileOutputStream 一构造目标文件就以 0 字节出现，
+        // 并发读请求会把它当成已经就绪的文件，拿到半截数据。
+        File targetFile = targetPath.toFile();
+        File tempFile = LocalWriteUtils.tempFileOf(targetFile);
+        try {
+            try (OutputStream out = new FileOutputStream(tempFile)) {
+                out.write(fileData);
+            }
+            LocalWriteUtils.replaceAtomically(tempFile.toPath(), targetPath);
             log.debug("文件已写入本地：{}，大小：{}", localOutputPath, DataSizeUtil.format(fileData.length));
         } catch (IOException e) {
             log.error("写入本地文件失败：{}", localOutputPath, e);
             throw new IOException("写入本地文件失败：" + localOutputPath, e);
+        } finally {
+            LocalWriteUtils.deleteIfExistsQuietly(tempFile.toPath());
         }
     }
 
