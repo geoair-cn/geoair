@@ -25,9 +25,4 @@ public class Bzip2Handler implements DecompressionHandler {
             return result;
         }
     }
-
-    @Override
-    public boolean supportStreamingDecompress() {
-        return false;
-    }
 }

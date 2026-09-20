@@ -3,8 +3,6 @@ package cn.geoair.map.tile.forge.core.zip;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-import cn.geoair.map.tile.forge.core.enums.GirCompressionType;
-import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionLimits;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
@@ -140,10 +138,6 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 entry.setDataOffset(estimatedOffset);
             }
         }
-        if (entry.getCompressedSize() > MAX_CHUNK_SIZE && entry.getDecompressionHandler().supportStreamingDecompress()) {
-            return readLargeEntryData(entry, source);
-        }
-
         byte[] compressedData = readRange(source, entry.getDataOffset(), entry.getDataOffset() + entry.getCompressedSize() - 1);
         return entry.getDecompressionHandler().decompress(compressedData, entry.getUncompressedSize());
     }
@@ -1295,44 +1289,6 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                 readLong(zip64Eocd, 48),
                 0L
         );
-    }
-
-    /**
-     * 读取大文件的压缩数据（分块解压）
-     */
-    private byte[] readLargeEntryData(CentralDirectoryModel entry, String source) throws IOException {
-        long totalCompressed = entry.getCompressedSize();
-        long totalUncompressed = entry.getUncompressedSize();
-        long currentOffset = entry.getDataOffset();
-        int methodCode = (int) entry.getCompressionMethod();
-        GirCompressionType type = GirCompressionType.getByMethodCode(methodCode);
-//        log.debug("使用[{}]适配器处理解压，预期大小: {}字节", type.getText(), entry.getUncompressedSize());
-
-        // 2. 调用对应适配器的解压方法
-        DecompressionHandler handler = type.getHandler();
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream((int) Math.min(totalUncompressed, Integer.MAX_VALUE));
-
-        try {
-            while (totalCompressed > 0) {
-                int chunkSize = (int) Math.min(totalCompressed, MAX_CHUNK_SIZE);
-                byte[] compressedChunk = readRange(source, currentOffset, currentOffset + chunkSize - 1);
-                byte[] decompress = handler.decompress(compressedChunk, chunkSize);
-                if (decompress != null && decompress.length != 0) {
-                    out.write(decompress);
-                }
-                currentOffset += chunkSize;
-                totalCompressed -= chunkSize;
-
-            }
-
-            if (out.size() != totalUncompressed && totalUncompressed > 0) {
-                log.warn("解压大小不匹配，预期:{}, 实际:{}", totalUncompressed, out.size());
-            }
-            return out.toByteArray();
-        } finally {
-            out.close();
-        }
     }
 
     private static void byteToLocal(String localOutputPath, byte[] fileData) throws IOException {

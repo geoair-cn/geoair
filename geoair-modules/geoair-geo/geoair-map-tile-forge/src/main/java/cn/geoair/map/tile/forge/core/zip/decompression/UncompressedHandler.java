@@ -24,9 +24,4 @@ public class UncompressedHandler implements DecompressionHandler {
         // 未压缩数据直接返回
         return compressedData;
     }
-
-    @Override
-    public boolean supportStreamingDecompress() {
-        return true;
-    }
 }
