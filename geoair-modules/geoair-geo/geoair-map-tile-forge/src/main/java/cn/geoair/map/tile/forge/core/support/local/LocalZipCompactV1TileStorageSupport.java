@@ -11,6 +11,7 @@ import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.support.arcgis.AbstractArcgisZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.utils.ArcgisTileUtils;
+import cn.geoair.map.tile.forge.core.utils.ExtractLockUtils;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
@@ -130,18 +131,29 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
         String pathToBundleFile = filePath.replaceFirst("^\\\\+", "") + fileExt;
         // 检查并解压 .bundle 文件到临时目录
         File tempBundleFile = FileUtil.file(tempDirAbsolutePath + File.separator + pathToBundleFile);
-        if (!FileUtil.exist(tempBundleFile)) {
-            // ZIP文件内路径统一使用正斜杠
-            String normalizedPathToBundleFile = pathToBundleFile.replace('\\', '/');
-            try {
-                getICompressionHandler().readFileFromZipToLocal(layerConfigContext.getObjectKey(), normalizedPathToBundleFile, tempBundleFile.getAbsolutePath());
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                return false;
-            }
+        if (FileUtil.exist(tempBundleFile)) {
             return true;
-        } else {
-            return true;
+        }
+        // ZIP文件内路径统一使用正斜杠
+        String normalizedPathToBundleFile = pathToBundleFile.replace('\\', '/');
+        try {
+            // 同一个 bundle 只允许一个线程抽取，其余线程等它落盘后直接读现成文件，
+            // 避免并发请求各自把同一份数据拉一遍，也避免读到还没写完的半截文件
+            return ExtractLockUtils.withLock(tempBundleFile.getAbsolutePath(), () -> {
+                if (FileUtil.exist(tempBundleFile)) {
+                    return true;
+                }
+                try {
+                    getICompressionHandler().readFileFromZipToLocal(layerConfigContext.getObjectKey(), normalizedPathToBundleFile, tempBundleFile.getAbsolutePath());
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    return false;
+                }
+                return true;
+            });
+        } catch (Exception e) {
+            log.error("解压[{}]到本地失败", normalizedPathToBundleFile, e);
+            return false;
         }
     }
 
@@ -161,24 +173,34 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
         if (FileUtil.exist(tempBundleFile)) {
             return true;
         }
-        try (LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext)) {
-            boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
-            if (b) {
-                String replace = pathToBundleFile.replace("\\", "/");
-                TileCentralDirectoryModel zipDirectoryByFileName = layerPerFileDao.findByFileName(replace);
-                if (zipDirectoryByFileName == null) {
+        // ZIP内路径统一使用正斜杠，这里提前算好，lambda 里要用
+        final String bundleFileInZipPath = pathToBundleFile.replace("\\", "/");
+        try {
+            return ExtractLockUtils.withLock(tempBundleFile.getAbsolutePath(), () -> {
+                if (FileUtil.exist(tempBundleFile)) {
+                    return true;
+                }
+                try (LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext)) {
+                    boolean b = layerPerFileDao.cacheEnableIs(layerConfigContext);
+                    if (!b) {
+                        return false;
+                    }
+                    TileCentralDirectoryModel zipDirectoryByFileName = layerPerFileDao.findByFileName(bundleFileInZipPath);
+                    if (zipDirectoryByFileName == null) {
+                        return false;
+                    }
+                    getICompressionHandler().readAndDecompressEntryToLocal(zipDirectoryByFileName, layerConfigContext.getObjectKey(), tempBundleFile.getAbsolutePath());
+                } catch (Exception e) {
+
+                    log.error("getTileDataByPreZipCache error:", e);
                     return false;
                 }
-                getICompressionHandler().readAndDecompressEntryToLocal(zipDirectoryByFileName, layerConfigContext.getObjectKey(), tempBundleFile.getAbsolutePath());
-            } else {
-                return false;
-            }
+                return true;
+            });
         } catch (Exception e) {
-
-            log.error("getTileDataByPreZipCache error:", e);
+            log.error("按缓存解压[{}]到本地失败", tempBundleFile.getAbsolutePath(), e);
             return false;
         }
-        return true;
     }
 
     @Override

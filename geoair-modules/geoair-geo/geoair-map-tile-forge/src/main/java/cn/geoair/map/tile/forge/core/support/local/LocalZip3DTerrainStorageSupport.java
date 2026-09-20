@@ -8,6 +8,7 @@ import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
+import cn.geoair.map.tile.forge.core.utils.ExtractLockUtils;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
@@ -85,7 +86,18 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
         String inLocalPath = localTileFile.getAbsolutePath();
         boolean localStatu = localTileFile.exists();
         if (!localStatu) {
-            localStatu = byPreCache(layerConfigContext, z, y, x, inLocalPath);
+            // 同一个瓦片只允许一个线程抽取，其余线程等它落盘后直接读现成文件
+            try {
+                localStatu = ExtractLockUtils.withLock(inLocalPath, () -> {
+                    if (localTileFile.exists()) {
+                        return true;
+                    }
+                    return byPreCache(layerConfigContext, z, y, x, inLocalPath);
+                });
+            } catch (Exception e) {
+                log.error("抽取三维瓦片到本地失败：{}", inLocalPath, e);
+                localStatu = false;
+            }
         }
         if (localStatu) {
             tileRequest.setBytes(FileUtil.readBytes(localTileFile));
