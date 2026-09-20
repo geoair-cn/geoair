@@ -6,7 +6,6 @@ import cn.geoair.base.percent.GiProgressReporter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
-import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MultiLayerTileSliceParameter;
@@ -25,6 +24,7 @@ import cn.geoair.map.dynamic.statics.mvt.v4.group.V4TileGroupStore;
 import cn.geoair.map.dynamic.statics.mvt.v4.input.V4FeatureReader;
 import cn.geoair.map.dynamic.statics.mvt.v4.input.V4FeatureReaderFactory;
 import cn.geoair.map.dynamic.statics.mvt.v4.input.V4GeoJsonFeatureMapper;
+import cn.geoair.map.dynamic.statics.mvt.v4.stats.V4TileStats;
 import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson2.JSON;
@@ -52,7 +52,12 @@ import java.util.Set;
  * <p>因此 V4 的产物与 V3 可比：同一份数据、同一组参数下，瓦片键、每瓦片要素集合
  * （含聚合安全阀的削减结果）、属性输出规则都由同一批代码决定。</p>
  *
- * <p><b>不修改 V1/V2/V3 的任何代码</b>：本类只调用它们的公开 API。</p>
+ * <p><b>瓦片统计由 V4 自己做</b>（tippecanoe 的 {@code tilestats}）：聚合回调里按<b>输入序号</b>
+ * 去重，然后写进任务元数据。V3 没有统计阶段，所以 V4 不沿用"给每行打一个唯一标记"
+ * 的做法 —— 在 V4 里那个标记既没有消费者、又会变成 PBF 属性（见 {@link V4TileStats}）。</p>
+ *
+ * <p><b>本类只调用 V1/V2/V3 的公开 API</b>，不修改它们。V3 侧唯一的改动是去掉一处
+ * 无消费者的统计标记，与 V4 的执行编排无关（见 {@code V4开发计划.md} 第八节）。</p>
  *
  * @author 张逢吉
  */
@@ -90,10 +95,10 @@ public class V4VectorTileGenerator {
 
         V4TileGroupStore.V4GroupStats groupStats = null;
         V4TileWriter writer = new V4TileWriter(base, progress);
+        // 统计开关关闭时不建收集器：聚合回调与元数据都不需要做额外工作
+        V4TileStats tileStats = options.isTileStats() ? new V4TileStats(base.getLayers()) : null;
         try (V4TileGroupStore store = new V4TileGroupStore(
-                base.getLayers(), base.getOutGridSrid(),
-                options.getSpillRowThreshold(), options.getSpillDirectory(),
-                options.isHilbert(), options.isReorder(), options.isPreserveInputOrder())) {
+                base.getLayers(), base.getOutGridSrid(), options, tileStats)) {
 
             progress.stage("读取并转换多图层数据");
             Map<String, Long> geometrySkips = new LinkedHashMap<>();
@@ -109,7 +114,10 @@ public class V4VectorTileGenerator {
             progress.completeStage("瓦片数: " + progress.getTilesWritten());
 
             progress.stage("写出任务元数据");
-            writer.writeMetadata(JSON.toJSONString(buildOutputMetadata(base)));
+            writer.writeMetadata(JSON.toJSONString(buildOutputMetadata(base, tileStats)));
+            if (tileStats != null) {
+                LOG.info("V4 瓦片统计：{}", tileStats.summary());
+            }
             progress.completeStage("元数据: " + (base.getOutputConfig().isWriteMetadata()
                     ? base.getOutputConfig().getMetadataFileName() : "已关闭"));
 
@@ -125,7 +133,7 @@ public class V4VectorTileGenerator {
 
         if (archive) {
             progress.stage("归档单文件瓦片");
-            archiveTiles(base);
+            archiveTiles(base, tileStats);
             progress.completeStage("归档完成");
         }
 
@@ -164,8 +172,8 @@ public class V4VectorTileGenerator {
                 long currentSequence = sequence[0]++;
                 failures[0] += V4GeoJsonFeatureMapper.applyAttributeTypes(
                         row, options.getAttributeTypes(), layer.getGeomFieldName());
-                // 与 V3 一致：给每行一个唯一标记，编码器在写 PBF 前会把它摘掉
-                row.put(VecConstant.FeatureRowID, IdUtil.fastSimpleUUID());
+                // 这里不写统计去重键：V4 的统计按输入序号去重（同一个源要素的多块瓦片行共用
+                // 一个序号），不需要往行里塞任何标记 —— 塞了就会变成 PBF 属性（V3 的老问题）。
                 GirAdvOneRow transformed = VectorTileCommonUtils.transformSingleFeature(row, readParameter);
                 if (transformed == null) {
                     skipped[0]++;
@@ -218,8 +226,12 @@ public class V4VectorTileGenerator {
     // 元数据与归档
     // ------------------------------------------------------------------
 
-    /** 组装目录清单、MBTiles 与 PMTiles 共用的元数据（字段与 V3 同一套）。 */
-    private Map<String, Object> buildOutputMetadata(MultiLayerTileSliceParameter parameter) {
+    /**
+     * 组装目录清单、MBTiles 与 PMTiles 共用的元数据（字段与 V3 同一套）。
+     *
+     * @param tileStats 瓦片统计；为 null 表示本任务关闭统计（不写 {@code tilestats} 段）
+     */
+    private Map<String, Object> buildOutputMetadata(MultiLayerTileSliceParameter parameter, V4TileStats tileStats) {
         V3TileOutputConfig outputConfig = parameter.getOutputConfig();
         Map<String, Object> metadata = new LinkedHashMap<>();
         metadata.put("format", "pbf");
@@ -245,7 +257,8 @@ public class V4VectorTileGenerator {
             vectorLayer.put("id", layer.getLayerName());
             vectorLayer.put("minzoom", layer.getMinZoom() == null ? parameter.getMinZoom() : layer.getMinZoom());
             vectorLayer.put("maxzoom", layer.getMaxZoom() == null ? parameter.getMaxZoom() : layer.getMaxZoom());
-            vectorLayer.put("fields", Collections.emptyMap());
+            vectorLayer.put("fields", tileStats == null
+                    ? Collections.emptyMap() : tileStats.fieldTypes(layer.getLayerName()));
             vectorLayers.add(vectorLayer);
         }
         metadata.put("layers", layers);
@@ -254,17 +267,21 @@ public class V4VectorTileGenerator {
                 ? "1.0" : parameter.getEdition());
         metadata.put("type", "overlay");
         metadata.put("vector_layers", vectorLayers);
+        if (tileStats != null) {
+            // tippecanoe 把 tilestats 写在元数据里（目录输出的 metadata.json / 归档的 JSON 头）
+            metadata.put("tilestats", JSON.toJSON(tileStats.toTileStats()));
+        }
         metadata.put("engine", "v4");
         return metadata;
     }
 
     /** 把已写入暂存目录的瓦片归档为 MBTiles 或 PMTiles（复用 V3 的归档实现）。 */
-    private void archiveTiles(MultiLayerTileSliceParameter parameter) throws Exception {
+    private void archiveTiles(MultiLayerTileSliceParameter parameter, V4TileStats tileStats) throws Exception {
         if (parameter.getOutGridSrid() != 3857) {
             throw new IllegalArgumentException("V4 MBTiles/PMTiles 输出仅支持 WebMercator（EPSG:3857）网格");
         }
         V3TileOutputConfig outputConfig = parameter.getOutputConfig();
-        String metadataJson = JSON.toJSONString(buildOutputMetadata(parameter));
+        String metadataJson = JSON.toJSONString(buildOutputMetadata(parameter, tileStats));
         if (resolveOutputType(parameter) == V3TileOutputType.MBTILES) {
             MbtilesArchiveUtils.archive(
                     Paths.get(outputConfig.getStagingDirectory()), Paths.get(outputConfig.getMbtilesFile()),

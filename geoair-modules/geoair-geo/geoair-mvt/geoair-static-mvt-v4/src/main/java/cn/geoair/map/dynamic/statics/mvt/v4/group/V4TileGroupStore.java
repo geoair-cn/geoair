@@ -6,6 +6,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.V3TileFeatureGroup;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.TileUtils;
+import cn.geoair.map.dynamic.statics.mvt.v4.dto.V4Options;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import org.locationtech.jts.geom.Envelope;
@@ -76,6 +77,9 @@ public final class V4TileGroupStore implements Closeable {
     private final boolean reorder;
     private final boolean keepInputOrder;
 
+    /** 逐瓦片回调"最终交给编码器的行"的旁路消费者；不需要时为 null。 */
+    private final V4EmittedRowListener emittedRowListener;
+
     /** 瓦片键 -> 图层名 -> 要素（内存缓冲）。 */
     private final Map<String, Map<String, List<V4OrderedRow>>> buffer = new HashMap<>();
 
@@ -88,18 +92,26 @@ public final class V4TileGroupStore implements Closeable {
     private long capEvents;
     private boolean finished;
 
+    /**
+     * @param layers             任务的全部内部图层（按配置顺序）
+     * @param outGridSrid        输出网格 SRID
+     * @param options            V4 单机运行时参数（溢写阈值、溢写目录、三种排序开关）
+     * @param emittedRowListener 逐瓦片回调最终保留的行（可为 null；统计用它）
+     */
     public V4TileGroupStore(List<MvtLayerSliceParameter> layers, int outGridSrid,
-            int spillRowThreshold, String spillDirectory,
-            boolean hilbert, boolean reorder, boolean keepInputOrder) throws IOException {
+            V4Options options, V4EmittedRowListener emittedRowListener) throws IOException {
+        V4Options resolved = options == null ? new V4Options() : options;
         this.layersByName = new LinkedHashMap<>();
         for (MvtLayerSliceParameter layer : layers) {
             this.layersByName.put(layer.getLayerName(), layer);
         }
         this.outGridSrid = outGridSrid;
-        this.spillRowThreshold = Math.max(1000, spillRowThreshold);
-        this.hilbert = hilbert;
-        this.reorder = reorder;
-        this.keepInputOrder = keepInputOrder;
+        this.spillRowThreshold = Math.max(1000, resolved.getSpillRowThreshold());
+        this.hilbert = resolved.isHilbert();
+        this.reorder = resolved.isReorder();
+        this.keepInputOrder = resolved.isPreserveInputOrder();
+        this.emittedRowListener = emittedRowListener;
+        String spillDirectory = resolved.getSpillDirectory();
         if (spillDirectory == null || spillDirectory.trim().isEmpty()) {
             // 用 java.io.tmpdir 下的固定父目录再建临时子目录：直接 createTempDirectory() 依赖
             // java.io.tmpdir 已存在，而生产环境里它未必存在（实测 NoSuchFileException）
@@ -333,6 +345,10 @@ public final class V4TileGroupStore implements Closeable {
             }
             if (layer != null && V4FeatureOrdering.needsSort(hilbert, reorder, keepInputOrder, rows.size())) {
                 V4FeatureOrdering.sort(rows, hilbert, reorder, keepInputOrder, layer, envelope);
+            }
+            if (emittedRowListener != null) {
+                // 旁路消费者（统计）看到的必须是"就这些行"：削减之后、排序之后的最终列表
+                emittedRowListener.onRows(layerName, rows);
             }
             features.put(layerName, V4FeatureOrdering.toRows(rows));
         }

@@ -50,6 +50,15 @@ public class V4Options implements Serializable {
     private Map<String, String> attributeTypes = new LinkedHashMap<>();
 
     /**
+     * 对应 tippecanoe {@code -T/--no-tile-stats} 的<b>反向</b>开关：是否统计瓦片要素信息。
+     *
+     * <p>开启时（默认）统计每个图层的要素数、几何类型、字段类型与取值分布，写进任务元数据的
+     * {@code tilestats} 段（结构与 V1/V2 写库那套一致，见 {@code TileStatRoot}）。
+     * 关闭时既不统计也不写出，同时省掉去重位图与字段计数这两块运行期开销。</p>
+     */
+    private boolean tileStats = true;
+
+    /**
      * V4 自有参数（非 tippecanoe 参数）：内存中累计多少行后溢写到磁盘。
      * <p>V4 不依赖 Spark 的分区与 spill，靠这个阈值把内存占用钉在可控范围：
      * 达到阈值就把当前缓冲按瓦片键排序落成一个 run 文件并清空内存，
@@ -69,6 +78,7 @@ public class V4Options implements Serializable {
         copy.reorder = this.reorder;
         copy.hilbert = this.hilbert;
         copy.attributeTypes = new LinkedHashMap<>(this.attributeTypes);
+        copy.tileStats = this.tileStats;
         copy.spillRowThreshold = this.spillRowThreshold;
         copy.spillDirectory = this.spillDirectory;
         return copy;

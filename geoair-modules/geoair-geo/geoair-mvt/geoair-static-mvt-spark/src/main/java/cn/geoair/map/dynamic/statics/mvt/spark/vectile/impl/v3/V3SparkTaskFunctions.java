@@ -1,11 +1,9 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3;
 
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
-import cn.hutool.core.util.IdUtil;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import scala.Tuple2;
@@ -92,7 +90,9 @@ final class V3SparkTaskFunctions {
 
         @Override
         public GirAdvOneRow call(GirAdvOneRow row) {
-            row.put(VecConstant.FeatureRowID, IdUtil.fastSimpleUUID());
+            // 这里不写统计去重键：V3 没有统计阶段（StatisticUtils 只被 V1/V2 调用），
+            // 写进去没人消费，只会被"未配置字段白名单=全字段输出"的多图层编码器
+            // 当成普通属性写进 PBF（一块 8000 要素的瓦片里它占掉绝大部分体积）。
             return VectorTileCommonUtils.transformSingleFeature(row, parameter);
         }
     }
