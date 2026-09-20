@@ -9,11 +9,11 @@ import java.io.InputStream;
  */
 public final class DecompressionLimits {
 
-    /** 单个压缩条目的最大压缩大小，默认 128 MiB。 */
-    private static volatile long maxCompressedEntrySize = 128L * 1024L * 1024L;
+    /** 单个压缩条目的最大压缩大小，默认 128 MiB*10。 */
+    private static volatile long maxCompressedEntrySize = 128L * 1024L * 1024L*10;
 
-    /** 单个解压条目的最大大小，默认 256 MiB。 */
-    private static volatile long maxDecompressedEntrySize = 256L * 1024L * 1024L;
+    /** 单个解压条目的最大大小，默认 256 MiB*10。 */
+    private static volatile long maxDecompressedEntrySize = 256L * 1024L * 1024L*10;
 
     private DecompressionLimits() {
     }

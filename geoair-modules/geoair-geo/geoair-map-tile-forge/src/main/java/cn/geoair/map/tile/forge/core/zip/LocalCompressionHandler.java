@@ -7,33 +7,10 @@ import cn.geoair.base.log.GirLoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
 
  
 public class LocalCompressionHandler extends AbstractZipCompressionHandler {
     public static GiLogger log = GirLoggerFactory.getLogger();
-    @Override
-    public List<byte[]> readFileByChunks(String source, long startOffset, long totalSize, int chunkSize ) throws IOException {
-      
-        List<byte[]> chunks = new ArrayList<>();
-        long remaining = totalSize;
-        long currentOffset = startOffset;
-
-        try (RandomAccessFile raf = new RandomAccessFile(source, "r")) {
-            while (remaining > 0) {
-                int readSize = (int) Math.min(chunkSize, remaining);
-                byte[] chunk = new byte[readSize];
-                raf.seek(currentOffset);
-                raf.readFully(chunk);
-                chunks.add(chunk);
-
-                currentOffset += readSize;
-                remaining -= readSize;
-            }
-        }
-        return chunks;
-    }
 
     @Override
     protected byte[] readRange(String source, long start, long end) throws IOException {

@@ -5,7 +5,6 @@ import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 压缩文件处理器接口
@@ -31,31 +30,6 @@ public interface ICompressionHandler {
      * @throws IOException 处理失败时抛出
      */
     byte[] readFileFromZip(String zipSource, String targetFilePathInZip) throws IOException;
-
-    /**
-     * 分块读取文件内容（适用于大文件）
-     *
-     * @param source      源文件（本地路径或S3键名）
-     * @param startOffset 起始偏移量（字节）
-     * @param totalSize   总读取大小（字节）
-     * @param chunkSize   每块大小（字节）
-     * @return 分块数据列表
-     * @throws IOException 读取失败时抛出
-     */
-    List<byte[]> readFileByChunks(String source, long startOffset, long totalSize, int chunkSize) throws IOException;
-
-    /**
-     * 异步分块读取文件内容
-     *
-     * @param source      源文件（本地路径或S3键名）
-     * @param startOffset 起始偏移量
-     * @param totalSize   总大小
-     * @param chunkSize   分块大小
-     * @return 异步结果
-     */
-    CompletableFuture<List<byte[]>> asyncReadFileByChunks(String source, long startOffset, long totalSize, int chunkSize);
-
-
 
     /**
      * 获取文件大小（字节）
@@ -129,4 +103,69 @@ public interface ICompressionHandler {
     void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException;
 
     void scanAllEntries(String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException;
+
+    // ---------------------------- 带进度回调的重载 ----------------------------
+    // 下面几个重载只是为了把进度消费者放进 ReadProgressScope，实现类的读取逻辑不用改。
+    // 传 null 等价于不上报，和调用不带 ProgressConsumer 的版本完全一致。
+    // 需要在批量任务或排障时观察进度，传 new LogProgressConsumer() 即可。
+
+    /**
+     * 从ZIP中读取指定文件并写入本地，过程中上报读取进度
+     *
+     * @param progressConsumer 进度消费者，可为 null
+     */
+    default void readFileFromZipToLocal(String zipSource, String targetFilePathInZip, String localOutputPath,
+                                        ProgressConsumer progressConsumer) throws IOException {
+        ProgressConsumer previous = ReadProgressScope.begin(progressConsumer);
+        try {
+            readFileFromZipToLocal(zipSource, targetFilePathInZip, localOutputPath);
+        } finally {
+            ReadProgressScope.end(previous);
+        }
+    }
+
+    /**
+     * 从ZIP中读取指定文件的字节数据，过程中上报读取进度
+     *
+     * @param progressConsumer 进度消费者，可为 null
+     */
+    default byte[] readFileFromZip(String zipSource, String targetFilePathInZip,
+                                   ProgressConsumer progressConsumer) throws IOException {
+        ProgressConsumer previous = ReadProgressScope.begin(progressConsumer);
+        try {
+            return readFileFromZip(zipSource, targetFilePathInZip);
+        } finally {
+            ReadProgressScope.end(previous);
+        }
+    }
+
+    /**
+     * 读取并解压ZIP中的指定条目，过程中上报读取进度
+     *
+     * @param progressConsumer 进度消费者，可为 null
+     */
+    default byte[] readAndDecompressEntry(CentralDirectoryModel entry, String source,
+                                          ProgressConsumer progressConsumer) throws IOException {
+        ProgressConsumer previous = ReadProgressScope.begin(progressConsumer);
+        try {
+            return readAndDecompressEntry(entry, source);
+        } finally {
+            ReadProgressScope.end(previous);
+        }
+    }
+
+    /**
+     * 读取并解压ZIP中的指定条目到本地目录，过程中上报读取进度
+     *
+     * @param progressConsumer 进度消费者，可为 null
+     */
+    default void readAndDecompressEntryToLocal(CentralDirectoryModel entry, String source, String localOutputPath,
+                                               ProgressConsumer progressConsumer) throws IOException {
+        ProgressConsumer previous = ReadProgressScope.begin(progressConsumer);
+        try {
+            readAndDecompressEntryToLocal(entry, source, localOutputPath);
+        } finally {
+            ReadProgressScope.end(previous);
+        }
+    }
 }

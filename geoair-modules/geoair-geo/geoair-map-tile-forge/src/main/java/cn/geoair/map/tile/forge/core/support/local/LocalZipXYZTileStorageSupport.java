@@ -10,6 +10,7 @@ import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.AbstractZipDirectoryGetter;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.utils.CentralDirectoryUtils;
+import cn.geoair.map.tile.forge.core.utils.ExtractLockUtils;
 import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
 import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.TileRequest;
@@ -117,8 +118,18 @@ public class LocalZipXYZTileStorageSupport extends AbstractZipDirectoryGetter im
         boolean localStatu = localTileFile.exists();
         if (!localStatu) {
             // xyz的zip特别大，byZip 去zip里面找特别耗时，故全部请求全部走byPreCache，有多少看多少。
-            localStatu = byPreCache(layerConfigContext, z, y, x, inLocalPath);
-
+            try {
+                // 同一个瓦片只允许一个线程抽取，其余线程等它落盘后直接读现成文件
+                localStatu = ExtractLockUtils.withLock(localTileFile.getAbsolutePath(), () -> {
+                    if (localTileFile.exists()) {
+                        return true;
+                    }
+                    return byPreCache(layerConfigContext, z, y, x, inLocalPath);
+                });
+            } catch (Exception e) {
+                log.error("抽取瓦片到本地失败：{}", inLocalPath, e);
+                localStatu = false;
+            }
         }
         if (localStatu) {
             tileRequest.setBytes(FileUtil.readBytes(localTileFile));

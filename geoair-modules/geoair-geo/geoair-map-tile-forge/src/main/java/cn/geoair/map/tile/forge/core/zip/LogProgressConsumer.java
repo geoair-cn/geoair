@@ -30,26 +30,42 @@ public class LogProgressConsumer implements ProgressConsumer {
     /**
      * 进度上报器：接收原始 (总量, 当前量) 上报，按步长节流后回调监听器
      */
-    private final GirProgressReporter percentReporter = new GirProgressReporter(1, new GiProgressListener() {
+    private final GirProgressReporter percentReporter;
 
-        /**
-         * 进度开始：记录任务总量
-         */
-        @Override
-        public void onStart(Number total) {
-            log.info("进度开始，总任务量: {}", total);
-        }
+    /**
+     * 默认构造：每 1% 输出一次
+     */
+    public LogProgressConsumer() {
+        this(1);
+    }
 
-        /**
-         * 进度更新：打印进度条与百分比（按步长节流，每 1% 触发一次）
-         */
-        @Override
-        public void onUpdate(Number percent) {
-            if (log.isInfoEnabled()) {
-                log.info("当前进度: {}%  {}", percent, GutilPercent.getProgressDisplay(percent.doubleValue()));
+    /**
+     * 指定步长构造
+     *
+     * @param step 百分比步长，越小越详细。批量抽取大文件时把步长调大能少刷点日志
+     */
+    public LogProgressConsumer(double step) {
+        this.percentReporter = new GirProgressReporter(step, new GiProgressListener() {
+
+            /**
+             * 进度开始：记录任务总量
+             */
+            @Override
+            public void onStart(Number total) {
+                log.info("进度开始，总任务量: {}", total);
             }
-        }
-    });
+
+            /**
+             * 进度更新：打印进度条与百分比（按步长节流）
+             */
+            @Override
+            public void onUpdate(Number percent) {
+                if (log.isInfoEnabled()) {
+                    log.info("当前进度: {}%  {}", percent, GutilPercent.getProgressDisplay(percent.doubleValue()));
+                }
+            }
+        });
+    }
 
     /**
      * 上报一次进度，交由内部上报器节流并输出到日志

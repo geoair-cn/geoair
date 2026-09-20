@@ -3,6 +3,8 @@ package cn.geoair.map.tile.forge.core.s3;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.config.GirS3ConfigProperties;
+import cn.geoair.map.tile.forge.core.utils.ExtractLockUtils;
+import cn.geoair.map.tile.forge.core.utils.LocalWriteUtils;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -145,18 +147,32 @@ public class S3ClientGetter {
             String normalizedRemotePath = remoteFilePath.replace('\\', '/');
             validateRemoteObjectPath(normalizedRemotePath);
             if (!FileUtil.exist(localFile)) {
-                Path parentPath = localFile.toPath().toAbsolutePath().normalize().getParent();
-                if (parentPath != null) {
-                    Files.createDirectories(parentPath);
-                }
-                AmazonS3 s3Client = getClient();
-                S3Object object = s3Client.getObject(bucketName, normalizedRemotePath);
-                try {
-                    FileUtil.writeFromStream(object.getObjectContent(), localFile);
-                } finally {
-                    object.close();
-                }
-                log.info("从S3下载文件成功: bucket={}, key={}, local={}", bucketName, normalizedRemotePath, localFile.getAbsolutePath());
+                // 同一个目标文件的下载只允许一个线程执行，避免并发请求重复拉取同一份数据
+                ExtractLockUtils.withLock(localFile.getAbsolutePath(), () -> {
+                    if (FileUtil.exist(localFile)) {
+                        return true;
+                    }
+                    Path parentPath = localFile.toPath().toAbsolutePath().normalize().getParent();
+                    if (parentPath != null) {
+                        Files.createDirectories(parentPath);
+                    }
+                    AmazonS3 s3Client = getClient();
+                    S3Object object = s3Client.getObject(bucketName, normalizedRemotePath);
+                    try {
+                        // 先落临时文件再整体替换，避免并发请求读到写到一半的目标文件
+                        File tempFile = LocalWriteUtils.tempFileOf(localFile);
+                        try {
+                            FileUtil.writeFromStream(object.getObjectContent(), tempFile);
+                            LocalWriteUtils.replaceAtomically(tempFile.toPath(), localFile.toPath());
+                        } finally {
+                            LocalWriteUtils.deleteIfExistsQuietly(tempFile.toPath());
+                        }
+                    } finally {
+                        object.close();
+                    }
+                    log.info("从S3下载文件成功: bucket={}, key={}, local={}", bucketName, normalizedRemotePath, localFile.getAbsolutePath());
+                    return true;
+                });
             }
         } catch (Exception e) {
             log.error("从S3下载文件失败: bucket={}, key={}", bucketName, remoteFilePath, e);
