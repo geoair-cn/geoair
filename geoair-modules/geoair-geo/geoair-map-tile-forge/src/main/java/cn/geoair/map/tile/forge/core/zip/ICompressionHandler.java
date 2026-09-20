@@ -5,7 +5,6 @@ import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 压缩文件处理器接口
@@ -31,31 +30,6 @@ public interface ICompressionHandler {
      * @throws IOException 处理失败时抛出
      */
     byte[] readFileFromZip(String zipSource, String targetFilePathInZip) throws IOException;
-
-    /**
-     * 分块读取文件内容（适用于大文件）
-     *
-     * @param source      源文件（本地路径或S3键名）
-     * @param startOffset 起始偏移量（字节）
-     * @param totalSize   总读取大小（字节）
-     * @param chunkSize   每块大小（字节）
-     * @return 分块数据列表
-     * @throws IOException 读取失败时抛出
-     */
-    List<byte[]> readFileByChunks(String source, long startOffset, long totalSize, int chunkSize) throws IOException;
-
-    /**
-     * 异步分块读取文件内容
-     *
-     * @param source      源文件（本地路径或S3键名）
-     * @param startOffset 起始偏移量
-     * @param totalSize   总大小
-     * @param chunkSize   分块大小
-     * @return 异步结果
-     */
-    CompletableFuture<List<byte[]>> asyncReadFileByChunks(String source, long startOffset, long totalSize, int chunkSize);
-
-
 
     /**
      * 获取文件大小（字节）

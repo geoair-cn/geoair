@@ -13,8 +13,6 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
  
 public class S3CompressionHandler extends AbstractZipCompressionHandler {
@@ -41,28 +39,6 @@ public class S3CompressionHandler extends AbstractZipCompressionHandler {
         if (s3ClientGetter == null) {
             s3ClientGetter = SpringUtil.getBean(S3ClientGetter.class);
         }
-    }
-
-
-    @Override
-    public List<byte[]> readFileByChunks(String source, long startOffset, long totalSize, int chunkSize) throws IOException {
-        if (chunkSize <= 0 || totalSize <= 0 || startOffset < 0) {
-            throw new IllegalArgumentException("无效的参数：chunkSize=" + chunkSize + ", totalSize=" + totalSize + ", startOffset=" + startOffset);
-        }
-
-        List<byte[]> chunks = new ArrayList<>();
-        long remaining = totalSize;
-        long currentOffset = startOffset;
-
-        while (remaining > 0) {
-            int readSize = (int) Math.min(chunkSize, remaining);
-            byte[] chunk = readRange(source, currentOffset, currentOffset + readSize - 1);
-            chunks.add(chunk);
-
-            currentOffset += readSize;
-            remaining -= readSize;
-        }
-        return chunks;
     }
 
     /**

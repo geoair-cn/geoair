@@ -72,37 +72,6 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     @Override
-    public List<byte[]> readFileByChunks(String source, long startOffset, long totalSize, int chunkSize) throws IOException {
-        List<byte[]> chunks = new ArrayList<>();
-        long remaining = totalSize;
-        long currentOffset = startOffset;
-
-        while (remaining > 0) {
-            int currentChunkSize = (int) Math.min(remaining, chunkSize);
-            byte[] chunk = readRange(source, currentOffset, currentOffset + currentChunkSize - 1);
-            chunks.add(chunk);
-
-            currentOffset += currentChunkSize;
-            remaining -= currentChunkSize;
-        }
-
-        return chunks;
-    }
-
-
-    @Override
-    public CompletableFuture<List<byte[]>> asyncReadFileByChunks(String source, long startOffset, long totalSize, int chunkSize) {
-        try {
-            return CompletableFuture.completedFuture(readFileByChunks(source, startOffset, totalSize, chunkSize));
-        } catch (IOException e) {
-            log.error("异步分块读取失败，source:{}", source, e);
-            CompletableFuture<List<byte[]>> future = new CompletableFuture<>();
-            future.completeExceptionally(e);
-            return future;
-        }
-    }
-
-    @Override
     public EocdInfo parseEocd(long fileSize, String source) throws IOException {
         long searchStart = Math.max(0, fileSize - 65536);
         byte[] tailBytes = readRange(source, searchStart, fileSize - 1);
