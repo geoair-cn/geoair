@@ -23,7 +23,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,23 +30,35 @@ import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 /**
- * V4 的按瓦片聚合容器：内存缓冲 + 溢写落盘 + 归并。
+ * V4 的按瓦片聚合容器：内存缓冲 + 溢写落盘 + 有界归并。
  *
- * <p>这一层是 V4 用来替代 Spark {@code reduceByKey} 的部分，思路是经典的外部排序聚合：</p>
+ * <p>这一层是 V4 用来替代 Spark {@code reduceByKey} 的部分，思路是外部排序聚合：</p>
  * <ol>
- *   <li>要素按瓦片键直接追加进内存缓冲（<b>不做逐条 merge</b>，避免 V3 里
- *       {@code reduceByKey} 那种"每来一条就复制一遍列表"的平方级开销）；</li>
+ *   <li>要素按瓦片键追加进内存缓冲（<b>不做逐条 merge</b>，避免 V3 里
+ *       {@code reduceByKey} 那种"每来一条就复制一遍列表"的开销）；</li>
  *   <li>缓冲行数超过阈值时，把缓冲按瓦片键排序落成一个 run 文件，然后清空内存；</li>
  *   <li>全部要素读完后，若没有 run 文件就直接逐瓦片回调；否则把剩余缓冲也落成一个 run，
  *       再对所有 run 做 k 路归并，同一个瓦片键的记录合并后回调一次。</li>
  * </ol>
  *
- * <p><b>聚合安全阀</b>：回调前会用 {@link V3TileFeatureGroup#merge} 施加与 V3 同一份实现的
- * 要素上限削减，因此"每个瓦片最终留下哪些要素"与 V3 的收敛结果一致（见开发计划里的说明）。</p>
+ * <p><b>保留哪些行：全局确定性，与溢写无关。</b>每个图层的行不超过 {@code hardFeatureLimit}（记作 N），
+ * 选取规则见 {@link V4IdentitySelector} —— 按 (身份排名, 输入序号, 批内下标) 取最小的 N 个。
+ * 该算子可结合、可交换、幂等，因此三处施加（累积时、归并时、回调前）结果完全一致，
+ * 溢写、run 数、到达顺序都不影响产物。这是 V4 与 V3 的关键差别：V3 的削减次数决定了保留量，
+ * 同一份数据在不同运行时配置下能差 18%（见 {@code V4开发计划.md} 7.8）。</p>
  *
- * <p><b>排序</b>：安全阀是按身份哈希排名取前 N 个，会打乱顺序，所以
- * {@code --preserve-input-order} / {@code --reorder} / {@code --hilbert} 的排序
- * 放在安全阀<b>之后</b>，否则用户要的顺序会被安全阀冲掉。</p>
+ * <p><b>内存取向：宁可多算，不要多存。</b></p>
+ * <ul>
+ *   <li>缓冲里每个瓦片每个图层 ≤ 2N 行，超了立刻用有界选择削到 N；</li>
+ *   <li>归并时同一个瓦片键的多个 run 记录<b>流式喂进容量 N 的堆</b>，不再"先 addAll 成并集再削"。
+ *       实测旧写法在 62 个 run 时会把堆撑到 4 GB 上限；有界之后归并的内存与 run 数无关，
+ *       多出来的只是 CPU（每行 O(log N) 比较）；</li>
+ *   <li>回调前排序与构建聚合单元只作用在 ≤ N 行上。</li>
+ * </ul>
+ *
+ * <p><b>排序的位置</b>：{@code --preserve-input-order} / {@code --reorder} / {@code --hilbert}
+ * 放在削减<b>之后</b>（顺序号由 {@link V4OrderedRow} 带着走，不需要额外的映射表），
+ * 否则用户要的顺序会被削减打乱。</p>
  *
  * @author 张逢吉
  */
@@ -118,81 +129,40 @@ public final class V4TileGroupStore implements Closeable {
         Map<String, List<V4OrderedRow>> byLayer = buffer
                 .computeIfAbsent(tileKey, key -> new LinkedHashMap<>());
         List<V4OrderedRow> target = byLayer.computeIfAbsent(layerName, key -> new ArrayList<>());
+        int rowIndex = 0;
         for (GirAdvOneRow row : rows) {
-            target.add(new V4OrderedRow(sequence, row));
+            target.add(new V4OrderedRow(sequence, rowIndex++, row));
         }
         bufferedRows += rows.size();
         totalRows += rows.size();
-        capTileIfNeeded(byLayer);
+        trimTileIfNeeded(layerName, byLayer);
     }
 
     /**
-     * 单个瓦片的要素超过「图层安全上限 × 2」时就地施加一次安全阀削减。
+     * 单个瓦片某个图层的行数超过 「N × 2」时就地削到 N。
      *
-     * <p>这一步不能省。只在编码前削的话，低层级瓦片会在内存里堆到几百万行 ——
-     * 实测 poi z6-9 在 4GB 堆下归并阶段直接 OOM。提前削之后每个瓦片始终不超过
-     * 2N 行，内存与溢写量都跟着降下来。</p>
+     * <p>这一步不能省：只在回调前削的话，低层级瓦片会在内存里堆到几百万行。</p>
      *
-     * <p>削减用的是 {@link V3TileFeatureGroup#merge}（V3 自己的实现），
-     * 因此"留下哪些要素"与 V3 一致：V3 在 {@code reduceByKey} 里反复削，每次都是
-     * "取身份哈希最小的 N 个"，反复施加的收敛结果与只削一次相同。</p>
+     * <p>触发线取 2N 而不是 N，是为了摊薄削减本身的开销 —— 削一次要按优先序重排一遍，
+     * 每来一行就削一次会把 O(n log N) 变成 O(n² log N)。这与 V3 的 2N 触发线相同，
+     * 但因为 V3 的最终保留量取决于触发次数、V4 的最终保留量由<b>回调前那一次</b>统一决定，
+     * 所以这里削到哪一步都不影响产物。</p>
      */
-    private void capTileIfNeeded(Map<String, List<V4OrderedRow>> byLayer) {
-        boolean overLimit = false;
-        for (Map.Entry<String, List<V4OrderedRow>> entry : byLayer.entrySet()) {
-            MvtLayerSliceParameter layer = layersByName.get(entry.getKey());
-            if (layer == null || layer.getHardFeatureLimit() == null || layer.getHardFeatureLimit() <= 0) {
-                continue;
-            }
-            if (entry.getValue().size() > layer.getHardFeatureLimit() * 2L) {
-                overLimit = true;
-                break;
-            }
-        }
-        if (!overLimit) {
+    private void trimTileIfNeeded(String layerName, Map<String, List<V4OrderedRow>> byLayer) {
+        MvtLayerSliceParameter layer = layersByName.get(layerName);
+        int limit = hardLimitOf(layer);
+        if (limit <= 0) {
             return;
         }
-        // 削减会按身份哈希排名重排，序号得先按对象引用记录下来，削完再挂回去，
-        // 否则 --preserve-input-order 会失去依据
-        IdentityHashMap<GirAdvOneRow, Long> sequenceByRow = new IdentityHashMap<>();
-        for (List<V4OrderedRow> rows : byLayer.values()) {
-            for (V4OrderedRow ordered : rows) {
-                sequenceByRow.put(ordered.getRow(), ordered.getSequence());
-            }
+        List<V4OrderedRow> rows = byLayer.get(layerName);
+        if (rows == null || rows.size() <= limit * 2L) {
+            return;
         }
-        V3TileFeatureGroup capped = groupOf(byLayer).merge(null, layersByName, outGridSrid);
-        Map<String, List<GirAdvOneRow>> survivors = capped.copyFeaturesByLayer();
-        long before = 0L;
-        long after = 0L;
-        for (Map.Entry<String, List<V4OrderedRow>> entry : byLayer.entrySet()) {
-            before += entry.getValue().size();
-            List<GirAdvOneRow> kept = survivors.get(entry.getKey());
-            if (kept == null) {
-                entry.setValue(new ArrayList<>());
-                continue;
-            }
-            List<V4OrderedRow> restored = new ArrayList<>(kept.size());
-            for (GirAdvOneRow row : kept) {
-                Long sequence = sequenceByRow.get(row);
-                restored.add(new V4OrderedRow(sequence == null ? 0L : sequence, row));
-            }
-            entry.setValue(restored);
-            after += restored.size();
-        }
-        bufferedRows -= (before - after);
+        List<V4OrderedRow> kept = V4IdentitySelector.keepSmallest(rows, limit, layer);
+        byLayer.put(layerName, kept);
+        bufferedRows -= (rows.size() - kept.size());
         capEvents++;
-        LOG.debug("V4 瓦片安全阀：{} 行 -> {} 行（第 {} 次）", before, after, capEvents);
-    }
-
-    /** 把当前瓦片的图层要素拼成一个聚合单元（不施加削减）。 */
-    private V3TileFeatureGroup groupOf(Map<String, List<V4OrderedRow>> byLayer) {
-        V3TileFeatureGroup group = null;
-        for (Map.Entry<String, List<V4OrderedRow>> entry : byLayer.entrySet()) {
-            V3TileFeatureGroup single = V3TileFeatureGroup.single(
-                    entry.getKey(), V4FeatureOrdering.toRows(entry.getValue()));
-            group = group == null ? single : group.merge(single, layersByName, outGridSrid);
-        }
-        return group;
+        LOG.debug("V4 瓦片预削：{} -> {} 行（第 {} 次）", rows.size(), kept.size(), capEvents);
     }
 
     /** 缓冲超过阈值时溢写；返回是否真的溢写了一次。 */
@@ -253,7 +223,12 @@ public final class V4TileGroupStore implements Closeable {
         bufferedRows = 0L;
     }
 
-    /** 对全部 run 做 k 路归并，同一个瓦片键的记录合并后回调一次。 */
+    /**
+     * 对全部 run 做 k 路归并，同一个瓦片键的记录合并后回调一次。
+     *
+     * <p>合并是<b>有界</b>的：同一瓦片键的记录不落成并集，而是逐条喂进容量 N 的选择器
+     * （{@link MergeAccumulator}），因此归并阶段的内存与 run 数无关。</p>
+     */
     private void mergeRuns(V4TileConsumer consumer) throws Exception {
         List<RunReader> readers = new ArrayList<>(runs.size());
         try {
@@ -269,15 +244,15 @@ public final class V4TileGroupStore implements Closeable {
             }
             while (!queue.isEmpty()) {
                 String tileKey = queue.peek().currentKey();
-                Map<String, List<V4OrderedRow>> merged = new LinkedHashMap<>();
+                MergeAccumulator accumulator = new MergeAccumulator(layersByName);
                 while (!queue.isEmpty() && tileKey.equals(queue.peek().currentKey())) {
                     RunReader reader = queue.poll();
-                    mergeInto(merged, reader.currentValue());
+                    accumulator.accept(reader.currentValue());
                     if (reader.advance()) {
                         queue.add(reader);
                     }
                 }
-                emit(tileKey, merged, consumer);
+                emit(tileKey, accumulator.toMap(), consumer);
             }
         } finally {
             for (RunReader reader : readers) {
@@ -286,72 +261,91 @@ public final class V4TileGroupStore implements Closeable {
         }
     }
 
-    private static void mergeInto(
-            Map<String, List<V4OrderedRow>> target, Map<String, List<V4OrderedRow>> source) {
-        if (source == null) {
-            return;
+    /**
+     * 归并累加器：配置了安全上限的图层走容量 N 的有界选择，没配置的按原样累加。
+     *
+     * <p>没配置上限（{@code hardFeatureLimit} 为空/≤0）的图层与 V3 行为一致 —— 不削。
+     * 这时缓冲与归并的内存不受约束，低层级任务需要用户自己把上限配上。</p>
+     */
+    private static final class MergeAccumulator {
+
+        private final Map<String, MvtLayerSliceParameter> layersByName;
+        private final Map<String, List<V4OrderedRow>> unbounded = new LinkedHashMap<>();
+        private final Map<String, V4IdentitySelector.Bounded> bounded = new LinkedHashMap<>();
+
+        private MergeAccumulator(Map<String, MvtLayerSliceParameter> layersByName) {
+            this.layersByName = layersByName;
         }
-        for (Map.Entry<String, List<V4OrderedRow>> entry : source.entrySet()) {
-            target.computeIfAbsent(entry.getKey(), key -> new ArrayList<>()).addAll(entry.getValue());
+
+        private void accept(Map<String, List<V4OrderedRow>> source) {
+            if (source == null) {
+                return;
+            }
+            for (Map.Entry<String, List<V4OrderedRow>> entry : source.entrySet()) {
+                String layerName = entry.getKey();
+                MvtLayerSliceParameter layer = layersByName.get(layerName);
+                int limit = hardLimitOf(layer);
+                if (limit <= 0) {
+                    unbounded.computeIfAbsent(layerName, key -> new ArrayList<>()).addAll(entry.getValue());
+                    continue;
+                }
+                bounded.computeIfAbsent(layerName, key -> new V4IdentitySelector.Bounded(limit, layer))
+                        .offerAll(entry.getValue());
+            }
+        }
+
+        private Map<String, List<V4OrderedRow>> toMap() {
+            Map<String, List<V4OrderedRow>> result = new LinkedHashMap<>(unbounded);
+            for (Map.Entry<String, V4IdentitySelector.Bounded> entry : bounded.entrySet()) {
+                result.put(entry.getKey(), entry.getValue().toList());
+            }
+            return result;
         }
     }
 
     // ------------------------------------------------------------------
-    // 回调：安全阀 + 排序
+    // 回调：统一削减 + 排序
     // ------------------------------------------------------------------
 
+    /**
+     * 回调前的最后一道：把每个图层的行统一削到不超过 N，再按用户指定的顺序排好，最后交给编码器。
+     *
+     * <p>这一道是"产物口径"的唯一定义处。前面累积与归并阶段的削减只影响内存，
+     * 不影响结果 —— 因为"取优先序最小的 N 个"可结合、可交换、幂等。</p>
+     */
     private void emit(String tileKey, Map<String, List<V4OrderedRow>> byLayer,
             V4TileConsumer consumer) throws Exception {
         if (byLayer == null || byLayer.isEmpty()) {
             return;
         }
         Envelope envelope = envelopeOf(tileKey);
-        // 序号不能写进行对象（会被当属性输出），所以先按引用建立"行 -> 序号"的映射，
-        // 等安全阀削完、顺序被打乱之后，仍能按原输入顺序把存活的行排回来
-        Map<GirAdvOneRow, Long> sequenceByRow = keepInputOrder || hilbert || reorder
-                ? new IdentityHashMap<>() : null;
-        if (sequenceByRow != null) {
-            for (List<V4OrderedRow> rows : byLayer.values()) {
-                for (V4OrderedRow ordered : rows) {
-                    sequenceByRow.put(ordered.getRow(), ordered.getSequence());
-                }
+        Map<String, List<GirAdvOneRow>> features = new LinkedHashMap<>();
+        for (Map.Entry<String, List<V4OrderedRow>> entry : byLayer.entrySet()) {
+            String layerName = entry.getKey();
+            MvtLayerSliceParameter layer = layersByName.get(layerName);
+            List<V4OrderedRow> rows = entry.getValue();
+            if (rows == null || rows.isEmpty()) {
+                continue;
             }
+            int limit = hardLimitOf(layer);
+            if (limit > 0) {
+                rows = V4IdentitySelector.keepSmallest(rows, limit, layer);
+            }
+            if (layer != null && V4FeatureOrdering.needsSort(hilbert, reorder, keepInputOrder, rows.size())) {
+                V4FeatureOrdering.sort(rows, hilbert, reorder, keepInputOrder, layer, envelope);
+            }
+            features.put(layerName, V4FeatureOrdering.toRows(rows));
         }
-
-        V3TileFeatureGroup capped = capByLayerSafety(byLayer);
-        if (capped == null) {
+        if (features.isEmpty()) {
             return;
         }
-        Map<String, List<GirAdvOneRow>> features = capped.copyFeaturesByLayer();
-        if (hilbert || reorder) {
-            for (Map.Entry<String, List<GirAdvOneRow>> entry : features.entrySet()) {
-                entry.setValue(sortSpatially(entry.getValue(), entry.getKey(), envelope));
-            }
-        } else if (keepInputOrder) {
-            for (Map.Entry<String, List<GirAdvOneRow>> entry : features.entrySet()) {
-                entry.setValue(sortByInputOrder(entry.getValue(), sequenceByRow));
-            }
+        V3TileFeatureGroup group = rebuild(features);
+        if (group != null) {
+            consumer.accept(tileKey, group);
         }
-        consumer.accept(tileKey, rebuild(features));
     }
 
-    /** 用 V3 自己的 merge 施加聚合安全阀：先合并成一个组，再触发一次上限削减。 */
-    private V3TileFeatureGroup capByLayerSafety(Map<String, List<V4OrderedRow>> byLayer) {
-        V3TileFeatureGroup group = null;
-        for (Map.Entry<String, List<V4OrderedRow>> entry : byLayer.entrySet()) {
-            List<GirAdvOneRow> rows = V4FeatureOrdering.toRows(entry.getValue());
-            V3TileFeatureGroup single = V3TileFeatureGroup.single(entry.getKey(), rows);
-            group = group == null ? single : group.merge(single, layersByName, outGridSrid);
-        }
-        if (group == null) {
-            return null;
-        }
-        // 单图层时上面的循环不会走 merge，这里补一次以保证安全阀确实执行；
-        // merge 对不超限的图层原样返回，因此对已削过的列表是幂等的
-        return group.merge(null, layersByName, outGridSrid);
-    }
-
-    /** 用排好序的图层要素重建聚合单元（仍需走一次 merge 以保持与 V3 相同的构造路径）。 */
+    /** 用（已削到上限的）图层要素重建聚合单元，交给复用的 V3 编码器。 */
     private V3TileFeatureGroup rebuild(Map<String, List<GirAdvOneRow>> features) {
         V3TileFeatureGroup group = null;
         for (Map.Entry<String, List<GirAdvOneRow>> entry : features.entrySet()) {
@@ -361,31 +355,12 @@ public final class V4TileGroupStore implements Closeable {
         return group == null ? null : group.merge(null, layersByName, outGridSrid);
     }
 
-    private List<GirAdvOneRow> sortSpatially(List<GirAdvOneRow> rows, String layerName, Envelope envelope) {
-        if (rows.size() < 2) {
-            return rows;
+    /** 图层的安全上限 N；未配置时返回 0 表示不削。 */
+    private static int hardLimitOf(MvtLayerSliceParameter layer) {
+        if (layer == null || layer.getHardFeatureLimit() == null || layer.getHardFeatureLimit() <= 0) {
+            return 0;
         }
-        MvtLayerSliceParameter layer = layersByName.get(layerName);
-        if (layer == null) {
-            return rows;
-        }
-        List<V4OrderedRow> ordered = new ArrayList<>(rows.size());
-        for (int i = 0; i < rows.size(); i++) {
-            ordered.add(new V4OrderedRow(i, rows.get(i)));
-        }
-        V4FeatureOrdering.sort(ordered, hilbert, reorder, false, layer, envelope);
-        return V4FeatureOrdering.toRows(ordered);
-    }
-
-    private List<GirAdvOneRow> sortByInputOrder(List<GirAdvOneRow> rows, Map<GirAdvOneRow, Long> sequenceByRow) {
-        if (rows.size() < 2 || sequenceByRow == null) {
-            return rows;
-        }
-        List<GirAdvOneRow> copy = new ArrayList<>(rows);
-        // 稳定排序 + 序号查不到时给最大值，保证顺序确定
-        copy.sort(Comparator.comparingLong(
-                row -> sequenceByRow.getOrDefault(row, Long.MAX_VALUE)));
-        return copy;
+        return layer.getHardFeatureLimit();
     }
 
     private Envelope envelopeOf(String tileKey) {
