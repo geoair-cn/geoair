@@ -19,11 +19,11 @@ public class PostGisGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
     protected Geometry readDialectGeometry(Object value) {
 
         // PostGIS net 驱动几何对象
-        if (GirPostGisNetTran.isGeometry(value)) {
+        if (GirPostGisTran.isNetConvert() && GirPostGisNetTran.isGeometry(value)) {
             return GirPostGisNetTran.getGeometry(value);
         }
         // PostGIS org 驱动几何对象
-        if (GirPostGisOrgTran.isGeometry(value)) {
+        if (GirPostGisTran.isOrgConvert() &&GirPostGisOrgTran.isGeometry(value)) {
             return GirPostGisOrgTran.getGeometry(value);
         }
         // PostgreSQL JDBC 驱动返回 PGobject

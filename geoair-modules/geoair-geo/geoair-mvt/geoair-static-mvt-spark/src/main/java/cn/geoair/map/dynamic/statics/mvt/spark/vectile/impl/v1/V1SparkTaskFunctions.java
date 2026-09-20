@@ -159,8 +159,8 @@ public class V1SparkTaskFunctions implements Serializable {
         @Override
         public GirAdvOneRow call(GirAdvOneRow girAdvOneRow) throws Exception {
 
-            // 用于后期生成统计值的进行去重，不进入矢量瓦片生成逻辑中
-            girAdvOneRow.put(VecConstant.FeatureRowID, IdUtil.fastSimpleUUID());
+            // 统计去重键：给源要素一个跨分区的唯一标记，供 StatisticUtils 去重（不进入 pbf）
+            girAdvOneRow.put(VecConstant.StatisticFeatureKey, IdUtil.fastSimpleUUID());
 
             return VectorTileCommonUtils.transformSingleFeature(girAdvOneRow, parameter);
         }

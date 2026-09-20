@@ -4,11 +4,9 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.percent.GiProgressReporter;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
-import cn.geoair.map.dynamic.adv.query.apo.BBoxApo;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.geoair.map.dynamic.mvt.tools.model.PbfInfo;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MultiLayerTileSliceParameter;
@@ -17,6 +15,7 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3TileOutputConfig
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3TileOutputType;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.archive.MbtilesArchiveUtils;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.archive.PmtilesUtils;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.input.V3FeatureReaderFactory;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.output.V3TileStore;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.output.V3TileStoreFactory;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
@@ -27,16 +26,17 @@ import cn.hutool.core.util.IdUtil;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 import org.apache.spark.util.LongAccumulator;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +45,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.nio.charset.StandardCharsets;
 
@@ -61,12 +60,14 @@ import java.nio.charset.StandardCharsets;
 public class SparkVectorTileGeneratorV3 implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final int DEFAULT_READ_PARTITION = 20;
     private static final int WRITE_BATCH_SIZE = 300;
     private static final String TABLE_NAME_PATTERN = "^[a-zA-Z0-9_\\.\\\"\\s]+$";
 
     private static final GiLogger LOG = GirLoggerFactory.getLogger();
     private transient SparkSession sparkSession;
+
+    /** 上一次执行的写出统计，由 {@link #doGenerate} 结束后填充 */
+    private V3TileWriteStats lastStats;
 
     public SparkVectorTileGeneratorV3(SparkSession sparkSession) {
         this.sparkSession = sparkSession;
@@ -101,7 +102,8 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         JavaPairRDD<String, V3TileFeatureGroup> allTileFeatures = null;
         for (MvtLayerSliceParameter layer : parameter.getLayers()) {
             TileSliceParameter readParameter = V3LegacyParameterAdapter.toReadParameter(parameter, layer);
-            JavaRDD<GirAdvOneRow> source = readLayer(readParameter)
+            JavaRDD<GirAdvOneRow> source = V3FeatureReaderFactory.getReader(layer)
+                    .read(sparkSession, layer)
                     .map(row -> {
                         if (row != null) {
                             featuresRead.add(1L);
@@ -136,52 +138,46 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
             tracker.completeStage();
         }
         tracker.printSummary();
-        LOG.info("V3 多图层切片完成，tileSetName:{}，内部图层数:{}", parameter.getTileSetName(), parameter.getLayers().size());
+        // 记录本次任务的写出统计，供使用方直接读取（无需再遍历目录或查表）
+        lastStats = new V3TileWriteStats(
+                tracker.getTilesWritten().value(),
+                tracker.getBytesWritten().value(),
+                tracker.getBatchesWritten().value(),
+                tracker.getFeaturesRead().value(),
+                archiveFileSize(parameter));
+        LOG.info("V3 多图层切片完成，tileSetName:{}，内部图层数:{}，{}",
+                parameter.getTileSetName(), parameter.getLayers().size(), lastStats);
     }
 
-    private JavaRDD<GirAdvOneRow> readLayer(TileSliceParameter parameter) throws Exception {
-        ReadStrategy strategy = Optional.ofNullable(parameter.getReadStrategy()).orElse(ReadStrategy.ID_PAGE);
-        if (strategy == ReadStrategy.ID_PAGE) {
-            return readDataByIdPage(parameter);
-        }
-        if (strategy == ReadStrategy.BBOX) {
-            return readDataByBBox(parameter);
-        }
-        throw new IllegalArgumentException("V3 不支持的读取策略：" + strategy);
+    /**
+     * 上一次执行（{@link #doGenerate}）的写出统计；任务结束后可直接读取。
+     * <p>
+     * 一个实例对应一次执行，并发任务请各自新建实例。
+     */
+    public V3TileWriteStats getLastStats() {
+        return lastStats;
     }
 
-    private JavaRDD<GirAdvOneRow> readDataByIdPage(TileSliceParameter parameter) throws Exception {
-        IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource(parameter.getInputSource().toDataSource());
-        long totalCount = executor.pCount(parameter.getQueryStatement());
-        if (totalCount <= 0) {
-            throw new IllegalArgumentException("图层 " + parameter.getLayerName() + " 查询结果为空");
+    /** 取归档文件大小（非归档输出返回 0），文件不存在时返回 0 */
+    private long archiveFileSize(MultiLayerTileSliceParameter parameter) {
+        V3TileOutputType outputType = resolveOutputType(parameter);
+        V3TileOutputConfig outputConfig = parameter.getOutputConfig();
+        String file = null;
+        if (outputType == V3TileOutputType.MBTILES) {
+            file = outputConfig.getMbtilesFile();
+        } else if (outputType == V3TileOutputType.PMTILES) {
+            file = outputConfig.getPmtilesFile();
         }
-        int requested = Optional.ofNullable(parameter.getMaxPartionNum()).orElse(DEFAULT_READ_PARTITION);
-        int partitionNum = (int) Math.max(1, Math.min((long) Math.max(1, requested), totalCount));
-        int countPerTask = (int) Math.min(Integer.MAX_VALUE,
-                Math.max(1L, (totalCount + partitionNum - 1L) / partitionNum));
-        String orderField = parameter.getIdFieldName() == null || parameter.getIdFieldName().trim().isEmpty()
-                ? parameter.getGeomFieldName() : parameter.getIdFieldName();
-        List<Integer> pages = V3DataReadUtils.buildPageNumberList(totalCount, partitionNum);
-        Dataset<Integer> dataSet = sparkSession.createDataset(pages, Encoders.INT())
-                .repartition(Math.min(pages.size(), partitionNum));
-        return dataSet.javaRDD().flatMap(new V3SparkTaskFunctions.IdPageFlatMapFunction(
-                parameter, parameter.getQueryStatement(), orderField, countPerTask));
-    }
-
-    private JavaRDD<GirAdvOneRow> readDataByBBox(TileSliceParameter parameter) throws Exception {
-        IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource(parameter.getInputSource().toDataSource());
-        BBoxApo extent = executor.eGetExtent(parameter.getQueryStatement(), parameter.getGeomFieldName());
-        if (extent == null) {
-            throw new IllegalArgumentException("图层 " + parameter.getLayerName() + " 无法获取空间范围");
+        if (file == null) {
+            return 0L;
         }
-        int partitionNum = Math.max(1, Optional.ofNullable(parameter.getMaxPartionNum()).orElse(DEFAULT_READ_PARTITION));
-        List<String> conditions = V3DataReadUtils.buildBboxPartitionConditions(
-                extent, partitionNum, parameter.getSourceDataSrid());
-        Dataset<String> dataSet = sparkSession.createDataset(conditions, Encoders.STRING())
-                .repartition(conditions.size());
-        return dataSet.javaRDD().flatMap(new V3SparkTaskFunctions.BboxFlatMapFunction(
-                parameter, parameter.getQueryStatement(), parameter.getGeomFieldName(), parameter.getSourceDataSrid()));
+        try {
+            Path path = Paths.get(file);
+            return Files.exists(path) ? Files.size(path) : 0L;
+        } catch (IOException e) {
+            LOG.warn("读取归档文件大小失败: {} - {}", file, e.getMessage());
+            return 0L;
+        }
     }
 
     private void writeTiles(
@@ -216,6 +212,11 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
                     while (iterator.hasNext()) {
                         Tuple2<String, V3TileFeatureGroup> item = iterator.next();
                         PbfInfo pbf = MultiLayerMvtEncoderV3.encode(item._1, item._2, parameter);
+                        // 空瓦片不写：没有要素的瓦片应当表现为"不存在"，
+                        // 而不是一条 tile_data 为空的记录（会虚高瓦片数、干扰预览与统计）
+                        if (isBlankTile(pbf)) {
+                            continue;
+                        }
                         bindDelete(delete, item._1, pbf, parameter);
                         bindInsert(insert, item._1, pbf, parameter);
                         batchSize++;
@@ -270,8 +271,9 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
                 while (iterator.hasNext()) {
                     Tuple2<String, V3TileFeatureGroup> item = iterator.next();
                     PbfInfo pbf = MultiLayerMvtEncoderV3.encode(item._1, item._2, parameter);
-                    if (pbf == null || pbf.getData() == null) {
-                        throw new IllegalStateException("V3 多图层瓦片编码结果为空，tileId=" + item._1);
+                    if (isBlankTile(pbf)) {
+                        // 空瓦片不落盘，也不计入写出统计
+                        continue;
                     }
                     TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(item._1);
                     int outputY = getOutputY(zxy, pbf.getGridSrid(), outputConfig.getTileYAxis());
@@ -465,11 +467,10 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         Set<String> layerNames = new HashSet<>();
         for (MvtLayerSliceParameter layer : parameter.getLayers()) {
             if (layer == null || layer.getLayerName() == null || layer.getLayerName().trim().isEmpty()
-                    || layer.getInputSource() == null || layer.getGeomFieldName() == null
-                    || layer.getGeomFieldName().trim().isEmpty() || layer.getQueryStatement() == null
-                    || layer.getQueryStatement().trim().isEmpty()) {
-                throw new IllegalArgumentException("V3 每个图层都必须配置 layerName、inputSource、geomFieldName 和 queryStatement");
+                    || layer.getGeomFieldName() == null || layer.getGeomFieldName().trim().isEmpty()) {
+                throw new IllegalArgumentException("V3 每个图层都必须配置 layerName 和 geomFieldName");
             }
+            V3FeatureReaderFactory.validate(layer);
             if (!layerNames.add(layer.getLayerName())) {
                 throw new IllegalArgumentException("V3 内部图层名称重复：" + layer.getLayerName());
             }
@@ -494,6 +495,15 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
     private static boolean isArchiveOutput(MultiLayerTileSliceParameter parameter) {
         V3TileOutputType outputType = resolveOutputType(parameter);
         return outputType == V3TileOutputType.MBTILES || outputType == V3TileOutputType.PMTILES;
+    }
+
+    /**
+     * 是否为"无内容"的瓦片。
+     * <p>编码器对没有要素可写的瓦片返回空数组，这类瓦片不应当落盘：
+     * 它们在产物里应当表现为"不存在"，写出一条空记录只会虚高瓦片数、干扰预览与统计。</p>
+     */
+    private static boolean isBlankTile(PbfInfo pbf) {
+        return pbf == null || pbf.getData() == null || pbf.getData().length == 0;
     }
 
     private static void validateTableName(String tableName) {

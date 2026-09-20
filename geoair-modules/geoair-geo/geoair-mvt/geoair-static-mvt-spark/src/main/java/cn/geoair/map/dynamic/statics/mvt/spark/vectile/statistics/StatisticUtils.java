@@ -45,7 +45,7 @@ public class StatisticUtils {
             SparkSession sparkSession) {
         try {
 
-            // 根据FeatureRowID进行去重
+            // 按统计去重键去重：一个源要素会被铺进多块瓦片，不去重会把同一要素重复计数
             JavaPairRDD<String, Tuple2<String, GirAdvOneRow>> featureIdRdd =
                     infoRdd.flatMapToPair(
                                     tuple -> {
@@ -66,7 +66,7 @@ public class StatisticUtils {
                                             // 严格过滤无效数据
                                             if (row == null) continue;
                                             Object featureRowIdObj =
-                                                    row.get(VecConstant.FeatureRowID);
+                                                    row.get(VecConstant.StatisticFeatureKey);
                                             if (featureRowIdObj == null) continue;
                                             String featureRowId = featureRowIdObj.toString();
                                             result.add(
@@ -113,7 +113,7 @@ public class StatisticUtils {
                                         Map<String, Object> tempMap = new HashMap<>();
                                         Set<String> fieldNamesByMap = new HashSet<>(row.keySet());
                                         fieldNamesByMap.remove(parameter.getGeomFieldName());
-                                        fieldNamesByMap.remove(VecConstant.FeatureRowID);
+                                        fieldNamesByMap.remove(VecConstant.StatisticFeatureKey);
                                         for (String fieldName : fieldNamesByMap) {
                                             tempMap.put(
                                                     fieldName,

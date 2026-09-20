@@ -534,8 +534,8 @@ public class AdvMvtDensityUtils {
             Geometry geom = (Geometry) feature.get(pbfParam.getGeomFieldName());
             if (geom == null || geom.isEmpty()) continue;
 
-            Object featureRowIDValue = feature.get(VecConstant.FeatureRowID);
-            feature.remove(VecConstant.FeatureRowID); // 手动生成的Id不放到pbf里面
+            Object featureRowIDValue = feature.get(VecConstant.StatisticFeatureKey);
+            feature.remove(VecConstant.StatisticFeatureKey); // 统计去重键不进 pbf，统计阶段再用
 
             // 过滤需要保留的字段（includeFields + sysIncludeFields）
             Map<String, Object> featureCopy = new HashMap<>();
@@ -650,8 +650,8 @@ public class AdvMvtDensityUtils {
                     }
                 }
             }
-            // 恢复FeatureRowID
-            feature.put(VecConstant.FeatureRowID, featureRowIDValue);
+            // 恢复统计去重键（编码已结束，统计阶段还要用它去重）
+            feature.put(VecConstant.StatisticFeatureKey, featureRowIDValue);
         }
 
         PbfInfo pbfInfo =

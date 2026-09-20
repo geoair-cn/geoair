@@ -103,7 +103,8 @@ public class V2SparkTaskFunctions implements Serializable {
 
         @Override
         public GirAdvOneRow call(GirAdvOneRow row) {
-            row.put(VecConstant.FeatureRowID, IdUtil.fastSimpleUUID());
+            // 统计去重键：给源要素一个跨分区的唯一标记，供 StatisticUtils 去重（不进入 pbf）
+            row.put(VecConstant.StatisticFeatureKey, IdUtil.fastSimpleUUID());
             return VectorTileCommonUtils.transformSingleFeature(row, parameter);
         }
     }

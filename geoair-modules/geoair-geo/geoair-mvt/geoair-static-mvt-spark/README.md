@@ -108,6 +108,8 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MultiLayerTileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerGeometryMode;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3JdbcInputConfig;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3LayerInputConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3TileOutputConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.SparkVectorTileGeneratorV3;
 import org.apache.spark.sql.SparkSession;
@@ -119,12 +121,14 @@ DataSourceConfig output = DataSourceConfig.fromProtocolUrlStr(
 
 MvtLayerSliceParameter roads = new MvtLayerSliceParameter()
         .setLayerName("road")
-        .setInputSource(input)
-        .setQueryStatement("select id, name, road_class, geom from public.road")
+        .setInputConfig(V3LayerInputConfig.jdbc(new V3JdbcInputConfig()
+                .setDataSource(input)
+                .setQueryStatement("select id, name, road_class, geom from public.road")
+                .setReadStrategy(ReadStrategy.ID_PAGE)
+                .setMaxPartitionNum(20)))
         .setIdFieldName("id")
         .setGeomFieldName("geom")
         .setSourceDataSrid(4326)
-        .setReadStrategy(ReadStrategy.ID_PAGE)
         .setMinZoom(6)
         .setMaxZoom(16)
         .setIncludeFields(java.util.Arrays.asList("id", "name", "road_class"))
@@ -135,8 +139,9 @@ MvtLayerSliceParameter roads = new MvtLayerSliceParameter()
 
 MvtLayerSliceParameter labels = new MvtLayerSliceParameter()
         .setLayerName("road_label")
-        .setInputSource(input)
-        .setQueryStatement("select id, name, geom from public.road where name is not null")
+        .setInputConfig(V3LayerInputConfig.jdbc(new V3JdbcInputConfig()
+                .setDataSource(input)
+                .setQueryStatement("select id, name, geom from public.road where name is not null")))
         .setIdFieldName("id")
         .setGeomFieldName("geom")
         .setSourceDataSrid(4326)
@@ -168,6 +173,48 @@ try {
     spark.stop();
 }
 ```
+
+### V3 GeoJSON 输入
+
+V3 的每个内部图层可以独立选择 JDBC 或 GeoJSON，因此同一个 PBF 可以同时包含数据库图层和文件图层。GeoJSON 未显式设置 `sourceDataSrid` 时按 RFC 7946 使用 `EPSG:4326`；几何字段默认写入 `geometry`。
+
+标准 FeatureCollection 使用流式解析，一个文件在 executor 内只保留当前 Feature，不会把整个文件加载到内存：
+
+```java
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3GeoJsonInputConfig;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3GeoJsonMode;
+import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3LayerInputConfig;
+
+MvtLayerSliceParameter boundary = new MvtLayerSliceParameter()
+        .setLayerName("boundary")
+        .setInputConfig(V3LayerInputConfig.geoJson(
+                V3GeoJsonInputConfig.of("hdfs:///geo/base/boundary.geojson")
+                        .setMode(V3GeoJsonMode.FEATURE_COLLECTION)
+                        .setMinPartitionNum(20)))
+        .setIdFieldName("id")
+        .setIncludeFields(java.util.Arrays.asList("id", "name", "code"))
+        .setMinZoom(4)
+        .setMaxZoom(14);
+```
+
+大文件推荐转换成每行一个 Feature 的 GeoJSON Lines。Spark 可以按文件块并行读取，不受单个 FeatureCollection 文件只能由一个 task 顺序解析的限制：
+
+```java
+MvtLayerSliceParameter poi = new MvtLayerSliceParameter()
+        .setLayerName("poi")
+        .setInputConfig(V3LayerInputConfig.geoJson(
+                V3GeoJsonInputConfig.of("s3a://geo-data/poi/*.geojsonl")
+                        .setMode(V3GeoJsonMode.GEOJSON_LINES)
+                        .setMinPartitionNum(200)
+                        .setSkipInvalidFeature(false)))
+        .setIdFieldName("id")
+        .setMinZoom(8)
+        .setMaxZoom(16);
+```
+
+支持 `file:///`、HDFS、`s3a://` 和 Hadoop 文件通配符。集群模式下本地文件必须由所有 executor 访问；HDFS/S3 凭证通过 Spark/Hadoop 配置提供，不要写入路径。`AUTO` 会把 `.geojsonl`、`.jsonl`、`.ndjson` 识别为行模式，其他扩展名按 FeatureCollection 读取；生产任务建议显式指定模式。
+
+GeoJSON 属性中的字符串、布尔值和数值会保留原类型；对象和数组会转成紧凑 JSON 字符串。默认遇到非法 Feature 会让任务失败，只有明确设置 `skipInvalidFeature=true` 时才跳过。
 
 ### V3 输出介质
 

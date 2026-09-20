@@ -15,8 +15,8 @@ import java.util.List;
  * WGS84（EPSG:4326）线性瓦片网格的公共实现。
  *
  * <p>子类定义经纬度方向的瓦片跨度和行列数量；本类负责范围换算、坐标系转换及层级元数据。
- * {@link #MAX_VALID_LAT} 只适用于等轴网格为兼容 Web Mercator 所作的纬度裁剪，Separate
- * 网格可覆盖完整的 {@code [-90°, 90°]}。</p>
+ * 4326 网格按标准瓦片矩阵集组织：经度 {@code 2^z} 列、纬度 {@code 2^(z-1)} 行，
+ * 纬度覆盖完整的 {@code [-90°, 90°]}，与 WMTS 的 EPSG:4326 矩阵集逐项一致。</p>
  *
  * @author 张逢吉
  */
@@ -30,10 +30,6 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     protected static final double MIN_LAT = -90.0;
 
     protected static final double MAX_LAT = 90.0;
-
-    protected static final double MAX_VALID_LAT = 85.0511287798; // 3857有效纬度上限
-
-    protected static final double MIN_VALID_LAT = -85.0511287798; // 3857有效纬度下限
 
     protected static final double PRECISION = 1e-9; // 浮点精度补偿
 
@@ -66,10 +62,10 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     /**
      * 将当前 Separate 网格的 Y 行号转换为 Equal 网格的 Y 行号。
      *
-     * <p>当前两种 EPSG:4326 网格使用相同的实际 Y 行定义（z=3 均为 4 行）和相同的
-     * 行号方向，因此映射是一一对应的。该实现通过层级元数据校验行号，不再采用旧的
-     * {@code 2^z} 行公式。{@code roundingType} 因不存在小数行号而不参与计算，仅为保持
-     * 原方法签名而保留。</p>
+     * <p>两条 4326 网格入口现在指向同一套网格（见 {@link Wgs84EqualAxisTileUtils}），
+     * 层级的实际 Y 行数和行号方向完全一致，因此映射是一一对应的。该实现通过层级元数据
+     * 校验行号，不再采用旧的 {@code 2^z} 行公式。{@code roundingType} 因不存在小数行号
+     * 而不参与计算，仅为保持原方法签名而保留。</p>
      *
      * @param separateAxisY Separate 网格的 XYZ Y 行号
      * @param zoom          缩放级别（0～22）
@@ -95,7 +91,7 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     /**
      * 将当前 Equal 网格的 Y 行号转换为 Separate 网格的 Y 行号。
      *
-     * <p>当前两种 EPSG:4326 网格在同一层级的实际 Y 行数相同，故该映射与
+     * <p>两条 4326 网格入口现在指向同一套网格，层级的实际 Y 行数相同，故该映射与
      * {@link #convertSeparateAxisYToEqualAxisY(int, int, RoundingType)} 严格互逆。
      * {@code roundingType} 仅为兼容原方法签名而保留。</p>
      *
@@ -133,8 +129,8 @@ public abstract class AbstractWgs84TileConverter extends TileConverterCommon {
     /**
      * 计算纬度方向单瓦片跨度，单位为度。
      *
-     * <p>当前等轴和 Separate 实现均返回 {@code 360 / 2^z}；两者的差异体现在实际
-     * 行数与纬度裁剪策略，而不是这里的数值公式。</p>
+     * <p>4326 网格的纬度跨度为 {@code 360 / 2^z}，乘以实际行数 {@code 2^(z-1)}
+     * 正好覆盖一个半球的纬度 {@code 180°}。</p>
      */
     protected abstract double calculateTileLatSpan(int z);
 

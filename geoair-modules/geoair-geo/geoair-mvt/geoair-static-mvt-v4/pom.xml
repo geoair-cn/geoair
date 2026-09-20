@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.geoair.devkit</groupId>
+    <artifactId>geoair-mvt</artifactId>
+    <version>J8-dev-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <groupId>cn.geoair.devkit</groupId>
+  <artifactId>geoair-static-mvt-v4</artifactId>
+  <version>J8-dev-SNAPSHOT</version>
+
+  <packaging>jar</packaging>
+  <name>geoair-static-mvt-v4</name>
+
+  <description>静态矢量瓦片切片服务 V4（不依赖 Spark 运行时）</description>
+
+  <url>https://github.com/geoair-cn/geoair</url>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, cn.geoair.map.dynamic.tools.Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>zhangfengji</name>
+      <email>zfj20250104@qq.com</email>
+      <organization>geoair</organization>
+      <organizationUrl>https://xmt.geoair.cn/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>https://github.com/geoair-cn/geoair.git</connection>
+    <developerConnection>scm:git:https://github.com:geoair-cn/geoair.git</developerConnection>
+    <url>https://github.com/geoair-cn/geoair</url>
+  </scm>
+
+  <!--
+    依赖 geoair-static-mvt-spark 复用它里面与 Spark 无关的那部分实现：
+    编码器（MultiLayerMvtEncoderV3）、要素-瓦片分配（VectorTileCommonUtils）、
+    聚合单元（V3TileFeatureGroup）、输出与归档（V3TileStore*、MbtilesArchiveUtils、PmtilesUtils）
+    以及全部 V3 参数 DTO。
+
+    关键点：这里把 Spark / Hadoop / Scala / janino 全部排除掉。
+    V4 只调用那些不含 Spark 依赖的类，因此运行期类路径上没有 Spark —— 这是"脱离 Spark"的落点。
+    V4 不修改 spark 模块的任何一行代码，V1/V2/V3 的行为因此不受影响。
+  -->
+  <dependencies>
+
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-static-mvt-spark</artifactId>
+      <version>${geoair.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.spark</groupId>
+          <artifactId>spark-core_2.12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.spark</groupId>
+          <artifactId>spark-sql_2.12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.spark</groupId>
+          <artifactId>spark-mllib_2.12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.janino</groupId>
+          <artifactId>janino</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-mvt-tools</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>cn.geoair.devkit</groupId>
+      <artifactId>geoair-jdbc-url</artifactId>
+      <version>${geoair.version}</version>
+    </dependency>
+
+    <!-- MVT 编码/解码运行时需要，且要优先于 Hadoop 传递的旧版 protobuf -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+    </dependency>
+
+    <!--
+      复用的 geoair 接口里有几处签名用到 scala.Tuple2 / Tuple4
+      （VectorTileCommonUtils.mapSingleFeatureToTilesStream、TileUtils.rangeToIndex），
+      因此运行时需要 scala-library。它只是 5MB 的标准库，与 Spark 运行时无关。
+    -->
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>2.12.18</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresql.version}</version>
+    </dependency>
+
+    <!-- V4 保留 V3 的 S3 输出能力 -->
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>${aws-java-sdk-s3.version}</version>
+    </dependency>
+
+    <!-- V4 保留 V3 的 MBTiles 归档能力 -->
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>${sqlite-jdbc.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-geojson</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+      <version>${commons.text.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>
