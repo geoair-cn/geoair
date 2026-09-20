@@ -15,7 +15,10 @@ import cn.hutool.core.io.unit.DataSizeUtil;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,6 +53,28 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     // ZIP64相关常量
     private static final int ZIP64_EXTRA_FIELD_ID = 0x0001;
     private static final long ZIP64_MAGIC_NUMBER = 0xFFFFFFFFL;
+
+    // ------------------------------ 文件名编码相关 ------------------------------
+
+    /**
+     * 通用位标记第 11 位。置位表示该条目的文件名与注释按 UTF-8 编码，这是 ZIP 规范里
+     * 唯一权威的编码声明；不置位时规范只能含糊地说"按原始 ZIP 的字符集"。
+     */
+    private static final int FLAG_UTF8_FILENAME = 0x0800;
+
+    /**
+     * 覆盖默认文件名编码的系统属性，例如 -Dgeoair.zip.filename.charset=GBK。
+     * 指定的编码会被提到候选列表最前面，用于处理"没有声明 UTF-8 但确实是 UTF-8"这类包。
+     */
+    private static final String FILENAME_CHARSET_PROPERTY = "geoair.zip.filename.charset";
+
+    /**
+     * 未声明编码、且 UTF-8 也解不通（或解出来不可信）时的候选文件名编码，按尝试顺序排列。
+     * UTF-8 不在这里，它在主流程里单独先试；这里放的是它失败之后的退路。
+     * GBK 在前：国内瓦片包多由 Windows 工具打包，本地编码即 GBK。
+     * CP437 兜底：单字节编码，任何字节都能映射，走到这里一定不会失败。
+     */
+    private static final Charset[] FILENAME_CHARSETS = resolveFilenameCharsets();
 
 
     @Override
@@ -373,7 +398,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             // 读取文件名
             String fileName = "";
             if (nameLen > 0 && 46 + nameLen <= entryData.length) {
-                fileName = decodeFileName(entryData, 46, nameLen);
+                fileName = decodeFileName(entryData, 46, nameLen, readShort(entryData, 8) & 0xFFFF);
                 fileName = normalizePath(fileName);
             }
 
@@ -597,7 +622,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                             int nameLen = readShort(entryData, 28) & 0xFFFF;
                             String fileName = "";
                             if (nameLen > 0 && 46 + nameLen <= entryData.length) {
-                                fileName = decodeFileName(entryData, 46, nameLen);
+                                fileName = decodeFileName(entryData, 46, nameLen, readShort(entryData, 8) & 0xFFFF);
                                 fileName = normalizePath(fileName);
                             }
 
@@ -924,7 +949,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
             // 5. 解析文件名
             int nameStart = pos + 46;
-            String fileName = decodeFileName(dirChunk, nameStart, nameLen);
+            String fileName = decodeFileName(dirChunk, nameStart, nameLen, readShort(dirChunk, pos + 8) & 0xFFFF);
             String normalizedFile = normalizePath(fileName);
 
             // 6. 判断当前条目类型（文件/文件夹）
@@ -1114,7 +1139,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
             // 解析文件名
             int nameStart = pos + 46;
-            String fileName = decodeFileName(dirChunk, nameStart, nameLen);
+            String fileName = decodeFileName(dirChunk, nameStart, nameLen, readShort(dirChunk, pos + 8) & 0xFFFF);
             String normalizedFile = normalizePath(fileName);
             boolean isFolderEntry = normalizedFile.endsWith("/") || fileName.endsWith("/");
 
@@ -1203,32 +1228,147 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     /**
-     * 解码文件名（支持多编码容错）
+     * 解码文件名。
+     *
+     * @param data               承载文件名的字节数组
+     * @param offset             文件名起始偏移
+     * @param length             文件名字节长度
+     * @param generalPurposeFlag 该条目的通用位标记，用于判断是否声明了 UTF-8
      */
-    private String decodeFileName(byte[] data, int offset, int length) {
+    private String decodeFileName(byte[] data, int offset, int length, int generalPurposeFlag) {
         if (length <= 0) {
             return "";
         }
-        // 尝试多种编码
-        List<Charset> charsets = Arrays.asList(
-                StandardCharsets.UTF_8,
-                Charset.forName("GBK"),
-                Charset.forName("ISO-8859-1"),
-                Charset.forName("CP437"),
-                Charset.defaultCharset()
-        );
 
-        for (Charset charset : charsets) {
-            try {
-                return new String(data, offset, length, charset);
-            } catch (Exception e) {
-                continue;
+        String utf8 = strictDecode(data, offset, length, StandardCharsets.UTF_8);
+
+        // 声明了 UTF-8 就按 UTF-8 解。这是规范给的确定信息，不需要也不应该再猜。
+        if ((generalPurposeFlag & FLAG_UTF8_FILENAME) != 0) {
+            if (utf8 != null) {
+                return utf8;
+            }
+            log.warn("条目声明文件名为 UTF-8，但按 UTF-8 解不出来，退回本地编码，长度={}字节", length);
+        }
+
+        // 纯 ASCII 的路径占绝大多数，各编码结果一致，直接返回
+        if (isAscii(data, offset, length)) {
+            return new String(data, offset, length, StandardCharsets.US_ASCII);
+        }
+
+        // 没声明编码就只能判断，而这里能判断的前提是两种编码的"严格程度"差得很远：
+        // GBK 汉字的字节序列极少能整段通过 UTF-8 的合法性校验（实测二十来个常用词拼起来的
+        // 路径全部被拒），而 UTF-8 的名字几乎都能被 GBK 顺利解成一串乱码（GBK 的字节空间太宽松）。
+        // 所以顺序必须是"先信 UTF-8"，反过来先试 GBK 会把正常的 UTF-8 名字全解成乱码。
+        if (utf8 != null && !looksMisdecoded(utf8)) {
+            return utf8;
+        }
+
+        // UTF-8 解不通，或者解出来的字落在只可能由误判产生的区间，退回本地编码
+        for (Charset charset : FILENAME_CHARSETS) {
+            String name = strictDecode(data, offset, length, charset);
+            if (name != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("文件名按 {} 解码（UTF-8 结果[{}]不可信），长度={}字节，结果={}",
+                            charset.name(), utf8, length, name);
+                }
+                return name;
             }
         }
 
-        // 所有编码都失败，返回十六进制
+        // 候选编码全都解不出来，返回十六进制便于排查
         log.warn("文件名解码失败，长度={}字节，使用十六进制表示", length);
         return bytesToHex(data, offset, length);
+    }
+
+    /**
+     * 严格解码：遇到非法字节序列直接判定该编码不适用。
+     * 这一点是整套兜底能成立的关键——宽松解码（new String(byte[], Charset)）会把非法字节
+     * 替换成 U+FFFD 而不报错，等于任何编码都"成功"，兜底也就无从谈起。
+     *
+     * @return 解码结果；该编码不适用时返回 null
+     */
+    private static String strictDecode(byte[] data, int offset, int length, Charset charset) {
+        try {
+            CharsetDecoder decoder = charset.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT);
+            return decoder.decode(ByteBuffer.wrap(data, offset, length)).toString();
+        } catch (CharacterCodingException e) {
+            return null;
+        }
+    }
+
+    /**
+     * 判断整段字节是否都是 ASCII（最高位为 0）
+     */
+    private static boolean isAscii(byte[] data, int offset, int length) {
+        int end = offset + length;
+        for (int i = offset; i < end; i++) {
+            if (data[i] < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 判断 UTF-8 解码结果是否像是"别的编码被误当 UTF-8 解"。
+     *
+     * 判据是看结果里有没有 U+0080~U+07FF 之间的字符。这个区间是 GBK 汉字字节被当成 UTF-8
+     * 双字节序列解码后的唯一落点，覆盖拉丁补充、组合符号、希腊、西里尔、希伯来、阿拉伯；
+     * 而正常的 UTF-8 中文名解出来是 CJK 区（U+4E00 起）加 ASCII，不会掉进这个区间。
+     *
+     * 例子：GBK 的"目录"（c4bfc2bc）刚好也是合法 UTF-8 双字节序列，会被解成"Ŀ¼"，
+     * 两个字符都落在拉丁补充区，据此就能识别出来并改用 GBK。
+     *
+     * 注意这是个启发式判据，对中文名和 ASCII 名可靠；如果文件名本身是西欧语种
+     * （带变音符号，同样是拉丁补充区），会被误判成需要回退，这种情况用系统属性
+     * {@link #FILENAME_CHARSET_PROPERTY} 显式指定 UTF-8 即可。
+     */
+    private static boolean looksMisdecoded(String name) {
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if ((c >= 0x0080 && c <= 0x07FF) || c < 0x20) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 组装候选文件名编码。系统属性指定了编码时把它放到最前面，其余默认候选仍然保留在后面兜底。
+     */
+    private static Charset[] resolveFilenameCharsets() {
+        List<Charset> candidates = new ArrayList<Charset>();
+
+        String override = System.getProperty(FILENAME_CHARSET_PROPERTY);
+        if (override != null && !override.trim().isEmpty()) {
+            Charset charset = charsetOrNull(override.trim());
+            if (charset != null) {
+                candidates.add(charset);
+            } else {
+                log.warn("系统属性 {}={} 不是可用编码，忽略该配置，改用默认候选", FILENAME_CHARSET_PROPERTY, override);
+            }
+        }
+
+        for (String name : new String[]{"GBK", "CP437"}) {
+            Charset charset = charsetOrNull(name);
+            if (charset != null && !candidates.contains(charset)) {
+                candidates.add(charset);
+            }
+        }
+        return candidates.toArray(new Charset[candidates.size()]);
+    }
+
+    /**
+     * 按名称取编码，取不到返回 null（不抛异常）
+     */
+    private static Charset charsetOrNull(String name) {
+        try {
+            return Charset.isSupported(name) ? Charset.forName(name) : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
