@@ -16,6 +16,7 @@ import cn.geoair.map.tile.forge.core.utils.TilePathParser;
 import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.zip.ICompressionHandler;
 import cn.geoair.map.tile.forge.core.zip.LocalCompressionHandler;
+import cn.geoair.map.tile.forge.core.zip.LogProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.ProgressConsumer;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
@@ -43,6 +44,12 @@ import static cn.geoair.map.tile.forge.core.bygwc.compact.ArcGISCompactCache.BUN
 
 public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirectoryGetter {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
+    /**
+     * 抽取 bundle 时的日志进度步长（百分比）。bundle 动辄几十上百兆，按 10% 输出一次，
+     * 既能看出大文件拉取的进展，又不至于把日志刷满。
+     */
+    private static final double EXTRACT_LOG_PROGRESS_STEP = 10;
 
     public LocalZipCompactV1TileStorageSupport(GirLayerConfigContextHelper contextHelper) {
         super(contextHelper);
@@ -144,7 +151,7 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
                     return true;
                 }
                 try {
-                    getICompressionHandler().readFileFromZipToLocal(layerConfigContext.getObjectKey(), normalizedPathToBundleFile, tempBundleFile.getAbsolutePath());
+                    getICompressionHandler().readFileFromZipToLocal(layerConfigContext.getObjectKey(), normalizedPathToBundleFile, tempBundleFile.getAbsolutePath(), new LogProgressConsumer(EXTRACT_LOG_PROGRESS_STEP));
                 } catch (Exception e) {
                     log.error(e.getMessage());
                     return false;
@@ -189,7 +196,7 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
                     if (zipDirectoryByFileName == null) {
                         return false;
                     }
-                    getICompressionHandler().readAndDecompressEntryToLocal(zipDirectoryByFileName, layerConfigContext.getObjectKey(), tempBundleFile.getAbsolutePath());
+                    getICompressionHandler().readAndDecompressEntryToLocal(zipDirectoryByFileName, layerConfigContext.getObjectKey(), tempBundleFile.getAbsolutePath(), new LogProgressConsumer(EXTRACT_LOG_PROGRESS_STEP));
                 } catch (Exception e) {
 
                     log.error("getTileDataByPreZipCache error:", e);

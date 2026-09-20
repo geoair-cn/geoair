@@ -91,7 +91,8 @@ public class S3CompressionHandler extends AbstractZipCompressionHandler {
 
         while (currentOffset <= end) {
             try {
-                byte[] part = readRangeOnce(source, currentOffset, end);
+                // 进度按整段请求的长度算，断点续读时已读到的部分算作已完成，进度不会回退
+                byte[] part = readRangeOnce(source, currentOffset, end, expectedLength, collector.size());
                 if (part.length == 0) {
                     // 服务端把连接关了但没报错，这里按失败处理，交给下面的重试分支
                     throw new IOException("S3返回了空数据");
@@ -123,8 +124,11 @@ public class S3CompressionHandler extends AbstractZipCompressionHandler {
 
     /**
      * 发起一次 Range 请求，返回的字节数可能少于请求的范围
+     *
+     * @param progressTotal 整段请求的总字节数，用于进度上报
+     * @param progressBase  本次尝试之前已经读到的字节数，用于进度上报
      */
-    private byte[] readRangeOnce(String source, long start, long end) throws IOException {
+    private byte[] readRangeOnce(String source, long start, long end, long progressTotal, long progressBase) throws IOException {
         GetObjectRequest request = new GetObjectRequest(s3ClientGetter.getDefaultBucket(), source)
                 .withRange(start, end);
 
@@ -134,8 +138,11 @@ public class S3CompressionHandler extends AbstractZipCompressionHandler {
 
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead;
+            long readInAttempt = 0;
             while ((bytesRead = in.read(buffer)) != -1) {
                 out.write(buffer, 0, bytesRead);
+                readInAttempt += bytesRead;
+                reportReadProgress(progressTotal, progressBase + readInAttempt);
             }
             return out.toByteArray();
         }

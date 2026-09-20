@@ -44,6 +44,11 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     protected static final int EOCD_BASE_SIZE = 22;
     protected static final int MAX_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
+    /**
+     * 单次读取小于这个字节数就没必要上报进度了，省得小请求刷屏
+     */
+    protected static final long PROGRESS_MIN_RANGE_BYTES = 1024L * 1024L;
+
     // ZIP64相关常量
     private static final int ZIP64_EXTRA_FIELD_ID = 0x0001;
     private static final long ZIP64_MAGIC_NUMBER = 0xFFFFFFFFL;
@@ -1383,6 +1388,22 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
     }
 
     // ------------------------------ 二进制读取工具（子类共享） ------------------------------
+
+    /**
+     * 上报一次读取进度，供子类的 readRange 实现调用。
+     * <p>
+     * 只有单次读取超过 {@link #PROGRESS_MIN_RANGE_BYTES} 才上报，避免小请求把日志刷爆。
+     * total 固定为整段请求的长度（不是本次重试的范围），这样重试续读时进度是连续的。
+     *
+     * @param total   整段请求的总字节数
+     * @param current 已读取的字节数
+     */
+    protected static void reportReadProgress(long total, long current) {
+        if (total < PROGRESS_MIN_RANGE_BYTES) {
+            return;
+        }
+        ReadProgressScope.report(total, current);
+    }
 
     protected int readInt(byte[] data, int offset) {
         if (offset + 4 > data.length) {
