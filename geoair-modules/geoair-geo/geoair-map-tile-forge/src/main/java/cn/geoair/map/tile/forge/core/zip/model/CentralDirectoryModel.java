@@ -16,6 +16,8 @@ public class CentralDirectoryModel {
     private long localHeaderOffset;
     // 压缩数据的起始偏移量（可通过本地文件头计算）
     private Long dataOffset;
+    // 中央目录中的CRC32。旧缓存未保存时，从本地头或数据描述符恢复。
+    private Long crc32;
     // 压缩方法（0=未压缩，8=DEFLATE）
     private long compressionMethod;
     // 压缩后的大小

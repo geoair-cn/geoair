@@ -28,9 +28,17 @@ public class ZipHandler implements DecompressionHandler {
 
         byte[] output = new byte[(int) expectedSize];
         try {
-            int inflated = inflater.inflate(output);
-            if (inflated != expectedSize) {
-                throw new IOException("ZIP解压不完整，预期:" + expectedSize + ", 实际:" + inflated);
+            int inflated = 0;
+            byte[] probe = new byte[1];
+            while (!inflater.finished()) {
+                int count = inflated < output.length
+                        ? inflater.inflate(output, inflated, output.length - inflated) : inflater.inflate(probe);
+                if (inflated == output.length && count > 0) throw new IOException("ZIP解压结果超过声明长度");
+                inflated += count;
+                if (count == 0 && !inflater.finished()) throw new IOException("ZIP压缩流不完整或无法继续解压");
+            }
+            if (inflated != expectedSize || inflater.getRemaining() != 0) {
+                throw new IOException("ZIP压缩流长度不匹配，预期:" + expectedSize + ", 实际:" + inflated);
             }
             return output;
         } catch (DataFormatException e) {

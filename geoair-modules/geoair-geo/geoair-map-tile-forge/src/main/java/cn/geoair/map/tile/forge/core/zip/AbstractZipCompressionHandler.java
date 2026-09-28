@@ -5,9 +5,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.zip.decompression.DecompressionLimits;
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
-import cn.geoair.map.tile.forge.core.zip.model.EntryPosition;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
-import cn.geoair.map.tile.forge.core.zip.model.LocalFileHeader;
 import cn.geoair.map.tile.forge.core.utils.LocalWriteUtils;
 import cn.hutool.core.io.unit.DataSizeUtil;
 
@@ -24,9 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * ZIP压缩文件处理抽象基类
@@ -78,1153 +73,261 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
 
 
     @Override
-    public void readFileFromZipToLocal(String zipSource, String targetFilePathInZip, String localOutputPath) throws IOException {
-        byte[] fileData = readFileFromZip(zipSource, targetFilePathInZip);
-        byteToLocal(localOutputPath, fileData);
+    public void readFileFromZipToLocal(String source, String path, String output) throws IOException {
+        byteToLocal(output, readFileFromZip(source, path));
     }
 
     @Override
-    public byte[] readFileFromZip(String zipSource, String targetFilePathInZip) throws IOException {
-        long zipFileSize = getFileSize(zipSource);
-        EocdInfo eocd = parseEocd(zipFileSize, zipSource);
-        CentralDirectoryModel targetEntry = findEntryInCentralDir(eocd, targetFilePathInZip, zipSource);
-        if (targetEntry == null) {
-            throw new IOException("ZIP文件[" + zipSource + "]中未找到目标路径：" + targetFilePathInZip);
-        }
-        return readAndDecompressEntry(targetEntry, zipSource);
+    public byte[] readFileFromZip(String source, String path) throws IOException {
+        CentralDirectoryModel entry = findEntryInCentralDir(parseEocd(getFileSize(source), source), path, source);
+        if (entry == null) throw new FileNotFoundException("ZIP中未找到路径: " + path);
+        return readAndDecompressEntry(entry, source);
     }
 
     @Override
     public EocdInfo parseEocd(long fileSize, String source) throws IOException {
-        long searchStart = Math.max(0, fileSize - 65536);
-        byte[] tailBytes = readRange(source, searchStart, fileSize - 1);
-
-        for (int i = tailBytes.length - EOCD_BASE_SIZE; i >= 0; i--) {
-            if (readInt(tailBytes, i) == EOCD_SIGNATURE) {
-                long eocdPosition = searchStart + i;
-                EocdInfo eocd = parseStandardEocd(tailBytes, i);
-
-                if (eocd.getTotalEntries() == 65535 || eocd.getCentralDirOffset() == ZIP64_MAGIC_NUMBER || eocd.getCentralDirSize() == ZIP64_MAGIC_NUMBER) {
-                    long locatorPosition = eocdPosition - 20;
-                    return parseZip64Eocd(locatorPosition, fileSize, source);
+        if (fileSize < EOCD_BASE_SIZE) throw new IOException("ZIP文件不足22字节");
+        long start = Math.max(0, fileSize - (65535L + EOCD_BASE_SIZE));
+        byte[] tail = readExact(source, start, fileSize - start);
+        IOException last = null;
+        for (int p = tail.length - EOCD_BASE_SIZE; p >= 0; p--) {
+            if (readInt(tail, p) != EOCD_SIGNATURE) continue;
+            int comment = readShort(tail, p + 20) & 0xFFFF;
+            if (p + EOCD_BASE_SIZE + comment != tail.length) continue;
+            try {
+                long endPosition = start + p;
+                EocdInfo e = new EocdInfo(readShort(tail, p + 4) & 0xFFFFL,
+                        readShort(tail, p + 6) & 0xFFFFL, readShort(tail, p + 8) & 0xFFFFL,
+                        readShort(tail, p + 10) & 0xFFFFL, readInt(tail, p + 12) & ZIP64_MAGIC_NUMBER,
+                        readInt(tail, p + 16) & ZIP64_MAGIC_NUMBER, comment);
+                long directoryEnd = endPosition;
+                if (e.getTotalEntries() == 65535 || e.getCentralDirSize() == ZIP64_MAGIC_NUMBER
+                        || e.getCentralDirOffset() == ZIP64_MAGIC_NUMBER) {
+                    byte[] locator = endPosition >= 20 ? readExact(source, endPosition - 20, 20) : new byte[0];
+                    if (locator.length == 20 && readInt(locator, 0) == ZIP64_LOCATOR_SIGNATURE) {
+                        if (readInt(locator, 4) != 0 || readInt(locator, 16) != 1) throw new IOException("不支持分卷ZIP64");
+                        long z = readLong(locator, 8);
+                        if (z < 0 || z > endPosition - 20 - 56) throw new IOException("ZIP64记录范围无效");
+                        byte[] record = readExact(source, z, 56);
+                        long recordSize = readLong(record, 4);
+                        if (readInt(record, 0) != ZIP64_EOCD_SIGNATURE || recordSize < 44
+                                || recordSize != endPosition - 20 - z - 12) throw new IOException("ZIP64记录长度或签名无效");
+                        e = new EocdInfo(readInt(record, 16) & ZIP64_MAGIC_NUMBER,
+                                readInt(record, 20) & ZIP64_MAGIC_NUMBER, readLong(record, 24), readLong(record, 32),
+                                readLong(record, 40), readLong(record, 48), comment);
+                        directoryEnd = z;
+                    } else if (e.getCentralDirSize() == ZIP64_MAGIC_NUMBER || e.getCentralDirOffset() == ZIP64_MAGIC_NUMBER) {
+                        throw new IOException("缺少ZIP64定位器");
+                    }
                 }
-                return eocd;
-            }
+                long size = e.getCentralDirSize(), offset = e.getCentralDirOffset(), count = e.getTotalEntries();
+                if (e.getDiskNumber() != 0 || e.getStartDisk() != 0 || e.getDiskEntries() != count
+                        || count < 0 || size < 0 || offset < 0 || offset > directoryEnd
+                        || size != directoryEnd - offset || count > size / 46
+                        || (count == 0 && size != 0)) throw new IOException("ZIP中央目录范围或条目数量无效");
+                e.setFileSize(fileSize);
+                return e;
+            } catch (IOException e) { last = e; }
         }
-        throw new IOException("未找到ZIP文件的EOCD记录，source:" + source);
+        throw new IOException("未找到有效ZIP结束记录: " + source, last);
     }
 
     @Override
-    public CentralDirectoryModel findEntryInCentralDir(EocdInfo eocd, String targetPath, String source) throws IOException {
-        String normalizedTarget = normalizePath(targetPath);
-        boolean isFolderCheck = isFolderPath(targetPath);
+    public CentralDirectoryModel findEntryInCentralDir(EocdInfo eocd, String path, String source) throws IOException {
+        String target = normalizePath(path);
+        CentralDirectoryModel[] result = {null};
+        scanAllEntries(eocd, source, (entry, total, index) -> {
+            if (matchesPath(entry.getName(), target)) { result[0] = entry; return false; }
+            return true;
+        });
+        return result[0];
+    }
 
-        log.debug("开始查找路径：原始路径=[{}]，标准化路径=[{}]，是否文件夹=[{}]",
-                targetPath, normalizedTarget, isFolderCheck);
-
-        long totalDirSize = eocd.getCentralDirSize();
-        long currentOffset = eocd.getCentralDirOffset();
-        long remaining = totalDirSize;
-        int chunkCount = 0;
-
-        while (remaining > 0) {
-            chunkCount++;
-            long chunkSize = Math.min(remaining, MAX_CHUNK_SIZE);
-            log.trace("读取中央目录块 {}：偏移={}, 大小={}", chunkCount, currentOffset, chunkSize);
-
-            byte[] dirChunk = readRange(source, currentOffset, currentOffset + chunkSize - 1);
-            CentralDirectoryModel entry = findEntryInDirChunk(dirChunk, normalizedTarget, isFolderCheck, currentOffset, source);
-
-            if (entry != null) {
-                log.debug("找到目标路径：{}", targetPath);
-                return entry;
+    @Override
+    public List<String> checkedPathsInZip(String source, List<String> paths) throws IOException {
+        if (paths == null || paths.isEmpty()) return Collections.emptyList();
+        Map<String, String> pending = new LinkedHashMap<>();
+        for (String path : paths) pending.put(path, normalizePath(path));
+        Set<String> found = new LinkedHashSet<>();
+        scanAllEntries(source, (entry, total, index) -> {
+            Iterator<Map.Entry<String, String>> it = pending.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, String> candidate = it.next();
+                if (matchesPath(entry.getName(), candidate.getValue())) { found.add(candidate.getKey()); it.remove(); }
             }
+            return !pending.isEmpty();
+        });
+        return new ArrayList<>(found);
+    }
 
-            currentOffset += chunkSize;
-            remaining -= chunkSize;
-        }
+    private boolean matchesPath(String name, String target) {
+        if (target.isEmpty()) return false;
+        if (name.equalsIgnoreCase(target)) return true;
+        if (!target.endsWith("/") && target.substring(target.lastIndexOf('/') + 1).contains(".")) return false;
+        // 调用方仍可使用无尾斜杠的目录查询，但不能把无扩展名文件改名为目录。
+        String prefix = target.endsWith("/") ? target : target + "/";
+        return name.regionMatches(true, 0, prefix, 0, prefix.length());
+    }
 
-        log.debug("中央目录中未找到目标路径：{}（共扫描 {} 块）", targetPath, chunkCount);
-        return null;
+    @Override
+    public void scanAllEntries(String source, TerminatingConsumer<CentralDirectoryModel> consumer) throws IOException {
+        scanAllEntries(parseEocd(getFileSize(source), source), source, consumer);
     }
 
     @Override
     public byte[] readAndDecompressEntry(CentralDirectoryModel entry, String source) throws IOException {
         DecompressionLimits.validateCompressedSize(entry.getCompressedSize());
         DecompressionLimits.validateExpectedSize(entry.getUncompressedSize());
-        if (Objects.isNull(entry.getDataOffset())) {
-            try {
-                LocalFileHeader header = readLocalFileHeader(entry.getLocalHeaderOffset(), source, getFileSize(source));
-                entry.setDataOffset(header.getDataOffset());
-            } catch (Exception e) {
-                log.warn("读取本地文件头失败，尝试直接使用偏移量估算", e);
-                // 估算数据偏移量（本地文件头固定30字节 + 文件名长度 + 扩展字段长度）
-                long estimatedOffset = estimateDataOffset(entry.getLocalHeaderOffset(), source, getFileSize(source));
-                entry.setDataOffset(estimatedOffset);
+        long fileSize = getFileSize(source), headerOffset = entry.getLocalHeaderOffset();
+        if (headerOffset < 0 || headerOffset > fileSize - 30) throw new IOException("ZIP文件头范围无效");
+        byte[] header = readExact(source, headerOffset, 30);
+        int flags = readShort(header, 6) & 0xFFFF;
+        if (readInt(header, 0) != LOCAL_FILE_HEADER_SIGNATURE) throw new IOException("ZIP文件头签名无效，拒绝猜测偏移");
+        if ((flags & 0x41) != 0) throw new IOException("不支持加密ZIP条目");
+        if ((readShort(header, 8) & 0xFFFF) != entry.getCompressionMethod()) throw new IOException("ZIP压缩方式不一致");
+        long variableLength = (readShort(header, 26) & 0xFFFF) + (readShort(header, 28) & 0xFFFF);
+        if (variableLength > fileSize - headerOffset - 30) throw new IOException("ZIP文件头长度越界");
+        long dataOffset = headerOffset + 30 + variableLength;
+        if (dataOffset > fileSize || entry.getCompressedSize() < 0
+                || entry.getCompressedSize() > fileSize - dataOffset) throw new IOException("ZIP数据范围无效");
+        if (entry.getDataOffset() != null && entry.getDataOffset() != dataOffset) throw new IOException("缓存的ZIP数据偏移已失效");
+        entry.setDataOffset(dataOffset);
+        long expectedCrc;
+        Long alternativeCrc = null;
+        if (entry.getCrc32() != null) {
+            expectedCrc = entry.getCrc32();
+        } else if ((flags & 8) == 0) {
+            expectedCrc = readInt(header, 14) & ZIP64_MAGIC_NUMBER;
+        } else {
+            // 兼容没有CRC字段的旧SQLite/PG缓存，从数据描述符取得校验值，无需重扫全包。
+            long descriptor = dataOffset + entry.getCompressedSize();
+            if (descriptor > fileSize - 8) throw new IOException("ZIP数据描述符不完整");
+            byte[] crc = readExact(source, descriptor, 8);
+            expectedCrc = readInt(crc, 0) & ZIP64_MAGIC_NUMBER;
+            if (expectedCrc == 0x08074b50L) {
+                // 无签名描述符的CRC也可能恰好等于可选签名。
+                alternativeCrc = expectedCrc;
+                expectedCrc = readInt(crc, 4) & ZIP64_MAGIC_NUMBER;
             }
         }
-        // 压缩大小为 0 的条目在归档里没有数据区，直接返回空结果。
-        // 不加这一步会算出 end = dataOffset - 1，readRange 判断 start > end 后抛「无效的范围」，
-        // 一个正常的空文件条目就会把整个瓦片请求带崩。
-        if (entry.getCompressedSize() <= 0) {
-            if (entry.getUncompressedSize() > 0) {
-                throw new IOException("条目数据不完整，压缩大小:" + entry.getCompressedSize()
-                        + ", 声明解压后大小:" + entry.getUncompressedSize());
-            }
-            return new byte[0];
-        }
-
-        byte[] compressedData = readRange(source, entry.getDataOffset(), entry.getDataOffset() + entry.getCompressedSize() - 1);
-        return entry.getDecompressionHandler().decompress(compressedData, entry.getUncompressedSize());
-    }
-
-    @Override
-    public void readAndDecompressEntryToLocal(CentralDirectoryModel entry, String source, String localOutputPath) throws IOException {
-        byte[] bytes = readAndDecompressEntry(entry, source);
-        byteToLocal(localOutputPath, bytes);
-    }
-
-    @Override
-    public List<String> checkedPathsInZip(String zipSource, List<String> checkedPaths) throws IOException {
-        if (checkedPaths == null || checkedPaths.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        // 标准化所有待检查路径并记录类型（文件/文件夹）
-        Map<String, String> pathMap = new HashMap<>();
-        Map<String, Boolean> pathTypeMap = new HashMap<>();
-        Set<String> normalizedCheckPaths = new HashSet<>();
-
-        for (String path : checkedPaths) {
-            String normalized = normalizePath(path);
-            boolean isFolder = isFolderPath(path);
-
-            pathMap.put(normalized, path);
-            pathTypeMap.put(normalized, isFolder);
-            normalizedCheckPaths.add(normalized);
-
-            // 文件夹路径添加带/和不带/两种形式
-            if (isFolder) {
-                String altNormalized = normalized.endsWith("/") ? normalized.substring(0, normalized.length() - 1) : normalized + "/";
-                pathMap.put(altNormalized, path);
-                pathTypeMap.put(altNormalized, isFolder);
-            }
-        }
-
-        // 存储存在的路径
-        Set<String> existsPaths = new HashSet<>();
-
-        // 获取EOCD信息
-        long zipFileSize = getFileSize(zipSource);
-        EocdInfo eocd = parseEocd(zipFileSize, zipSource);
-
-        // 扫描中央目录查找匹配路径
-        long totalDirSize = eocd.getCentralDirSize();
-        long currentOffset = eocd.getCentralDirOffset();
-        long remaining = totalDirSize;
-
-        while (remaining > 0 && !normalizedCheckPaths.isEmpty()) {
-            long chunkSize = Math.min(remaining, MAX_CHUNK_SIZE);
-            byte[] dirChunk = readRange(zipSource, currentOffset, currentOffset + chunkSize - 1);
-
-            // 在当前块中查找所有匹配的路径
-            findAllMatchingPaths(dirChunk, normalizedCheckPaths, existsPaths, pathTypeMap);
-
-            currentOffset += chunkSize;
-            remaining -= chunkSize;
-        }
-
-        // 转换回原始路径格式并去重
-        Set<String> resultSet = new HashSet<>();
-        for (String normalizedPath : existsPaths) {
-            String originalPath = pathMap.get(normalizedPath);
-            if (originalPath != null) {
-                resultSet.add(originalPath);
-            }
-        }
-
-        List<String> result = new ArrayList<>(resultSet);
-        log.info("路径检查完成：共检查{}个路径，存在{}个", checkedPaths.size(), result.size());
+        byte[] compressed = readExact(source, dataOffset, entry.getCompressedSize());
+        byte[] result = entry.getDecompressionHandler().decompress(compressed, entry.getUncompressedSize());
+        if (result.length != entry.getUncompressedSize()) throw new IOException("ZIP解压长度不匹配");
+        java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+        crc.update(result);
+        if (crc.getValue() != expectedCrc && (alternativeCrc == null || crc.getValue() != alternativeCrc))
+            throw new IOException("ZIP内容CRC校验失败: " + entry.getName());
         return result;
     }
 
-    /**
-     * 读取ZIP64中央目录结束记录（处理大于4GB的ZIP文件）
-     */
-    private EocdInfo readZip64Eocd(long fileSize, String source) throws IOException {
-        long fileLength = fileSize;
-        // 1. 查找ZIP64定位器（位于ZIP文件末尾，固定20字节）
-        long locatorStart = Math.max(0, fileLength - 20);
-        byte[] locatorData = readRange(source, locatorStart, fileLength - 1);
-
-        // 校验ZIP64定位器签名
-        if (locatorData.length < 20 || readInt(locatorData, 0) != ZIP64_LOCATOR_SIGNATURE) {
-            return null; // 非ZIP64格式，返回null
-        }
-
-        // 解析ZIP64定位器中的关键信息
-        long zip64EocdDiskNumber = readInt(locatorData, 4) & ZIP64_MAGIC_NUMBER; // ZIP64 EOCD所在磁盘号
-        long zip64EocdOffset = readLong(locatorData, 8); // ZIP64 EOCD的起始偏移量
-        long totalDisks = readInt(locatorData, 16) & ZIP64_MAGIC_NUMBER; // 总磁盘数
-
-        // 2. 读取ZIP64 EOCD记录（最小长度56字节，实际可能更长）
-        byte[] zip64EocdData = readRange(source, zip64EocdOffset, zip64EocdOffset + 55); // 先读取基础56字节
-        if (zip64EocdData.length < 56 || readInt(zip64EocdData, 0) != ZIP64_EOCD_SIGNATURE) {
-            throw new IOException("无效的ZIP64中央目录结束记录（签名不匹配）");
-        }
-
-        // 解析ZIP64 EOCD的固定字段（按ZIP规范顺序）
-        long eocdSize = readLong(zip64EocdData, 4); // ZIP64 EOCD总大小（不含签名）
-        long versionMadeBy = readShort(zip64EocdData, 12) & 0xFFFFL; // 创建版本
-        long versionNeeded = readShort(zip64EocdData, 14) & 0xFFFFL; // 所需版本
-        long diskNumber = readInt(zip64EocdData, 16) & ZIP64_MAGIC_NUMBER; // 当前磁盘号
-        long startDisk = readInt(zip64EocdData, 20) & ZIP64_MAGIC_NUMBER; // 中央目录起始磁盘号
-        long diskEntries = readLong(zip64EocdData, 24); // 当前磁盘的中央目录条目数
-        long totalEntries = readLong(zip64EocdData, 32); // 中央目录条目总数
-        long centralDirSize = readLong(zip64EocdData, 40); // 中央目录总大小
-        long centralDirOffset = readLong(zip64EocdData, 48); // 中央目录起始偏移量
-
-        // 3. 解析ZIP64 EOCD的注释长度（若存在）
-        long commentLength = 0;
-        int eocdTotalLength = (int) (eocdSize + 4); // 总长度=EOCD大小+4字节签名
-        if (eocdTotalLength > 56) {
-            // 读取注释长度字段（位于EOCD末尾）
-            byte[] commentLengthData = readRange(source, zip64EocdOffset + eocdTotalLength - 2, zip64EocdOffset + eocdTotalLength - 1);
-            commentLength = readShort(commentLengthData, 0) & 0xFFFFL;
-        }
-
-        // 4. 构造完整的EocdInfo对象
-        return new EocdInfo(
-                diskNumber,
-                startDisk,
-                diskEntries,
-                totalEntries,
-                centralDirSize,
-                centralDirOffset,
-                commentLength
-        );
+    @Override
+    public void readAndDecompressEntryToLocal(CentralDirectoryModel entry, String source, String output) throws IOException {
+        byteToLocal(output, readAndDecompressEntry(entry, source));
     }
 
-    public void scanAllEntries1(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
-        // 优先使用ZIP64 EOCD（若存在）
-        EocdInfo finalEocd = eocd;
-        long fileSize = eocd.getFileSize();
-        try {
-            EocdInfo zip64Eocd = readZip64Eocd(fileSize, source);
-            if (zip64Eocd != null) {
-                finalEocd = zip64Eocd;
-                log.info("使用ZIP64中央目录信息：offset={}, size={}, entries={}",
-                        finalEocd.getCentralDirOffset(), finalEocd.getCentralDirSize(), finalEocd.getTotalEntries());
-            }
-        } catch (Exception e) {
-            log.warn("读取ZIP64 EOCD失败，使用普通EOCD", e);
-        }
-
-        long totalDirSize = finalEocd.getCentralDirSize();
-        long currentOffset = finalEocd.getCentralDirOffset();
-        long totalEntries = finalEocd.getTotalEntries();
-        long remaining = totalDirSize;
-        long entryCount = 0;
-        long fileLength = fileSize;
-
-        while (remaining > 0) {
-            // 读取中央目录条目签名（4字节）
-            if (currentOffset + 4 > finalEocd.getCentralDirOffset() + totalDirSize) {
-                break;
-            }
-
-            // 确保有足够的字节读取签名
-            long signatureEnd = currentOffset + 3;
-            if (signatureEnd >= fileLength) {
-                log.warn("到达文件末尾，无法读取中央目录签名");
-                break;
-            }
-
-//            byte[] signatureBytes = readRange(source, currentOffset, signatureEnd);
-//            if (signatureBytes.length < 4) {
-//                log.warn("读取签名数据不足：{}字节", signatureBytes.length);
-//                break;
-//            }
-
-//            int signature = ByteBuffer.wrap(signatureBytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
-
-//            if (signature != CENTRAL_DIR_SIGNATURE) {
-//                log.debug("无效的中央目录签名：{}，偏移量：{}", Integer.toHexString(signature), currentOffset);
-//                currentOffset++;
-//                remaining--;
-//                continue;
-//            }
-
-            // 读取条目头部（46字节固定长度）
-            long headerEnd = currentOffset + 45;
-            if (headerEnd >= fileLength) {
-                log.warn("条目头部超出文件范围：{}", headerEnd);
-                break;
-            }
-
-            byte[] headerData = readRange(source, currentOffset, headerEnd);
-            if (headerData.length < 46) {
-                log.warn("读取条目头部数据不足：{}字节", headerData.length);
-                break;
-            }
-
-            // 解析条目长度字段
-            int nameLen = readShort(headerData, 28) & 0xFFFF;
-            int extraLen = readShort(headerData, 30) & 0xFFFF;
-            int commentLen = readShort(headerData, 32) & 0xFFFF;
-            int entryTotalLength = 46 + nameLen + extraLen + commentLen;
-
-            if (entryTotalLength > remaining) {
-                log.warn("条目长度超过剩余字节：{} > {}，终止解析", entryTotalLength, remaining);
-                break;
-            }
-
-            // 检查条目是否超出文件范围
-            long entryEnd = currentOffset + entryTotalLength - 1;
-            if (entryEnd >= fileLength) {
-                log.warn("条目超出文件范围：{}", entryEnd);
-                break;
-            }
-
-            // 读取完整条目数据
-            byte[] entryData = readRange(source, currentOffset, entryEnd);
-
-            // 解析核心字段
-            long compressionMethod = readShort(entryData, 10) & 0xFFFF;
-            long compressedSize32 = readInt(entryData, 20) & ZIP64_MAGIC_NUMBER;
-            long uncompressedSize32 = readInt(entryData, 24) & ZIP64_MAGIC_NUMBER;
-            long headerOffset32 = readInt(entryData, 42) & ZIP64_MAGIC_NUMBER;
-
-            // 读取文件名
-            String fileName = "";
-            if (nameLen > 0 && 46 + nameLen <= entryData.length) {
-                fileName = decodeFileName(entryData, 46, nameLen, readShort(entryData, 8) & 0xFFFF);
-                fileName = normalizePath(fileName);
-            }
-
-            // 判断是否为目录
-            boolean isDirectory = false;
-            isDirectory = isDirectory(fileName, compressedSize32, uncompressedSize32);
-
-            // 处理ZIP64扩展字段 - 增强版解析
-            long compressedSize = compressedSize32;
-            long uncompressedSize = uncompressedSize32;
-            long headerOffset = headerOffset32;
-
-            // 如果任何字段是ZIP64占位符，强制扫描整个扩展字段
-            boolean needZip64Parsing = (compressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                        uncompressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                        headerOffset32 == ZIP64_MAGIC_NUMBER);
-
-            if (needZip64Parsing && extraLen > 0) {
-                // 直接扫描整个扩展字段数据，不依赖结构解析
-                int extraPos = 46 + nameLen;
-                byte[] extraData = Arrays.copyOfRange(entryData, extraPos, extraPos + extraLen);
-
-                // 查找ZIP64扩展字段（ID: 0x0001）
-                int pos = 0;
-                while (pos + 4 <= extraData.length) {
-                    int headerId = (extraData[pos] & 0xFF) | ((extraData[pos + 1] & 0xFF) << 8);
-                    int dataSize = (extraData[pos + 2] & 0xFF) | ((extraData[pos + 3] & 0xFF) << 8);
-
-                    if (headerId == ZIP64_EXTRA_FIELD_ID) {
-                        log.debug("{}: 找到ZIP64扩展字段，大小：{}", fileName, dataSize);
-
-                        // 解析ZIP64扩展字段内容
-                        ByteBuffer buffer = ByteBuffer.wrap(extraData, pos + 4, Math.min(dataSize, extraData.length - pos - 4));
-                        buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-                        if (uncompressedSize32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
-                            uncompressedSize = buffer.getLong();
-                            log.debug("{}: ZIP64未压缩大小 = {}", fileName, uncompressedSize);
-                        }
-                        if (compressedSize32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
-                            compressedSize = buffer.getLong();
-                            log.debug("{}: ZIP64压缩大小 = {}", fileName, compressedSize);
-                        }
-                        if (headerOffset32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
-                            headerOffset = buffer.getLong();
-                            log.debug("{}: ZIP64本地头偏移 = {}", fileName, headerOffset);
-                        }
-
-                        break; // 找到ZIP64字段后退出
-                    }
-
-                    pos += 4 + dataSize;
-                }
-
-                // 如果仍然没有找到ZIP64字段，尝试从中央目录直接计算偏移量
-                if (headerOffset == ZIP64_MAGIC_NUMBER) {
-                    log.warn("{}: ZIP64扩展字段未找到，尝试从中央目录位置估算偏移量", fileName);
-                    // 这是一个备选方案，可能不准确，但比失败好
-                    headerOffset = estimateLocalHeaderOffset(currentOffset, fileLength, source);
-                }
-            }
-
-            // 校验headerOffset合法性
-            Long dataOffset = null;
-            if (headerOffset >= 0 && headerOffset < fileLength) {
-                try {
-                    LocalFileHeader localHeader = readLocalFileHeader(headerOffset, source, fileSize);
-                    dataOffset = localHeader.getDataOffset();
-                } catch (Exception e) {
-                    log.warn("读取本地文件头失败：fileName={}, headerOffset={}", fileName, headerOffset, e);
-                    // 尝试估算数据偏移量
-                    dataOffset = estimateDataOffset(headerOffset, source, fileSize);
-                }
-            } else {
-                log.warn("headerOffset超出文件范围：{}（文件长度：{}），fileName={}",
-                        headerOffset, fileLength, fileName);
-                // 尝试修复偏移量
-                if (headerOffset >= fileLength) {
-                    log.warn("{}: 尝试修复过大的偏移量", fileName);
-                    headerOffset = fileLength - 100000; // 向后偏移
-                    if (headerOffset > 0) {
-                        try {
-                            LocalFileHeader localHeader = readLocalFileHeader(headerOffset, source, fileSize);
-                            dataOffset = localHeader.getDataOffset();
-                        } catch (Exception e) {
-                            dataOffset = estimateDataOffset(headerOffset, source, fileSize);
-                        }
-                    }
-                }
-            }
-
-            // 创建条目并消费
-            CentralDirectoryModel entry = new CentralDirectoryModel(
-                    headerOffset,
-                    dataOffset,
-                    compressionMethod,
-                    compressedSize,
-                    uncompressedSize,
-                    fileName,
-                    entryTotalLength
-            );
-            entry.setDirectoryIs(isDirectory);
-            Long allCount = totalEntries;
-            Long currentCount = entryCount; // 重新赋值一下，面得accept里面修改了变量的值
-            boolean accept = entryConsumer.accept(entry, allCount, currentCount);
-
-            if (!accept) {
-                log.info("accept 接收到该中央目录后返回停止条件 {}", entry.getName());
-                break;
-            }
-
-            // 更新偏移量
-            currentOffset += entryTotalLength;
-            remaining -= entryTotalLength;
-            entryCount++;
-        }
-
-        log.info("中央目录扫描完成：共解析{}个条目", entryCount);
+    private byte[] readExact(String source, long offset, long length) throws IOException {
+        if (offset < 0 || length < 0 || length > Integer.MAX_VALUE - 8 || offset > Long.MAX_VALUE - length)
+            throw new IOException("ZIP读取范围无效");
+        if (length == 0) return new byte[0];
+        byte[] bytes = readRange(source, offset, offset + length - 1);
+        if (bytes.length != length) throw new EOFException("ZIP范围读取不完整");
+        return bytes;
     }
 
-
+    @Override
     public void scanAllEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
-        // ===================== 固定配置 =====================
-        final int BATCH_SIZE = 500;                    // 每批解析多少条
-        final int QUEUE_CAPACITY = 2000;
-        int threads = Math.min(Runtime.getRuntime().availableProcessors() * 2, 8);
+        ZipDirectoryPipeline.scan(this, eocd, source, entryConsumer);
+    }
 
-        EocdInfo finalEocd = eocd;
-        long fileSize = eocd.getFileSize();
-        try {
-            EocdInfo zip64Eocd = readZip64Eocd(fileSize, source);
-            if (zip64Eocd != null) finalEocd = zip64Eocd;
-        } catch (Exception e) {
-            log.warn("读取ZIP64 EOCD失败，使用普通EOCD");
+    void scanDirectoryEntries(EocdInfo eocd, String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
+        // 中央目录已经包含名称、压缩大小和本地头位置。扫描时不读取各文件的本地头，
+        // dataOffset 留空，由 readAndDecompressEntry 在实际取文件时按需解析。
+        // 按连续块读取，跨块条目由 reader 拼接，避免每个条目发起多个 S3 Range 请求。
+        long offset = eocd.getCentralDirOffset();
+        long size = eocd.getCentralDirSize();
+        if (offset < 0 || size < 0 || offset > Long.MAX_VALUE - size || eocd.getTotalEntries() < 0) {
+            throw new IOException("无效的ZIP中央目录范围");
         }
-
-        long totalDirSize = finalEocd.getCentralDirSize();
-        long currentOffset = finalEocd.getCentralDirOffset();
-        long totalEntries = finalEocd.getTotalEntries();
-        long fileLength = fileSize;
-        long remaining = totalDirSize;
-
-        BlockingQueue<CentralDirectoryModel> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
-        ExecutorService producerExecutor = Executors.newWorkStealingPool(threads);
-        AtomicBoolean producerFinish = new AtomicBoolean(false);
-        AtomicBoolean shouldStop = new AtomicBoolean(false);
-        AtomicLong entryCount = new AtomicLong(0);
-        Thread consumerThread = new Thread(() -> {
-            try {
-                while (!shouldStop.get()) {
-                    // 队列获取，超时判断是否结束
-                    CentralDirectoryModel entry = queue.poll(100, TimeUnit.MILLISECONDS);
-                    if (entry == null && producerFinish.get()) {
+        CentralDirectoryReader reader = new CentralDirectoryReader(this, source, offset, size);
+        for (long index = 0; index < eocd.getTotalEntries(); index++) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new java.io.InterruptedIOException("ZIP中央目录扫描已中断");
+            }
+            byte[] header = reader.read(46);
+            if (readInt(header, 0) != CENTRAL_DIR_SIGNATURE) {
+                throw new IOException("无效的ZIP中央目录签名，条目: " + index);
+            }
+            int nameLen = readShort(header, 28) & 0xFFFF;
+            int extraLen = readShort(header, 30) & 0xFFFF;
+            int commentLen = readShort(header, 32) & 0xFFFF;
+            byte[] variable = reader.read(nameLen + extraLen + commentLen);
+            int flags = readShort(header, 8) & 0xFFFF;
+            String name = normalizePath(decodeEntryName(variable, nameLen, extraLen, flags));
+            long compressed = readInt(header, 20) & ZIP64_MAGIC_NUMBER;
+            long uncompressed = readInt(header, 24) & ZIP64_MAGIC_NUMBER;
+            long localOffset = readInt(header, 42) & ZIP64_MAGIC_NUMBER;
+            long disk = readShort(header, 34) & 0xFFFF;
+            boolean zip64 = compressed == ZIP64_MAGIC_NUMBER || uncompressed == ZIP64_MAGIC_NUMBER
+                    || localOffset == ZIP64_MAGIC_NUMBER || disk == 0xFFFF;
+            if (zip64) {
+                boolean found = false;
+                int end = nameLen + extraLen;
+                for (int p = nameLen; p + 4 <= end;) {
+                    int id = readShort(variable, p) & 0xFFFF;
+                    int length = readShort(variable, p + 2) & 0xFFFF;
+                    if (length > end - p - 4) throw new IOException("ZIP扩展字段不完整: " + name);
+                    if (id == ZIP64_EXTRA_FIELD_ID) {
+                        ByteBuffer values = ByteBuffer.wrap(variable, p + 4, length).slice().order(ByteOrder.LITTLE_ENDIAN);
+                        int required = (uncompressed == ZIP64_MAGIC_NUMBER ? 8 : 0)
+                                + (compressed == ZIP64_MAGIC_NUMBER ? 8 : 0)
+                                + (localOffset == ZIP64_MAGIC_NUMBER ? 8 : 0) + (disk == 0xFFFF ? 4 : 0);
+                        if (values.remaining() < required) throw new IOException("ZIP64扩展字段不完整: " + name);
+                        if (uncompressed == ZIP64_MAGIC_NUMBER) uncompressed = values.getLong();
+                        if (compressed == ZIP64_MAGIC_NUMBER) compressed = values.getLong();
+                        if (localOffset == ZIP64_MAGIC_NUMBER) localOffset = values.getLong();
+                        if (disk == 0xFFFF) disk = values.getInt() & ZIP64_MAGIC_NUMBER;
+                        found = true;
                         break;
                     }
-                    if (entry == null) continue;
-
-                    try {
-                        long index = entryCount.incrementAndGet() - 1;
-                        boolean result = entryConsumer.accept(entry, totalEntries, index);
-                        // 如果消费者返回false，设置停止标志
-                        if (!result) {
-                            shouldStop.set(true);
-                            log.info("消费者返回false，停止扫描，当前已处理：{} 条", index + 1);
-                            break;
-                        }
-
-                    } catch (Exception e) {
-                        shouldStop.set(true); // 异常时也停止
-                        log.error("消费条目异常", e);
-                    }
+                    p += 4 + length;
                 }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                if (!found) throw new IOException("缺少ZIP64扩展字段: " + name);
             }
-        }, "zip-entry-consumer");
-        consumerThread.start();
-        try {
-            while (remaining > 0 && !shouldStop.get()) {
-                List<EntryPosition> batch = new ArrayList<>(BATCH_SIZE);
-                while (batch.size() < BATCH_SIZE && remaining > 0 && !shouldStop.get()) {
-                    long headerEnd = currentOffset + 45;
-                    if (headerEnd >= fileLength) break;
-
-                    byte[] headerData = readRange(source, currentOffset, headerEnd);
-                    if (headerData.length < 46) break;
-
-                    int nameLen = readShort(headerData, 28) & 0xFFFF;
-                    int extraLen = readShort(headerData, 30) & 0xFFFF;
-                    int commentLen = readShort(headerData, 32) & 0xFFFF;
-                    int entryTotalLength = 46 + nameLen + extraLen + commentLen;
-
-                    if (entryTotalLength > remaining) break;
-                    long entryEnd = currentOffset + entryTotalLength - 1;
-                    if (entryEnd >= fileLength) break;
-
-                    batch.add(new EntryPosition(currentOffset, entryTotalLength));
-                    currentOffset += entryTotalLength;
-                    remaining -= entryTotalLength;
-                }
-
-                if (batch.isEmpty()) break;
-
-                // 并行解析
-                List<CompletableFuture<Void>> futures = new ArrayList<>();
-                for (EntryPosition pos : batch) {
-                    if (shouldStop.get()) break;
-                    futures.add(CompletableFuture.runAsync(() -> {
-                        try {
-                            long entryOffset = pos.offset;
-                            int entryLen = pos.totalLength;
-                            long entryEnd = entryOffset + entryLen - 1;
-                            byte[] entryData = readRange(source, entryOffset, entryEnd);
-
-                            // -------------- 你原有解析逻辑 --------------
-                            long compressionMethod = readShort(entryData, 10) & 0xFFFF;
-                            long compressedSize32 = readInt(entryData, 20) & ZIP64_MAGIC_NUMBER;
-                            long uncompressedSize32 = readInt(entryData, 24) & ZIP64_MAGIC_NUMBER;
-                            long headerOffset32 = readInt(entryData, 42) & ZIP64_MAGIC_NUMBER;
-
-                            int nameLen = readShort(entryData, 28) & 0xFFFF;
-                            String fileName = "";
-                            if (nameLen > 0 && 46 + nameLen <= entryData.length) {
-                                fileName = decodeFileName(entryData, 46, nameLen, readShort(entryData, 8) & 0xFFFF);
-                                fileName = normalizePath(fileName);
-                            }
-
-                            boolean isDirectory = isDirectory(fileName, compressedSize32, uncompressedSize32);
-                            long compressedSize = compressedSize32;
-                            long uncompressedSize = uncompressedSize32;
-                            long headerOffset = headerOffset32;
-                            int extraLen = readShort(entryData, 30) & 0xFFFF;
-
-                            boolean needZip64Parsing = (compressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                                        uncompressedSize32 == ZIP64_MAGIC_NUMBER ||
-                                                        headerOffset32 == ZIP64_MAGIC_NUMBER);
-
-                            if (needZip64Parsing && extraLen > 0) {
-                                int extraPos = 46 + nameLen;
-                                byte[] extraData = Arrays.copyOfRange(entryData, extraPos, extraPos + extraLen);
-                                int p = 0;
-                                while (p + 4 <= extraData.length) {
-                                    int hid = (extraData[p] & 0xFF) | ((extraData[p + 1] & 0xFF) << 8);
-                                    int dsz = (extraData[p + 2] & 0xFF) | ((extraData[p + 3] & 0xFF) << 8);
-                                    if (hid == ZIP64_EXTRA_FIELD_ID) {
-                                        ByteBuffer buf = ByteBuffer.wrap(extraData, p + 4, Math.min(dsz, extraData.length - p - 4));
-                                        buf.order(ByteOrder.LITTLE_ENDIAN);
-                                        if (uncompressedSize32 == ZIP64_MAGIC_NUMBER && buf.remaining() >= 8)
-                                            uncompressedSize = buf.getLong();
-                                        if (compressedSize32 == ZIP64_MAGIC_NUMBER && buf.remaining() >= 8)
-                                            compressedSize = buf.getLong();
-                                        if (headerOffset32 == ZIP64_MAGIC_NUMBER && buf.remaining() >= 8)
-                                            headerOffset = buf.getLong();
-                                        break;
-                                    }
-                                    p += 4 + dsz;
-                                }
-                                if (headerOffset == ZIP64_MAGIC_NUMBER) {
-                                    headerOffset = estimateLocalHeaderOffset(entryOffset, fileLength, source);
-                                }
-                            }
-
-                            Long dataOffset = null;
-                            if (headerOffset >= 0 && headerOffset < fileLength) {
-                                try {
-                                    LocalFileHeader lh = readLocalFileHeader(headerOffset, source, fileSize);
-                                    dataOffset = lh.getDataOffset();
-                                } catch (Exception e) {
-                                    dataOffset = estimateDataOffset(headerOffset, source, fileSize);
-                                }
-                            } else {
-                                if (headerOffset >= fileLength) {
-                                    headerOffset = fileLength - 100000;
-                                    if (headerOffset > 0) {
-                                        try {
-                                            LocalFileHeader lh = readLocalFileHeader(headerOffset, source, fileSize);
-                                            dataOffset = lh.getDataOffset();
-                                        } catch (Exception e) {
-                                            dataOffset = estimateDataOffset(headerOffset, source, fileSize);
-                                        }
-                                    }
-                                }
-                            }
-
-                            CentralDirectoryModel entry = new CentralDirectoryModel(
-                                    headerOffset, dataOffset, compressionMethod,
-                                    compressedSize, uncompressedSize, fileName, entryLen
-                            );
-                            entry.setDirectoryIs(isDirectory);
-
-                            if (!shouldStop.get()) {
-                                queue.put(entry);
-                            }
-
-                        } catch (Exception e) {
-                            log.error("解析条目失败", e);
-                        }
-                    }, producerExecutor));
-                }
-
-                if (!futures.isEmpty() && !shouldStop.get()) {
-                    try {
-                        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                                .get(10, TimeUnit.HOURS);
-                    } catch (Exception e) {
-                        log.warn("等待批次完成超时或异常", e);
-                    }
-                }
-                if (shouldStop.get()) {
-                    break;
-                }
+            if (disk != 0 || compressed < 0 || uncompressed < 0 || localOffset < 0) {
+                throw new IOException("不支持的ZIP分卷或无效的条目范围: " + name);
             }
-
-        } catch (Exception e) {
-            log.error("扫描异常", e);
-        } finally {
-            // 标记生产完成
-            producerFinish.set(true);
-            producerExecutor.shutdown();
-        }
-
-        if (shouldStop.get()) {
-            queue.clear();
-            log.info("因停止标志，清空队列中未处理的数据");
-        }
-        // 等待消费者消费完
-        try {
-            consumerThread.join();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        log.info("中央目录扫描+消费完成：共解析 {} 个条目", entryCount.get());
-    }
-
-
-    /**
-     * 估算本地文件头偏移量（备选方案）
-     */
-    private long estimateLocalHeaderOffset(long centralDirOffset, long fileLength, String source) {
-        // 从中央目录位置向前查找本地文件头
-        long searchStart = Math.max(0, centralDirOffset - 1000000); // 向前1MB
-        long searchEnd = centralDirOffset;
-
-        try {
-            // 读取一段数据进行搜索
-            int searchChunkSize = (int) Math.min(100000, searchEnd - searchStart);
-            byte[] searchData = readRange(source, searchStart, searchStart + searchChunkSize - 1);
-
-            // 查找本地文件头签名
-            for (int i = 0; i < searchData.length - 3; i++) {
-                int sig = (searchData[i] & 0xFF) |
-                          ((searchData[i + 1] & 0xFF) << 8) |
-                          ((searchData[i + 2] & 0xFF) << 16) |
-                          ((searchData[i + 3] & 0xFF) << 24);
-
-                if (sig == LOCAL_FILE_HEADER_SIGNATURE) {
-                    long foundOffset = searchStart + i;
-                    log.debug("估算找到本地文件头签名在偏移量：{}", foundOffset);
-                    return foundOffset;
-                }
-            }
-        } catch (Exception e) {
-            log.warn("估算本地文件头偏移量失败", e);
-        }
-
-        // 如果找不到，返回一个合理的默认值
-        return Math.max(0, centralDirOffset - 10000);
-    }
-
-    private static boolean isDirectory(String fileName, long compressedSize32, long uncompressedSize32) {
-        boolean isDirectory = false;
-        // 规则1：文件名以路径分隔符结尾（ZIP标准目录标识）
-        if (fileName.endsWith("/") || fileName.endsWith("\\")) {
-            isDirectory = true;
-        }
-        // 规则2：压缩大小和未压缩大小均为0且包含路径分隔符（兼容部分工具创建的目录条目）
-        else if (compressedSize32 == 0 && uncompressedSize32 == 0
-                 && (fileName.contains("/") || fileName.contains("\\"))) {
-            isDirectory = true;
-        }
-        // 规则3：文件名本身是盘符或根目录（特殊情况处理）
-        else if (fileName.matches("^[a-zA-Z]:[/\\\\]?$")) {
-            isDirectory = true;
-        }
-        return isDirectory;
-    }
-
-    public void scanAllEntries(String source, TerminatingConsumer<CentralDirectoryModel> entryConsumer) throws IOException {
-        long fileSize = getFileSize(source);
-        EocdInfo eocdInfo = parseEocd(fileSize, source);
-        eocdInfo.setFileSize(fileSize);
-        scanAllEntries(eocdInfo, source, entryConsumer);
-    }
-
-    /**
-     * 估算数据偏移量（当无法读取本地文件头时使用）
-     */
-    private long estimateDataOffset(long headerOffset, String source, long fileSize) throws IOException {
-        if (headerOffset == ZIP64_MAGIC_NUMBER) {
-            log.error("无法估算偏移量：headerOffset是ZIP64占位符");
-            // 尝试从文件开头开始查找
-            return 0;
-        }
-
-        long fileLength = fileSize;
-
-        // 读取本地文件头的前30字节来获取文件名长度和扩展字段长度
-        long headerEnd = Math.min(headerOffset + 29, fileLength - 1);
-        if (headerOffset > headerEnd) {
-            return headerOffset + 30; // 默认偏移
-        }
-
-        byte[] headerData = readRange(source, headerOffset, headerEnd);
-        if (headerData.length < 30) {
-            return headerOffset + 30; // 默认偏移
-        }
-
-        try {
-            int nameLen = readShort(headerData, 26) & 0xFFFF;
-            int extraLen = readShort(headerData, 28) & 0xFFFF;
-            return headerOffset + 30 + nameLen + extraLen;
-        } catch (Exception e) {
-            log.warn("估算数据偏移量失败，使用默认值", e);
-            return headerOffset + 30; // 默认偏移
+            CentralDirectoryModel entry = new CentralDirectoryModel(localOffset, null,
+                    readShort(header, 10) & 0xFFFF, compressed, uncompressed, name,
+                    46 + nameLen + extraLen + commentLen);
+            entry.setCrc32(readInt(header, 16) & ZIP64_MAGIC_NUMBER);
+            long attributes = readInt(header, 38) & ZIP64_MAGIC_NUMBER;
+            entry.setDirectoryIs(name.endsWith("/") || (attributes & 0x10) != 0
+                    || ((attributes >>> 16) & 0xF000) == 0x4000);
+            // 生产线程按目录顺序送入有界队列，入库回调在调用线程串行执行。
+            if (!entryConsumer.accept(entry, eocd.getTotalEntries(), index)) return;
         }
     }
 
-    /**
-     * 读取本地文件头（增强容错版）
-     */
-    private LocalFileHeader readLocalFileHeader(long offset, String source, long fileSize) throws IOException {
-        // 首先检查是否是ZIP64占位符
-        if (offset == ZIP64_MAGIC_NUMBER) {
-            throw new IOException("headerOffset是ZIP64占位符，未解析真实值");
+    /** 验证扩展字段边界，并仅接受版本和原始名称CRC匹配的Unicode路径。 */
+    private String decodeEntryName(byte[] data, int nameLength, int extraLength, int flags) throws IOException {
+        String name = decodeFileName(data, 0, nameLength, flags);
+        int end = nameLength + extraLength;
+        for (int p = nameLength; p < end;) {
+            if (end - p < 4) throw new IOException("ZIP扩展字段头不完整");
+            int id = readShort(data, p) & 0xFFFF;
+            int length = readShort(data, p + 2) & 0xFFFF;
+            if (length > end - p - 4) throw new IOException("ZIP扩展字段长度越界");
+            if (id == 0x7075 && (flags & FLAG_UTF8_FILENAME) == 0 && length >= 5 && data[p + 4] == 1) {
+                java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+                crc.update(data, 0, nameLength);
+                if (crc.getValue() == (readInt(data, p + 5) & ZIP64_MAGIC_NUMBER)) {
+                    String unicode = strictDecode(data, p + 9, length - 5, StandardCharsets.UTF_8);
+                    if (unicode != null) name = unicode;
+                }
+            }
+            p += 4 + length;
         }
-
-        long fileLength = fileSize;
-
-        // 基本范围检查
-        if (offset < 0 || offset >= fileLength) {
-            throw new IOException("本地文件头偏移量无效：" + offset + "（文件长度：" + fileLength + "）");
-        }
-
-        // 检查是否有足够的字节读取完整的本地文件头
-        long headerEnd = offset + 29;
-        if (headerEnd >= fileLength) {
-            throw new IOException("本地文件头超出文件范围：" + headerEnd);
-        }
-
-        // 读取基础头数据
-        byte[] headerData = readRange(source, offset, headerEnd);
-        if (headerData.length < 30) {
-            throw new IOException("本地文件头数据不完整：仅读取到" + headerData.length + "字节");
-        }
-
-        // 检查签名（支持小范围搜索）
-        int signature = readInt(headerData, 0);
-        if (signature != LOCAL_FILE_HEADER_SIGNATURE) {
-            // 尝试在更大范围内搜索有效的签名
-            long searchStart = Math.max(0, offset - 1000);
-            long searchEnd = Math.min(fileLength - 4, offset + 1000);
-
-            boolean found = false;
-            for (long i = searchStart; i <= searchEnd; i += 4) { // 按4字节对齐搜索
-                if (i + 3 >= fileLength) break;
-
-                byte[] sigData = readRange(source, i, i + 3);
-                if (sigData.length < 4) continue;
-
-                int currentSig = readInt(sigData, 0);
-                if (currentSig == LOCAL_FILE_HEADER_SIGNATURE) {
-                    offset = i;
-                    log.debug("在偏移量{}找到有效的本地文件头签名（原偏移量{}）", i, offset);
-
-                    // 重新读取头数据
-                    headerEnd = offset + 29;
-                    if (headerEnd >= fileLength) {
-                        throw new IOException("找到的签名位置超出文件范围：" + headerEnd);
-                    }
-                    headerData = readRange(source, offset, headerEnd);
-                    signature = currentSig;
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                throw new IOException("无效的本地文件头签名：0x" + Integer.toHexString(signature) +
-                                      "，偏移量：" + offset);
-            }
-        }
-
-        // 解析文件名长度和扩展字段长度
-        int nameLen = readShort(headerData, 26) & 0xFFFF;
-        int extraLen = readShort(headerData, 28) & 0xFFFF;
-
-        // 计算数据偏移量
-        long dataOffset = offset + 30 + nameLen + extraLen;
-
-        // 验证数据偏移量是否有效
-        if (dataOffset > fileLength) {
-            log.warn("计算出的数据偏移量超出文件范围：{}（文件长度：{}）", dataOffset, fileLength);
-            dataOffset = fileLength; // 设为文件末尾
-        }
-
-        return new LocalFileHeader(nameLen, extraLen, dataOffset);
-    }
-
-    /**
-     * 在中央目录分块中查找目标路径（支持文件和文件夹）
-     */
-    private CentralDirectoryModel findEntryInDirChunk(byte[] dirChunk, String normalizedTarget, boolean isFolderCheck, long chunkOffset, String source) throws IOException {
-        int pos = 0;
-
-        // 处理跨分块的情况：回退查找可能的签名
-        if (dirChunk.length > 46) {
-            for (int i = Math.min(45, dirChunk.length - 4); i >= 0; i--) {
-                if (readInt(dirChunk, i) == CENTRAL_DIR_SIGNATURE) {
-                    pos = i;
-                    break;
-                }
-            }
-        }
-
-        while (pos + 4 <= dirChunk.length) {
-            // 1. 查找中央目录签名
-            if (readInt(dirChunk, pos) != CENTRAL_DIR_SIGNATURE) {
-                pos++;
-                continue;
-            }
-
-            // 2. 确保有足够的字节
-            if (pos + 46 > dirChunk.length) {
-                break; // 跨分块，由外层处理
-            }
-
-            // 3. 解析长度字段
-            int nameLen = readShort(dirChunk, pos + 28) & 0xFFFF;
-            int extraLen = readShort(dirChunk, pos + 30) & 0xFFFF;
-            int commentLen = readShort(dirChunk, pos + 32) & 0xFFFF;
-
-            // 4. 检查条目完整性
-            int entryTotalLength = 46 + nameLen + extraLen + commentLen;
-            if (pos + entryTotalLength > dirChunk.length) {
-                break;
-            }
-
-            // 5. 解析文件名
-            int nameStart = pos + 46;
-            String fileName = decodeFileName(dirChunk, nameStart, nameLen, readShort(dirChunk, pos + 8) & 0xFFFF);
-            String normalizedFile = normalizePath(fileName);
-
-            // 6. 判断当前条目类型（文件/文件夹）
-            boolean isFolderEntry = normalizedFile.endsWith("/") || fileName.endsWith("/");
-
-            // 7. 灵活的路径匹配
-            boolean isMatch = false;
-
-            if (isFolderCheck) {
-                // 文件夹匹配逻辑
-                String folderTargetWithSlash = normalizedTarget.endsWith("/") ? normalizedTarget : normalizedTarget + "/";
-                String folderFileWithSlash = normalizedFile.endsWith("/") ? normalizedFile : normalizedFile + "/";
-
-                // 精确匹配文件夹
-                if (normalizedFile.equals(normalizedTarget) ||
-                    normalizedFile.equals(folderTargetWithSlash) ||
-                    folderFileWithSlash.equals(normalizedTarget)) {
-                    isMatch = true;
-                }
-                // 子文件/子文件夹匹配
-                else if (normalizedFile.startsWith(folderTargetWithSlash)) {
-                    isMatch = true;
-                }
-            } else {
-                // 文件匹配逻辑
-                if (normalizedFile.equals(normalizedTarget)) {
-                    isMatch = true;
-                }
-                // 处理文件名大小写问题
-                else if (normalizedFile.equalsIgnoreCase(normalizedTarget)) {
-                    isMatch = true;
-                }
-            }
-
-            // 8. 检查Unicode文件名
-            String unicodeFileName = null;
-            int extraPos = nameStart + nameLen;
-            if (!isMatch && extraLen > 0) {
-                int currentExtraPos = extraPos;
-                while (currentExtraPos + 4 <= extraPos + extraLen) {
-                    int headerId = readShort(dirChunk, currentExtraPos) & 0xFFFF;
-                    int dataSize = readShort(dirChunk, currentExtraPos + 2) & 0xFFFF;
-
-                    // 处理Unicode文件名扩展
-                    if (headerId == 0x7075 || headerId == 0x0007) {
-                        int dataPtr = currentExtraPos + 4;
-                        if (dataPtr + nameLen <= currentExtraPos + dataSize) {
-                            unicodeFileName = new String(dirChunk, dataPtr, nameLen, StandardCharsets.UTF_8);
-                            String normalizedUnicodeFile = normalizePath(unicodeFileName);
-
-                            // 重新检查匹配
-                            if (isFolderCheck) {
-                                String folderTargetWithSlash = normalizedTarget.endsWith("/") ? normalizedTarget : normalizedTarget + "/";
-                                if (normalizedUnicodeFile.equals(normalizedTarget) ||
-                                    normalizedUnicodeFile.startsWith(folderTargetWithSlash)) {
-                                    isMatch = true;
-                                    normalizedFile = normalizedUnicodeFile;
-                                }
-                            } else {
-                                if (normalizedUnicodeFile.equals(normalizedTarget) ||
-                                    normalizedUnicodeFile.equalsIgnoreCase(normalizedTarget)) {
-                                    isMatch = true;
-                                    normalizedFile = normalizedUnicodeFile;
-                                }
-                            }
-                        }
-                    }
-
-                    currentExtraPos += 4 + dataSize;
-                    if (isMatch) break;
-                }
-            }
-
-            if (isMatch) {
-                log.debug("找到匹配路径：ZIP内路径=[{}]（{}），目标路径=[{}]（{}）",
-                        normalizedFile, isFolderEntry ? "文件夹" : "文件",
-                        normalizedTarget, isFolderCheck ? "文件夹" : "文件");
-
-                // 解析核心字段
-                long headerOffset32 = readInt(dirChunk, pos + 42) & ZIP64_MAGIC_NUMBER;
-                long compressedSize32 = readInt(dirChunk, pos + 20) & ZIP64_MAGIC_NUMBER;
-                long uncompressedSize32 = readInt(dirChunk, pos + 24) & ZIP64_MAGIC_NUMBER;
-                long compressionMethod = readShort(dirChunk, pos + 10) & 0xFFFF;
-
-                // 解析扩展字段（支持ZIP64）
-                long headerOffset = headerOffset32;
-                long compressedSize = compressedSize32;
-                long uncompressedSize = uncompressedSize32;
-
-                // 直接扫描整个扩展字段
-                if (extraLen > 0) {
-                    byte[] extraData = Arrays.copyOfRange(dirChunk, extraPos, extraPos + extraLen);
-                    int extraPosInChunk = 0;
-
-                    while (extraPosInChunk + 4 <= extraData.length) {
-                        int headerId = (extraData[extraPosInChunk] & 0xFF) |
-                                       ((extraData[extraPosInChunk + 1] & 0xFF) << 8);
-                        int dataSize = (extraData[extraPosInChunk + 2] & 0xFF) |
-                                       ((extraData[extraPosInChunk + 3] & 0xFF) << 8);
-
-                        if (headerId == ZIP64_EXTRA_FIELD_ID) {
-                            ByteBuffer buffer = ByteBuffer.wrap(extraData, extraPosInChunk + 4,
-                                    Math.min(dataSize, extraData.length - extraPosInChunk - 4));
-                            buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-                            if (uncompressedSize32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
-                                uncompressedSize = buffer.getLong();
-                            }
-                            if (compressedSize32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
-                                compressedSize = buffer.getLong();
-                            }
-                            if (headerOffset32 == ZIP64_MAGIC_NUMBER && buffer.remaining() >= 8) {
-                                headerOffset = buffer.getLong();
-                                log.debug("条目{}的真实headerOffset：{}", fileName, headerOffset);
-                            }
-
-                            break;
-                        }
-
-                        extraPosInChunk += 4 + dataSize;
-                    }
-                }
-
-                // 如果ZIP64解析失败，尝试估算
-                if (headerOffset == ZIP64_MAGIC_NUMBER) {
-                    log.warn("{}: ZIP64扩展字段解析失败，尝试估算偏移量", fileName);
-                    headerOffset = estimateLocalHeaderOffset(chunkOffset + pos, getFileSize(source), source);
-                }
-
-                boolean isDirectory = false;
-                isDirectory = isDirectory(fileName, compressedSize32, uncompressedSize32);
-                CentralDirectoryModel centralDirectoryModel = new CentralDirectoryModel(
-                        headerOffset,
-                        null,
-                        compressionMethod,
-                        compressedSize,
-                        uncompressedSize,
-                        unicodeFileName != null ? unicodeFileName : fileName,
-                        (int) (chunkOffset + pos)
-                );
-                centralDirectoryModel.setDirectoryIs(isDirectory);
-                return centralDirectoryModel;
-            }
-
-            // 9. 移动到下一个条目
-            pos += entryTotalLength;
-        }
-
-        return null;
-    }
-
-    /**
-     * 在中央目录块中查找所有匹配的路径（支持文件和文件夹）
-     */
-    private void findAllMatchingPaths(byte[] dirChunk, Set<String> checkPaths, Set<String> existsPaths, Map<String, Boolean> pathTypeMap) {
-        int pos = 0;
-
-        // 处理跨分块的情况
-        if (dirChunk.length > 46) {
-            for (int i = Math.min(45, dirChunk.length - 4); i >= 0; i--) {
-                if (readInt(dirChunk, i) == CENTRAL_DIR_SIGNATURE) {
-                    pos = i;
-                    break;
-                }
-            }
-        }
-
-        while (pos + 4 <= dirChunk.length && !checkPaths.isEmpty()) {
-            if (readInt(dirChunk, pos) != CENTRAL_DIR_SIGNATURE) {
-                pos++;
-                continue;
-            }
-
-            if (pos + 46 > dirChunk.length) {
-                break;
-            }
-
-            // 解析长度字段
-            int nameLen = readShort(dirChunk, pos + 28) & 0xFFFF;
-            int extraLen = readShort(dirChunk, pos + 30) & 0xFFFF;
-            int commentLen = readShort(dirChunk, pos + 32) & 0xFFFF;
-            int entryTotalLength = 46 + nameLen + extraLen + commentLen;
-
-            if (pos + entryTotalLength > dirChunk.length) {
-                break;
-            }
-
-            // 解析文件名
-            int nameStart = pos + 46;
-            String fileName = decodeFileName(dirChunk, nameStart, nameLen, readShort(dirChunk, pos + 8) & 0xFFFF);
-            String normalizedFile = normalizePath(fileName);
-            boolean isFolderEntry = normalizedFile.endsWith("/") || fileName.endsWith("/");
-
-            // 检查所有待匹配路径
-            Iterator<String> iterator = checkPaths.iterator();
-            while (iterator.hasNext()) {
-                String checkPath = iterator.next();
-                Boolean isFolderCheck = pathTypeMap.get(checkPath);
-                if (isFolderCheck == null) continue;
-
-                boolean matchFound = false;
-
-                if (isFolderCheck) {
-                    // 文件夹匹配
-                    String folderCheckWithSlash = checkPath.endsWith("/") ? checkPath : checkPath + "/";
-                    if (normalizedFile.equals(checkPath) ||
-                        normalizedFile.equals(folderCheckWithSlash) ||
-                        normalizedFile.startsWith(folderCheckWithSlash)) {
-                        matchFound = true;
-                    }
-                } else {
-                    // 文件匹配
-                    if (normalizedFile.equals(checkPath) ||
-                        normalizedFile.equalsIgnoreCase(checkPath)) {
-                        matchFound = true;
-                    }
-                }
-
-                if (matchFound) {
-                    existsPaths.add(checkPath);
-                    iterator.remove();
-                    log.trace("找到匹配路径：{}", checkPath);
-                }
-            }
-
-            // 检查Unicode文件名
-            if (!checkPaths.isEmpty() && extraLen > 0) {
-                int currentExtraPos = nameStart + nameLen;
-                while (currentExtraPos + 4 <= nameStart + nameLen + extraLen) {
-                    int headerId = readShort(dirChunk, currentExtraPos) & 0xFFFF;
-                    int dataSize = readShort(dirChunk, currentExtraPos + 2) & 0xFFFF;
-
-                    if (headerId == 0x7075 || headerId == 0x0007) {
-                        int dataPtr = currentExtraPos + 4;
-                        if (dataPtr + nameLen <= currentExtraPos + dataSize) {
-                            String unicodeFileName = new String(dirChunk, dataPtr, nameLen, StandardCharsets.UTF_8);
-                            String normalizedUnicodeFile = normalizePath(unicodeFileName);
-
-                            // 再次检查匹配
-                            Iterator<String> unicodeIterator = checkPaths.iterator();
-                            while (unicodeIterator.hasNext()) {
-                                String checkPath = unicodeIterator.next();
-                                Boolean isFolderCheck = pathTypeMap.get(checkPath);
-                                if (isFolderCheck == null) continue;
-
-                                boolean matchFound = false;
-                                if (isFolderCheck) {
-                                    String folderCheckWithSlash = checkPath.endsWith("/") ? checkPath : checkPath + "/";
-                                    if (normalizedUnicodeFile.equals(checkPath) ||
-                                        normalizedUnicodeFile.startsWith(folderCheckWithSlash)) {
-                                        matchFound = true;
-                                    }
-                                } else {
-                                    if (normalizedUnicodeFile.equals(checkPath) ||
-                                        normalizedUnicodeFile.equalsIgnoreCase(checkPath)) {
-                                        matchFound = true;
-                                    }
-                                }
-
-                                if (matchFound) {
-                                    existsPaths.add(checkPath);
-                                    unicodeIterator.remove();
-                                    log.trace("找到Unicode匹配路径：{}", checkPath);
-                                }
-                            }
-                        }
-                    }
-
-                    currentExtraPos += 4 + dataSize;
-                    if (checkPaths.isEmpty()) break;
-                }
-            }
-
-            pos += entryTotalLength;
-        }
+        return name;
     }
 
     /**
@@ -1382,66 +485,6 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         return sb.toString();
     }
 
-    /**
-     * 解析标准EOCD结构
-     */
-    private EocdInfo parseStandardEocd(byte[] data, int offset) {
-//        return new EocdInfo(
-//                (long) readShort(data, offset + 4),
-//                (long) readShort(data, offset + 6),
-//                (long) readShort(data, offset + 8),
-//                (long) readShort(data, offset + 10),
-//                readInt(data, offset + 12) & ZIP64_MAGIC_NUMBER,
-//                readInt(data, offset + 16) & ZIP64_MAGIC_NUMBER,
-//                (long) readShort(data, offset + 20)
-//        );
-        return new EocdInfo(
-                (long) readShort(data, offset + 4) & 0xFFFFL, // 转为无符号
-                (long) readShort(data, offset + 6) & 0xFFFFL,
-                (long) readShort(data, offset + 8) & 0xFFFFL,
-                (long) readShort(data, offset + 10) & 0xFFFFL, // 关键：totalEntries转无符号
-                readInt(data, offset + 12) & ZIP64_MAGIC_NUMBER,
-                readInt(data, offset + 16) & ZIP64_MAGIC_NUMBER,
-                (long) readShort(data, offset + 20) & 0xFFFFL
-        );
-    }
-
-    /**
-     * 解析ZIP64 EOCD结构
-     */
-    private EocdInfo parseZip64Eocd(long locatorPosition, long fileSize, String source) throws IOException {
-        // 确保定位器位置有效
-        if (locatorPosition < 0 || locatorPosition + 19 >= fileSize) {
-            locatorPosition = Math.max(0, fileSize - 20);
-        }
-
-        byte[] locatorData = readRange(source, locatorPosition, locatorPosition + 19);
-        if (locatorData.length < 20 || readInt(locatorData, 0) != ZIP64_LOCATOR_SIGNATURE) {
-            throw new IOException("无效的ZIP64定位器签名");
-        }
-
-        long zip64EocdOffset = readLong(locatorData, 8);
-        long zip64EocdEnd = zip64EocdOffset + 55;
-        if (zip64EocdOffset < 0 || zip64EocdEnd >= fileSize) {
-            throw new IOException("ZIP64 EOCD范围无效：" + zip64EocdOffset + "-" + zip64EocdEnd);
-        }
-
-        byte[] zip64Eocd = readRange(source, zip64EocdOffset, zip64EocdEnd);
-        if (zip64Eocd.length < 56 || readInt(zip64Eocd, 0) != ZIP64_EOCD_SIGNATURE) {
-            throw new IOException("无效的ZIP64 EOCD签名");
-        }
-
-        return new EocdInfo(
-                readInt(zip64Eocd, 16) & ZIP64_MAGIC_NUMBER,
-                readInt(zip64Eocd, 20) & ZIP64_MAGIC_NUMBER,
-                readLong(zip64Eocd, 24),
-                readLong(zip64Eocd, 32),
-                readLong(zip64Eocd, 40),
-                readLong(zip64Eocd, 48),
-                0L
-        );
-    }
-
     private static void byteToLocal(String localOutputPath, byte[] fileData) throws IOException {
         Path targetPath = Paths.get(localOutputPath);
         Files.createDirectories(targetPath.getParent());
@@ -1521,8 +564,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             return false;
         }
         return path.endsWith("/") || path.endsWith("\\") ||
-               path.endsWith(File.separator) ||
-               !path.contains(".") && !path.matches(".+\\.[a-zA-Z0-9]+$");
+               path.endsWith(File.separator);
     }
 
     /**
