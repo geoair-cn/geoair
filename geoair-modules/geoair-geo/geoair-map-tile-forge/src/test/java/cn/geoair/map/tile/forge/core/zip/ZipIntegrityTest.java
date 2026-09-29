@@ -95,6 +95,29 @@ public class ZipIntegrityTest {
         expectIo(() -> new H(new byte[3]).parseEocd(3, "test"), "22");
     }
 
+    @Test public void acceptsOptionalZip64RecordsWhenClassicFieldsDoNotOverflow() throws Exception {
+        byte[] normal = zip("layer.json", new byte[]{1, 2, 3}, false, null);
+        int eocd = normal.length - 22;
+        java.nio.ByteBuffer classic = java.nio.ByteBuffer.wrap(normal).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+        long entries = classic.getShort(eocd + 10) & 0xFFFFL;
+        long directorySize = classic.getInt(eocd + 12) & 0xFFFFFFFFL;
+        long directoryOffset = classic.getInt(eocd + 16) & 0xFFFFFFFFL;
+
+        java.nio.ByteBuffer zip64 = java.nio.ByteBuffer.allocate(76).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+        zip64.putInt(0x06064b50).putLong(44).putShort((short) 20).putShort((short) 45);
+        zip64.putInt(0).putInt(0).putLong(entries).putLong(entries);
+        zip64.putLong(directorySize).putLong(directoryOffset);
+        zip64.putInt(0x07064b50).putInt(0).putLong(eocd).putInt(1);
+
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        result.write(normal, 0, eocd);
+        result.write(zip64.array());
+        result.write(normal, eocd, 22);
+        H handler = new H(result.toByteArray());
+        assertEquals(entries, handler.parseEocd(handler.bytes.length, "test").getTotalEntries());
+        assertArrayEquals(new byte[]{1, 2, 3}, handler.readFileFromZip("test", "layer.json"));
+    }
+
     @Test public void sharesUnicodeExtraFieldDecodingAcrossLookupAndScan() throws Exception {
         String unicode = "地形/layer.json";
         byte[] alias = "alias.json".getBytes(java.nio.charset.StandardCharsets.US_ASCII);

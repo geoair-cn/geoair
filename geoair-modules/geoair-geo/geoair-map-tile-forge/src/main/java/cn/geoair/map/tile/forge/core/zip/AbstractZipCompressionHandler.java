@@ -101,10 +101,21 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                         readShort(tail, p + 10) & 0xFFFFL, readInt(tail, p + 12) & ZIP64_MAGIC_NUMBER,
                         readInt(tail, p + 16) & ZIP64_MAGIC_NUMBER, comment);
                 long directoryEnd = endPosition;
-                if (e.getTotalEntries() == 65535 || e.getCentralDirSize() == ZIP64_MAGIC_NUMBER
-                        || e.getCentralDirOffset() == ZIP64_MAGIC_NUMBER) {
-                    byte[] locator = endPosition >= 20 ? readExact(source, endPosition - 20, 20) : new byte[0];
-                    if (locator.length == 20 && readInt(locator, 0) == ZIP64_LOCATOR_SIGNATURE) {
+                boolean zip64Required = e.getTotalEntries() == 65535
+                        || e.getCentralDirSize() == ZIP64_MAGIC_NUMBER
+                        || e.getCentralDirOffset() == ZIP64_MAGIC_NUMBER;
+                // 一些打包工具即使经典 EOCD 字段没有溢出，也会同时写 ZIP64 EOCD。
+                // 定位器固定紧邻经典 EOCD，因此始终探测它，避免把合法的 76 字节
+                // ZIP64 EOCD + locator 误判成中央目录与 EOCD 之间的非法间隙。
+                byte[] locator;
+                if (p >= 20) {
+                    locator = Arrays.copyOfRange(tail, p - 20, p);
+                } else if (zip64Required && endPosition >= 20) {
+                    locator = readExact(source, endPosition - 20, 20);
+                } else {
+                    locator = new byte[0];
+                }
+                if (locator.length == 20 && readInt(locator, 0) == ZIP64_LOCATOR_SIGNATURE) {
                         if (readInt(locator, 4) != 0 || readInt(locator, 16) != 1) throw new IOException("不支持分卷ZIP64");
                         long z = readLong(locator, 8);
                         if (z < 0 || z > endPosition - 20 - 56) throw new IOException("ZIP64记录范围无效");
@@ -116,9 +127,8 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
                                 readInt(record, 20) & ZIP64_MAGIC_NUMBER, readLong(record, 24), readLong(record, 32),
                                 readLong(record, 40), readLong(record, 48), comment);
                         directoryEnd = z;
-                    } else if (e.getCentralDirSize() == ZIP64_MAGIC_NUMBER || e.getCentralDirOffset() == ZIP64_MAGIC_NUMBER) {
-                        throw new IOException("缺少ZIP64定位器");
-                    }
+                } else if (zip64Required) {
+                    throw new IOException("缺少ZIP64定位器");
                 }
                 long size = e.getCentralDirSize(), offset = e.getCentralDirOffset(), count = e.getTotalEntries();
                 if (e.getDiskNumber() != 0 || e.getStartDisk() != 0 || e.getDiskEntries() != count
