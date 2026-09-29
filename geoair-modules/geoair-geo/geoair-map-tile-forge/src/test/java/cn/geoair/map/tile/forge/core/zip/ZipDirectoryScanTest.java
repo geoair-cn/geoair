@@ -69,7 +69,7 @@ public class ZipDirectoryScanTest {
             return false;
         });
         assertEquals(1, count[0]);
-        assertEquals("Tail, ZIP64 locator, ZIP64 EOCD and first block", 4, handler.reads);
+        assertEquals("Tail (including locator), ZIP64 EOCD and first block", 3, handler.reads);
     }
 
     @Test
