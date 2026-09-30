@@ -7,12 +7,12 @@
     <parent>
         <groupId>cn.geoair.devkit</groupId>
         <artifactId>geoair-framework</artifactId>
-        <version>J17-dev-SNAPSHOT</version>
+        <version>J17.1.7</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-dependencies-bom</artifactId>
-    <version>J17-dev-SNAPSHOT</version>
+    <version>J17.1.7</version>
     <packaging>pom</packaging>
     <name>geoair-dependencies-bom</name>
     <description>GeoAir 第三方依赖版本管理 BOM</description>

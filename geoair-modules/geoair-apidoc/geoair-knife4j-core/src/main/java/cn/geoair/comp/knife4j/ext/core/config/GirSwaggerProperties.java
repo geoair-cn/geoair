@@ -24,7 +24,7 @@ public class GirSwaggerProperties {
     private boolean enable = false;
 
     /** API版本号，默认为空 */
-    private String version = "J17-dev-SNAPSHOT";
+    private String version = "J17.1.7";
 
     /**
      * 鉴权处理
@@ -46,7 +46,7 @@ public class GirSwaggerProperties {
     /**
      * API描述，默认为空
      */
-    private String description = "API文档 VJ17-dev-SNAPSHOT";
+    private String description = "API文档 VJ17.1.7";
 
     /**
      * 手动指定控制器根包（优先级高于从SpringBootApplication自动提取） 示例：com.gtc.gishubteam.editor.wcs.controller
