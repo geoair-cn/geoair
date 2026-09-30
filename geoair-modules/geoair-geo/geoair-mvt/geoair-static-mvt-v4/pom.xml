@@ -4,12 +4,12 @@
   <parent>
     <groupId>cn.geoair.devkit</groupId>
     <artifactId>geoair-mvt</artifactId>
-    <version>J8-dev-SNAPSHOT</version>
+    <version>J8.1.7</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>cn.geoair.devkit</groupId>
   <artifactId>geoair-static-mvt-v4</artifactId>
-  <version>J8-dev-SNAPSHOT</version>
+  <version>J8.1.7</version>
 
   <packaging>jar</packaging>
   <name>geoair-static-mvt-v4</name>
