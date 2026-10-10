@@ -190,7 +190,8 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
             List<String> aliasFields = new ArrayList<>();
             for (String field : keepFieldList) {
                 if (StrUtil.isNotBlank(field)) {
-                    aliasFields.add(tableAlias + "." + StrUtil.wrap(field, "\""));
+//                    aliasFields.add(tableAlias + "." + StrUtil.wrap(field, "\""));
+                    aliasFields.add(tableAlias + "." + iAdvExecutor.tbQuoteFieldName(field));
                 }
             }
             rootSql.append(String.join(", ", aliasFields))
