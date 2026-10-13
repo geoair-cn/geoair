@@ -263,10 +263,9 @@ public abstract class AbstractVectorTileExecutor extends AbstractITileExecutor {
             } else if (lowLevelOptStrategy.equals(TileExecutorConfig.LowLevelOptStrategy.LIMIT)
                     && zoom <= limitStartLevel) {
                 excuteSQL = iAdvExecutor.tbRemoveSqlSpaces(excuteSQL);
-                String template = "select * from ( {tableName} ) as limit_table ";
-                String sql = StrUtil.replaceFirst(template, "{tableName}", excuteSQL);
                 Long maxLimitCount = tileExecutorConfig.getMaxLimitCount();
-                girAdvOneRows = iAdvExecutor.bSelectList(sql + "limit " + maxLimitCount);
+                String sql = iAdvExecutor.tbBuildPageSql(excuteSQL, Math.toIntExact(maxLimitCount), 0L);
+                girAdvOneRows = iAdvExecutor.bSelectList(sql);
             } else {
                 girAdvOneRows = iAdvExecutor.bSelectList(excuteSQL);
             }

@@ -353,9 +353,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
                 getAdvDDLOpt().dIsTableExists(tableName)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableName)
-                        : StrUtil.format(
-                        "({}) as {}",
-                        tableName,
+                        : dialectTableNameProcessor.tbBuildAsTable(
+                        StrUtil.format("({})", tableName),
                         dialectTableNameProcessor.tbGetTempAliasTableName());
 
         String sql = getQueryIntersectsSql(qualifiedTableName, geomFieldName, geometry, srid);
@@ -380,9 +379,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
                 getAdvDDLOpt().dIsTableExists(tableName)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableName)
-                        : StrUtil.format(
-                        "({}) as {}",
-                        tableName,
+                        : dialectTableNameProcessor.tbBuildAsTable(
+                        StrUtil.format("({})", tableName),
                         dialectTableNameProcessor.tbGetTempAliasTableName());
         String bboxWkt =
                 StrUtil.format(
@@ -444,9 +442,8 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
                 getAdvDDLOpt().dIsTableExists(tableName)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableName)
-                        : StrUtil.format(
-                        "({}) as {}",
-                        tableName,
+                        : dialectTableNameProcessor.tbBuildAsTable(
+                        StrUtil.format("({})", tableName),
                         dialectTableNameProcessor.tbGetTempAliasTableName());
 
         String sql =
@@ -476,9 +473,9 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
                 getAdvDDLOpt().dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameOrSqlView)
-                        : StrUtil.format(
-                        "({}) as {}",
-                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                        : dialectTableNameProcessor.tbBuildAsTable(
+                        StrUtil.format("({})",
+                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView)),
                         dialectTableNameProcessor.tbGetTempAliasTableName());
 
         String sql = getCentroidSql(geomFieldName, centerAlias, qualifiedTableName);
@@ -609,9 +606,9 @@ public abstract class AbstractExecAdvGeoOpt implements IAdvGeoPreOpt {
                 getAdvDDLOpt().dIsTableExists(tableNameOrSqlView)
                         ? dialectTableNameProcessor.tbGetTableNameWithSchema(
                         dataSourceGetter, tableNameOrSqlView)
-                        : StrUtil.format(
-                        "({}) as {}",
-                        dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView),
+                        : dialectTableNameProcessor.tbBuildAsTable(
+                        StrUtil.format("({})",
+                                dialectTableNameProcessor.tbRemoveSqlSpaces(tableNameOrSqlView)),
                         dialectTableNameProcessor.tbGetTempAliasTableName());
 
         Integer srid = eGetSrid(tableNameOrSqlView, geomFieldName);
