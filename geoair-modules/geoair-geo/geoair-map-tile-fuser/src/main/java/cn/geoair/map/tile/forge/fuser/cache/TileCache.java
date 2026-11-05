@@ -1,6 +1,8 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
 import cn.geoair.web.mime.GiMimeType;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
+import java.util.BitSet;
 
 /**
  * 瓦片缓存接口
@@ -10,6 +12,22 @@ import cn.geoair.web.mime.GiMimeType;
  * @description 定义瓦片缓存的标准操作
  */
 public interface TileCache {
+    /** 返回当前分段中有效缓存的位置；旧驱动使用兼容回退，新驱动可批量读取元数据。 */
+    default BitSet findExisting(TileCacheQuery query, TileOperationContext context) {
+        BitSet found=new BitSet(query.size());
+        if(!isEnabled()) return found;
+        for(long index=query.getFrom();index<query.getTo();index++) {
+            context.check();
+            byte[] data=get(query.getLayerName(),query.getZoom(),query.x(index),query.y(index),query.getFormat());
+            context.check();
+            if(data!=null && data.length>0) found.set((int)(index-query.getFrom()));
+        }
+        return found;
+    }
+    /** 默认显式返回不支持；FILE/MBTiles 提供真实统计。 */
+    default TileCacheStatistics statistics(String layerName, TileOperationContext context) {
+        TileCacheStatistics result=new TileCacheStatistics(); result.setLayerName(layerName); return result;
+    }
 
     /**
      * 从缓存获取瓦片

@@ -1,5 +1,9 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
+
+import java.util.BitSet;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
@@ -25,6 +29,16 @@ import java.util.stream.Stream;
  */
 
 public class FileTileCache implements TileCache {
+    @Override
+    public BitSet findExisting(TileCacheQuery query, TileOperationContext context) {
+        return isEnabled() ? CacheInspection.file(getLayerPath(query.getLayerName()), expireTime, query, context) : new BitSet();
+    }
+
+    @Override
+    public TileCacheStatistics statistics(String layerName, TileOperationContext context) {
+        return CacheInspection.statistics(getLayerPath(layerName), layerName, false, context);
+    }
+
     private static GiLogger log = GirLoggerFactory.getLogger();
     private static final ExecutorService DELETE_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
         Thread thread = new Thread(r, "tile-cache-delete");

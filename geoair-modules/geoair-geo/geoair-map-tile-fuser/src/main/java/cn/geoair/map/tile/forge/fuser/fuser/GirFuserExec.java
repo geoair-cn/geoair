@@ -1,5 +1,8 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationStatus;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
@@ -471,6 +474,17 @@ public class GirFuserExec implements FuserExec {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("获取瓦片");
         Map<String, Resource> resourceMap = new ConcurrentHashMap<>();
+        if (TileOperationContext.current() != null) {
+            // 受控调用串行读取一张输出瓦片依赖的源片，任务/分段并发由上层执行器负责。
+            // 不把隐式 ThreadLocal 和不可取消 I/O 分派到公共 ForkJoinPool。
+            for (long gridy = starty; gridy <= srcRectangle[3]; gridy++) {
+                for (long gridx = srcRectangle[0]; gridx <= srcRectangle[2]; gridx++) {
+                    TileOperationContext.checkCurrent();
+                    Resource blob = layerTileGetter.getTileResource(srcIdx, (int) gridx, (int) gridy);
+                    if (blob != null) resourceMap.put(srcIdx + "_" + gridx + "_" + gridy, blob);
+                }
+            }
+        } else {
         IntStream.rangeClosed((int) starty, (int) srcRectangle[3])
                 .parallel()
                 .forEach(gridy -> {
@@ -484,10 +498,12 @@ public class GirFuserExec implements FuserExec {
                                 }
                             });
                 });
+        }
         stopWatch.stop();
         stopWatch.start("渲染瓦片renderCanvas");
         // gridy 是瓦片行索引
         for (long gridy = starty; gridy <= srcRectangle[3]; gridy++) {
+            TileOperationContext.checkCurrent();
             int tiley = 0;
             int canvasy = (int) (srcRectangle[3] - gridy) * gridSubset.getTileHeight();
             int tileHeight = gridSubset.getTileHeight();
@@ -537,6 +553,8 @@ public class GirFuserExec implements FuserExec {
                         null);
 
                 if (tileImg == null) {
+                    if (TileOperationContext.current()!=null)
+                        throw new TileOperationException(TileOperationStatus.FAILED,"源瓦片解码失败");
                     errorLog("瓦片解码失败 - formatName={}, gridx={}, gridy={}", formatName, gridx, gridy);
                     continue;
                 }
@@ -628,10 +646,15 @@ public class GirFuserExec implements FuserExec {
         infoLog("开始瓦片融合处理 - 请求范围: {}, 输出尺寸: {}x{}", reqBounds, reqWidth, reqHeight);
 
         try {
+            TileOperationContext.checkCurrent();
             determineSourceResolution();
+            TileOperationContext.checkCurrent();
             determineCanvasLayout();
+            TileOperationContext.checkCurrent();
             createCanvas();
+            TileOperationContext.checkCurrent();
             renderCanvas();
+            TileOperationContext.checkCurrent();
             scaleRaster();
 
             ByteArrayOutputStream aos = new ByteArrayOutputStream();
@@ -664,6 +687,7 @@ public class GirFuserExec implements FuserExec {
 
             long endTime = System.currentTimeMillis();
             infoLog("瓦片融合处理完成 - 耗时: {} ms, 输出大小: {} bytes", (endTime - startTime), imageBytes.length);
+            TileOperationContext.checkCurrent();
             return imageBytes;
 
         } catch (Exception e) {

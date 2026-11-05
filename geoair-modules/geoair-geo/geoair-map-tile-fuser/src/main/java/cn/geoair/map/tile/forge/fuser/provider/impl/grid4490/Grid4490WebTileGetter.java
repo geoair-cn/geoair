@@ -9,6 +9,7 @@ import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.provider.BaseTileGetter;
 
 import java.net.Proxy;
+import cn.geoair.map.tile.forge.fuser.utils.LayerHttpTileClient;
 
 /**
  * 谷歌网络瓦片获取器
@@ -48,18 +49,6 @@ public class Grid4490WebTileGetter extends BaseTileGetter {
                 .replace("{x}", String.valueOf(x))
                 .replace("{y}", String.valueOf(y));
 
-        String logContext = String.format("(%d,%d,%d)", z, x, y);
-
-        // 使用工具类请求瓦片（带重试）
-        return HttpTileRequestUtils.requestTileWithRetry(
-                httpUrl,
-                proxy,
-                totalTimeout,
-                3,
-                1,
-                3,
-                getSrcFormat(),
-                logContext
-        );
+        return LayerHttpTileClient.fetch(getLayerInfo(), httpUrl, z, x, y, getSrcFormat(), totalTimeout);
     }
 }

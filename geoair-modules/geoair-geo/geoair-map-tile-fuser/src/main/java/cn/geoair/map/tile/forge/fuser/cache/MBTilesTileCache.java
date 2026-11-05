@@ -1,5 +1,11 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
+
+import java.nio.file.Paths;
+
+import java.util.BitSet;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.runtime.GutilShutdownHook;
@@ -31,6 +37,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public class MBTilesTileCache implements TileCache {
+    @Override
+    public BitSet findExisting(TileCacheQuery query, TileOperationContext context) {
+        return isEnabled() ? CacheInspection.mbtiles(Paths.get(getDbPath(query.getLayerName())), query, context) : new BitSet();
+    }
+
+    @Override
+    public TileCacheStatistics statistics(String layerName, TileOperationContext context) {
+        return CacheInspection.statistics(Paths.get(getDbPath(layerName)), layerName, true, context);
+    }
+
     private static GiLogger log = GirLoggerFactory.getLogger( );
     private final String cacheRoot;
     private final boolean enabled;
@@ -130,8 +146,8 @@ public class MBTilesTileCache implements TileCache {
         try {
 
             LayerCacheHolder result = layerCaches.compute(layerName, (key, oldValue) -> {
-                // 情况1: initIs 为 true 且旧值为 NULL_OBJ，需要重建
-                if (initIs && oldValue == NULL_OBJ) {
+                // 首次写入也必须创建库；批量查询不会先制造 NULL_OBJ 占位。
+                if (initIs && (oldValue == null || oldValue == NULL_OBJ)) {
                     try {
                         String dbPath = getDbPath(key);
                         log.debug("重建图层缓存: {}", key);
