@@ -39,6 +39,11 @@ public interface ICompressionHandler {
      */
     long getFileSize(String source);
 
+    /** 自定义存储应覆盖为可靠版本号；默认仅按大小识别，兼容既有实现。 */
+    default String getSourceVersion(String source) {
+        return Long.toString(getFileSize(source));
+    }
+
     /**
      * 解析ZIP的EOCD（中央目录结束记录）
      *

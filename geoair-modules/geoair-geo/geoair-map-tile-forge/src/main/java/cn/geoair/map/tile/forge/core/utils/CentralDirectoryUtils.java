@@ -4,7 +4,6 @@ import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
 import cn.geoair.map.tile.forge.core.zip.cache.TileCentralDirectoryModel;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,15 +15,12 @@ public class CentralDirectoryUtils {
 
 
     public static void doInsert(List<TileCentralDirectoryModel> batchList, LayerPerFileDao layerPerFileDao) {
-        List<TileCentralDirectoryModel> insertList = new ArrayList<>(batchList);
-        ForgeExecutorUtils.getExecutor().submit(() -> {
-            try {
-                layerPerFileDao.batchInsert(insertList);
-                insertList.clear();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        // 扫描流水线已经隔离生产与消费；此处等待事务提交，向扫描端施加背压。
+        try {
+            layerPerFileDao.batchInsert(batchList);
+        } catch (SQLException e) {
+            throw new IllegalStateException("归档索引批次写入失败", e);
+        }
     }
 
 

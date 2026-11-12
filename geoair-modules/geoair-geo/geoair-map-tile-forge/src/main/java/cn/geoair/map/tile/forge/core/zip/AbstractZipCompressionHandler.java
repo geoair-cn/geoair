@@ -260,6 +260,7 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
         }
         CentralDirectoryReader reader = new CentralDirectoryReader(this, source, offset, size);
         for (long index = 0; index < eocd.getTotalEntries(); index++) {
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedIOException("ZIP目录扫描已中断");
             if (Thread.currentThread().isInterrupted()) {
                 throw new java.io.InterruptedIOException("ZIP中央目录扫描已中断");
             }
@@ -272,7 +273,10 @@ public abstract class AbstractZipCompressionHandler implements ICompressionHandl
             int commentLen = readShort(header, 32) & 0xFFFF;
             byte[] variable = reader.read(nameLen + extraLen + commentLen);
             int flags = readShort(header, 8) & 0xFFFF;
-            String name = normalizePath(decodeEntryName(variable, nameLen, extraLen, flags));
+            String rawName = decodeEntryName(variable, nameLen, extraLen, flags).replace('\\', '/');
+            String checkedName = rawName.endsWith("/") ? rawName.substring(0, rawName.length() - 1) : rawName;
+            if (!ZipPaths.safe(checkedName)) throw new IOException("ZIP包含非法条目路径");
+            String name = normalizePath(rawName);
             long compressed = readInt(header, 20) & ZIP64_MAGIC_NUMBER;
             long uncompressed = readInt(header, 24) & ZIP64_MAGIC_NUMBER;
             long localOffset = readInt(header, 42) & ZIP64_MAGIC_NUMBER;

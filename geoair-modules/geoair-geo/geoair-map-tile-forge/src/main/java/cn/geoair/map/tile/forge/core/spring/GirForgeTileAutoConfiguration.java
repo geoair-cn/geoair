@@ -5,6 +5,7 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.config.SpringProviderConfig;
 import cn.geoair.map.tile.forge.core.config.TileTempPathConfig;
+import cn.geoair.map.tile.forge.core.config.ZipReadOptions;
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
 import org.springframework.beans.factory.ObjectProvider;
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-@EnableConfigurationProperties({SpringProviderConfig.class, TileTempPathConfig.class})
+@EnableConfigurationProperties({SpringProviderConfig.class, TileTempPathConfig.class, ZipReadOptions.class})
 public class GirForgeTileAutoConfiguration {
 
     private static final GiLogger log = GirLoggerFactory.getLogger(GirForgeTileAutoConfiguration.class);

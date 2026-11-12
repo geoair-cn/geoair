@@ -1,5 +1,9 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.zip.ZipPaths;
+
+import cn.geoair.map.tile.forge.core.zip.ZipRootResolver;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
@@ -69,44 +73,10 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
 
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
-        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-        String format = layerConfigContext.getFormat();
-        Path rootPath = Paths.get(tempDirAbsolutePath).toAbsolutePath().normalize();
-        Path localPath;
-        if (StrUtil.isEmpty(y) && StrUtil.isEmpty(x)) {
-            localPath = rootPath.resolve(z).normalize();
-        } else {
-            localPath = rootPath.resolve(z).resolve(y).resolve(x + "." + format).normalize();
-        }
-        if (!localPath.startsWith(rootPath)) {
-            throw new IOException("瓦片路径越出临时目录");
-        }
-        File localTileFile = localPath.toFile();
-        String inLocalPath = localTileFile.getAbsolutePath();
-        boolean localStatu = localTileFile.exists();
-        if (!localStatu) {
-            // 同一个瓦片只允许一个线程抽取，其余线程等它落盘后直接读现成文件
-            try {
-                localStatu = ExtractLockUtils.withLock(inLocalPath, () -> {
-                    if (localTileFile.exists()) {
-                        return true;
-                    }
-                    return byPreCache(layerConfigContext, z, y, x, inLocalPath);
-                });
-            } catch (Exception e) {
-                log.error("抽取三维瓦片到本地失败：{}", inLocalPath, e);
-                localStatu = false;
-            }
-        }
-        if (localStatu) {
-            tileRequest.setBytes(FileUtil.readBytes(localTileFile));
-            tileRequest.setLastModified(localTileFile.lastModified());
-            tileRequest.setSize(localTileFile.length());
-            tileRequest.setExists(true);
-            tileRequest.setMimeType(GutilMimeType.fromExtension(FileUtil.getSuffix(localTileFile.getName())));
-        }
-        return tileRequest;
+        String relative = StrUtil.isEmpty(x) && StrUtil.isEmpty(y) ? z
+                : ZipPaths.number(z) + "/" + ZipPaths.number(x) + "/" + ZipPaths.number(y) + "."
+                + ZipPaths.format(layerConfigContext.getFormat() == null ? "terrain" : layerConfigContext.getFormat());
+        return zipResources.readTile(layerConfigContext, relative);
     }
 
     protected boolean byPreCache(GirLayerConfigContext layerConfigContext, String z, String y, String x, String inLocalPath) {
@@ -158,27 +128,6 @@ public class LocalZip3DTerrainStorageSupport extends AbstractZipDirectoryGetter 
 
     @Override
     public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
-        AtomicReference<String> tileSetPath = new AtomicReference<>("");
-        iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
-            boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
-            if (directoryIs) {
-                return true;
-            }
-            String name = centralDirectoryEntry.getName();
-            if (name.toLowerCase().contains("layer.json")) {
-                tileSetPath.set(name);
-                return false;
-            }
-            return true;
-        });
-        String tileSetJsonPath = tileSetPath.get();
-
-        if (StrUtil.isEmpty(tileSetJsonPath)) {
-            throw new RuntimeException("三维地形中缺失layer.json关键元素");
-        }else{
-            log.info("zip中找到layer.json，判断为合法的三维地形文件：{}", tileSetJsonPath);
-        }
-        String rootPath = tileSetJsonPath.replace("layer.json", "");
-        return RootPathInfo.of().setRootFileName("layer.json").setRootPath(rootPath);
+        return ZipRootResolver.resolve(layerConfigContext, iCompressionHandler);
     }
 }

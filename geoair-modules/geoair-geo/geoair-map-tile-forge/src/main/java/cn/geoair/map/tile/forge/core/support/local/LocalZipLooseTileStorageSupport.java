@@ -1,5 +1,13 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.hutool.core.bean.BeanUtil;
+
+import java.util.Locale;
+
+import cn.geoair.map.tile.forge.core.zip.ZipPaths;
+
+import cn.geoair.map.tile.forge.core.zip.ZipRootResolver;
+
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.arcgis.AbstractArcgisZipDirectoryGetter;
@@ -57,19 +65,24 @@ public class LocalZipLooseTileStorageSupport extends AbstractArcgisZipDirectoryG
      */
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-
-        return null;
+        int level = Integer.parseInt(ZipPaths.number(z));
+        int col = Integer.parseInt(ZipPaths.number(x)), row = Integer.parseInt(ZipPaths.number(y));
+        String relative = String.format(Locale.ROOT, "L%02d/R%08x/C%08x.%s", level, row, col, ZipPaths.format(layerConfigContext.getFormat()));
+        return zipResources.readTile(layerConfigContext, relative);
     }
 
 
     @Override
     public TileCentralDirectoryModel tranToTileModel(CentralDirectoryModel centralDirectoryModel) {
-        return null;
+        TileCentralDirectoryModel model = new TileCentralDirectoryModel();
+        BeanUtil.copyProperties(centralDirectoryModel, model);
+        model.setFileName(centralDirectoryModel.getName());
+        return model;
     }
 
     @Override
     public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
-        return RootPathInfo.of();
+        return ZipRootResolver.resolve(layerConfigContext, iCompressionHandler);
     }
 
     /**
@@ -81,13 +94,13 @@ public class LocalZipLooseTileStorageSupport extends AbstractArcgisZipDirectoryG
      */
     @Override
     public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
-        return ArcgisTileUtils.getConfigXmlByZip(layerConfigContext, getICompressionHandler());
+        return zipResources.readArcgisMetadata(layerConfigContext, "conf.xml");
     }
 
 
     @Override
     public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
-        return ArcgisTileUtils.getConfigCdiByZip(layerConfigContext, getICompressionHandler());
+        return zipResources.readArcgisMetadata(layerConfigContext, "conf.cdi");
     }
 
 }
