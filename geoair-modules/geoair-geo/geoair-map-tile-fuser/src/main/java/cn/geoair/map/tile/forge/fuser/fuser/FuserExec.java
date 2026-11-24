@@ -12,6 +12,11 @@ public interface FuserExec {
 
     byte[] toImageBytes() throws Exception;
 
+    /** 新入口保留旧实现的二进制兼容性，增强实现可返回源读取完整性。 */
+    default TileFusionResult toImageResult() throws Exception {
+        return TileFusionResult.legacy(toImageBytes());
+    }
+
     ImageMime getOutputFormat();
 
     ImageMime getSrcFormat();

@@ -7,6 +7,7 @@ import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 
 import lombok.Getter;
+import java.io.IOException;
 
 /**
  * 带缓存的GtcTileFuser装饰器
@@ -53,6 +54,11 @@ public class CacheTileFuserExec implements FuserExec {
      */
     @Override
     public byte[] toImageBytes() throws Exception {
+        return toImageResult().getBytes();
+    }
+
+    @Override
+    public TileFusionResult toImageResult() throws Exception {
         long startTime = System.currentTimeMillis();
 
         // 尝试从缓存获取
@@ -63,7 +69,7 @@ public class CacheTileFuserExec implements FuserExec {
                 long cacheHitTime = System.currentTimeMillis() - startTime;
                 log.debug("缓存命中 - layer: {}, z: {}, x: {}, y: {}, 耗时: {} ms, 数据大小: {} bytes",
                         layerName, z, x, y, cacheHitTime, cachedResult.length);
-                return cachedResult;
+                return TileFusionResult.legacy(cachedResult);
             }
             log.debug("缓存未命中 - layer: {}, z: {}, x: {}, y: {}", layerName, z, x, y);
         } catch (Exception e) {
@@ -73,11 +79,16 @@ public class CacheTileFuserExec implements FuserExec {
 
         // 缓存未命中，执行实际融合操作
         long fusionStartTime = System.currentTimeMillis();
-        byte[] result = target.toImageBytes();
+        TileFusionResult fusion = target.toImageResult();
+        if (fusion.getState() == TileFusionState.FAILED) {
+            if (fusion.getFailure() != null) throw fusion.getFailure();
+            throw new IOException("源瓦片不可用，不能将透明画布作为完整结果");
+        }
+        byte[] result = fusion.getBytes();
         long fusionTime = System.currentTimeMillis() - fusionStartTime;
 
         // 将结果存入缓存
-        if (result != null && result.length > 0) {
+        if (fusion.isCacheable() && result != null && result.length > 0) {
             try {
                 tileCache.put(layerName, z, x, y, result, target.getOutputFormat());
                 long totalTime = System.currentTimeMillis() - startTime;
@@ -91,7 +102,7 @@ public class CacheTileFuserExec implements FuserExec {
             log.warn("融合结果为空，跳过缓存 - layer: {}, z: {}, x: {}, y: {}", layerName, z, x, y);
         }
 
-        return result;
+        return fusion;
     }
 
     @Override

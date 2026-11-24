@@ -12,14 +12,16 @@ import cn.geoair.map.dynamic.tools.simple.response.TileResponseByByte;
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
-import cn.geoair.map.tile.forge.core.bygwc.grid.SRS;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.enums.TileServiceOperation;
 import cn.geoair.map.tile.forge.fuser.fuser.CacheTileFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.FuserExec;
+import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExec;
 import cn.geoair.map.tile.forge.fuser.fuser.GirFuserExecFactory;
 import cn.geoair.map.tile.forge.fuser.provider.CachedTileGetter;
+import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
+import cn.geoair.map.tile.forge.fuser.provider.SameGridTileReader;
 import cn.geoair.map.tile.forge.fuser.provider.TileGetterFactory;
 import cn.geoair.map.tile.forge.fuser.request.TileServiceRequest;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
@@ -359,44 +361,31 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
     public TileResponse buildTileResponse(String layerName, Integer z, Integer x, Integer y,
                                           BoundingBox bounds, String outputFormat, boolean deleteCache, int requestGridSrid) {
         try {
+            PxyLayerInfo layer = resolveLayerInfo(layerName);
             TileResponse sameGridResponse = tryBuildSameGridTileResponse(
-                    layerName, z, x, y, bounds, outputFormat, deleteCache, requestGridSrid);
+                    layer, layerName, z, x, y, bounds, outputFormat, deleteCache, requestGridSrid);
             if (sameGridResponse != null) {
                 return sameGridResponse;
             }
 
             GiMimeType fromFormat = GutilMimeType.fromFormat(outputFormat);
-
-            // 创建融合执行器
-            FuserExec cacheTileFuser = GirFuserExecFactory.createCachedFuser(
-                    layerName,
-                    z,
-                    x,
-                    y,
-                    bounds,
-                    DEFAULT_TILE_SIZE,
-                    DEFAULT_TILE_SIZE,
-                    (ImageMime) ImageMime.createFromFormat(fromFormat.getFormat())
-            );
-
-            // 如果需要删除缓存
-            if (deleteCache) {
-                deleteCacheForTile(layerName, z, x, y, cacheTileFuser, (GirImageMime) fromFormat);
-                // 删除缓存后，重新生成瓦片
-                cacheTileFuser = GirFuserExecFactory.createCachedFuser(
-                        layerName,
-                        z,
-                        x,
-                        y,
-                        bounds,
-                        DEFAULT_TILE_SIZE,
-                        DEFAULT_TILE_SIZE,
-                        (ImageMime) ImageMime.createFromFormat(fromFormat.getFormat())
-                );
+            ImageMime imageFormat = (ImageMime) ImageMime.createFromFormat(fromFormat.getFormat());
+            FuserExec fuser;
+            if (layer != null && !layer.isCacheEnabled(layer)) {
+                // 关闭缓存后，重投影也直接读取源瓦片，刷新请求不触碰历史缓存。
+                fuser = new GirFuserExec(createUncachedTileGetter(layer), imageFormat, bounds,
+                        DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE);
+            } else {
+                fuser = GirFuserExecFactory.createCachedFuser(layerName, z, x, y, bounds,
+                        DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE, imageFormat);
+                if (deleteCache) {
+                    deleteCacheForTile(layerName, z, x, y, fuser, (GirImageMime) fromFormat);
+                    fuser = GirFuserExecFactory.createCachedFuser(layerName, z, x, y, bounds,
+                            DEFAULT_TILE_SIZE, DEFAULT_TILE_SIZE, imageFormat);
+                }
             }
 
-            // 生成瓦片
-            byte[] imageBytes = cacheTileFuser.toImageBytes();
+            byte[] imageBytes = fuser.toImageBytes();
 
 
             return TileResponseByByte.of()
@@ -412,19 +401,18 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
     }
 
     private TileResponse tryBuildSameGridTileResponse(
-            String layerName, Integer z, Integer x, Integer y, BoundingBox bounds,
+            PxyLayerInfo layerInfo, String layerName, Integer z, Integer x, Integer y, BoundingBox bounds,
             String outputFormat, boolean deleteCache, int requestGridSrid) {
         if (z == null || x == null || y == null || bounds == null) {
             return null;
         }
 
-        PxyLayerInfo layerInfo = resolveLayerInfo(layerName);
         if (layerInfo == null || !isSameGridSrid(layerInfo.getGridSrid(), requestGridSrid)) {
             return null;
         }
 
         try {
-            CachedTileGetter tileGetter = createSameGridTileGetter(layerInfo, layerName);
+            LayerTileGetter tileGetter = createDirectTileGetter(layerInfo, layerName);
             int tmsY = validateSameGridAndGetTmsY(
                     tileGetter.getSrcGridSubset(), layerInfo.getGridSrid(), z, x, y);
             BoundingBox sourceTileBounds = tileGetter.getSrcGridSubset()
@@ -455,7 +443,7 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
                 throw new IllegalArgumentException("同网格直出要求配置gridSrid: layerName=" + layerName);
             }
             sourceGridSrid = normalizeGridSrid(layerInfo.getGridSrid());
-            CachedTileGetter tileGetter = createSameGridTileGetter(layerInfo, layerName);
+            LayerTileGetter tileGetter = createDirectTileGetter(layerInfo, layerName);
             return doBuildSameGridTileResponse(
                     layerInfo, tileGetter, layerName, z, x, y, outputFormat, deleteCache);
         } catch (Exception e) {
@@ -464,7 +452,7 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
     }
 
     private TileResponse doBuildSameGridTileResponse(
-            PxyLayerInfo layerInfo, CachedTileGetter tileGetter,
+            PxyLayerInfo layerInfo, LayerTileGetter tileGetter,
             String layerName, Integer z, Integer x, Integer y,
             String outputFormat, boolean deleteCache) throws Exception {
         if (z == null || x == null || y == null) {
@@ -481,8 +469,8 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
 
         int tmsY = validateSameGridAndGetTmsY(
                 tileGetter.getSrcGridSubset(), layerInfo.getGridSrid(), z, x, y);
-        if (deleteCache) {
-            tileGetter.clearTileCache(z, x, tmsY);
+        if (deleteCache && tileGetter instanceof CachedTileGetter) {
+            ((CachedTileGetter) tileGetter).clearTileCache(z, x, tmsY);
         }
 
         Resource tileResource = tileGetter.getTileResource(z, x, tmsY);
@@ -516,6 +504,15 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
                 layerInfo, null, layerName + FuserCacheUtils.ORIGINAL_GRID_SUFFIX);
     }
 
+    private LayerTileGetter createDirectTileGetter(PxyLayerInfo layer, String layerName) {
+        return layer.isCacheEnabled(layer) ? createSameGridTileGetter(layer, layerName) : createUncachedTileGetter(layer);
+    }
+
+    /** 接入方可以为关闭缓存的图层提供自己的源读取器。 */
+    protected LayerTileGetter createUncachedTileGetter(PxyLayerInfo layer) {
+        return TileGetterFactory.createUncached(layer);
+    }
+
     private int resolveSourceBoundsSrid(PxyLayerInfo layerInfo, boolean googleTo4326) {
         if (layerInfo == null) {
             // 图层不存在时保持原入口的历史假设，后续由 Getter 创建阶段返回明确错误。
@@ -525,8 +522,7 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
     }
 
     private boolean isSameGridSrid(Integer sourceGridSrid, int requestGridSrid) {
-        return sourceGridSrid != null
-               && normalizeGridSrid(sourceGridSrid) == normalizeGridSrid(requestGridSrid);
+        return SameGridTileReader.equivalentSrid(sourceGridSrid, requestGridSrid);
     }
 
     private int normalizeGridSrid(int gridSrid) {
@@ -541,32 +537,9 @@ public class TileServiceTran implements TileServiceTranResponseProvider {
         if (configuredGridSrid == null) {
             throw new IllegalArgumentException("同网格直出要求配置gridSrid");
         }
-        SRS expectedSrs = configuredGridSrid == 4490
-                ? SRS.getEPSG4326()
-                : SRS.getSRS(normalizeGridSrid(configuredGridSrid));
-        if (!expectedSrs.equals(sourceGrid.getSRS())) {
-            throw new IllegalArgumentException("源Getter网格坐标系与配置不一致: configuredGridSrid="
-                                               + configuredGridSrid + ", getterSrs=" + sourceGrid.getSRS());
-        }
-        if (sourceGrid.getTileWidth() != DEFAULT_TILE_SIZE
-            || sourceGrid.getTileHeight() != DEFAULT_TILE_SIZE) {
+        if (sourceGrid.getTileWidth() != DEFAULT_TILE_SIZE || sourceGrid.getTileHeight() != DEFAULT_TILE_SIZE)
             throw new IllegalArgumentException("同网格直出要求瓦片大小为256x256");
-        }
-
-        if (z < sourceGrid.getZoomStart() || z > sourceGrid.getZoomStop()) {
-            throw new IllegalArgumentException("超出源网格级别范围: z=" + z);
-        }
-        long tilesHigh = sourceGrid.getGridSet().getGrid(z).getNumTilesHigh();
-        if (xyzY < 0 || xyzY >= tilesHigh) {
-            throw new IllegalArgumentException("瓦片Y坐标超出源网格范围: z=" + z + ", y=" + xyzY);
-        }
-        int tmsY = Math.toIntExact(tilesHigh - xyzY - 1L);
-        long[] tileIndex = {x, tmsY, z};
-        if (!sourceGrid.covers(tileIndex)) {
-            throw new IllegalArgumentException("瓦片坐标超出源图层覆盖范围: z=" + z
-                                               + ", x=" + x + ", y=" + xyzY);
-        }
-        return tmsY;
+        return SameGridTileReader.tmsY(sourceGrid, configuredGridSrid, z, x, xyzY);
     }
 
     private boolean isSameImageFormat(ImageMime sourceFormat, ImageMime outputFormat) {

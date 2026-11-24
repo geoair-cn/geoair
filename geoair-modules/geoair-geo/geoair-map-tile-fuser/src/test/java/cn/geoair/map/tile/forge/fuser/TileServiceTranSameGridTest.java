@@ -12,6 +12,7 @@ import cn.geoair.map.tile.forge.fuser.enums.SrcType;
 import cn.geoair.map.tile.forge.fuser.enums.TileServiceOperation;
 import cn.geoair.map.tile.forge.fuser.provider.CachedTileGetter;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
+import cn.geoair.map.tile.forge.fuser.support.TileTestImages;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
 import cn.geoair.web.mime.GiMimeType;
@@ -118,6 +119,22 @@ public class TileServiceTranSameGridTest {
         Assert.assertTrue(response.getErrorMessage().contains("不支持格式转换"));
     }
 
+    @Test
+    public void disabledCacheStillReadsSameGridAndReprojectsFromSource() throws Exception {
+        byte[] png = TileTestImages.solid(0xff0000, "png");
+        FakeLayerTileGetter source = new FakeLayerTileGetter(png);
+        MemoryTileCache oldCache = new MemoryTileCache();
+        oldCache.put("web-layer" + FuserCacheUtils.ORIGINAL_GRID_SUFFIX, 2, 1, 2, new byte[]{9}, ImageMime.png);
+        TestTileServiceTran service = new TestTileServiceTran(webMercatorLayer().setEnableCache("false"), source, oldCache);
+
+        Assert.assertArrayEquals(png, service.sameGridRequestDelCacheForTileResponse("web-layer", 2, 1, 1, "image/png").toByteArrays());
+        TileResponse projected = service.googleServiceTo4326RequestDelCacheForTileResponse("web-layer", 2, 1, 0, "image/png");
+        Assert.assertTrue(projected.getErrorMessage(), projected.isValid());
+        Assert.assertTrue(source.requestCount > 1);
+        Assert.assertEquals(1, oldCache.putCount);
+        Assert.assertEquals(0, oldCache.deleteCount);
+    }
+
     private PxyLayerInfo webMercatorLayer() {
         return new PxyLayerInfo()
                 .setLayerName("web-layer")
@@ -159,6 +176,9 @@ public class TileServiceTranSameGridTest {
             return new CachedTileGetter(
                     source, layerName + FuserCacheUtils.ORIGINAL_GRID_SUFFIX, cache);
         }
+
+        @Override
+        protected LayerTileGetter createUncachedTileGetter(PxyLayerInfo ignored) { return source; }
     }
 
     private static class FakeLayerTileGetter implements LayerTileGetter {
