@@ -201,6 +201,9 @@ public class LayerHttpTileClientTest {
         server.createContext(
                 "/redirect",
                 e -> {
+                    // JDK8 的本地 HttpServer 在 Windows 上复用此空响应连接可能被重置。
+                    // 本例验证重定向语义，显式关闭测试连接，避免本机连接复用干扰结论。
+                    e.getResponseHeaders().set("Connection", "close");
                     e.getResponseHeaders().set("Location", "/target");
                     e.sendResponseHeaders(302, -1);
                     e.close();
