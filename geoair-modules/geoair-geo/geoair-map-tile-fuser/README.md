@@ -157,3 +157,99 @@ MBTiles 物理字节数包含数据库、WAL、SHM；FILE 物理字节数包含�
 源片缺失不缓存透明图以及受控融合实际图片结果。另保留同网格输出和 Getter 工厂回归。
 
 运行时需要显式 `-DskipTests=false`，根 POM 默认跳过测试。
+
+## 大容量缓存与原始网格能力（2026-11-07）
+
+以下能力位于 `J8-dev-SNAPSHOT` 源码。当前应用仍使用已发布的 `J8.1.6-R2`，接入方升级库时再选择这些入口。
+
+### 大容量 MBTiles 源读取
+
+普通 `MBTilesTileGetter` 共享只读读取器，构造 Getter 时不统计整库瓦片数，也不创建源库表。读取器按真实文件路径复用连接池，默认最多 8 个文件、每文件 2 条连接、闲置 60 秒回收。每连接页缓存默认 2048 KiB，关闭 mmap；查询默认 3 秒，连接等待默认 2 秒。SQL 先检查图片大小，再把允许的 BLOB 复制到 Java，超限或读库错误向上传递。兼容 `tiles` 视图、中文及带空格的 Windows 路径。
+
+需要调整资源限制时创建共享读取器并注入 Getter，读取器的生命周期由调用方管理。
+
+```java
+MbtilesReadOptions readOptions = new MbtilesReadOptions();
+readOptions.setMaxOpenFiles(8);
+readOptions.setConnectionsPerFile(2);
+readOptions.setQueryTimeoutMillis(3000);
+try (MbtilesSourceReader reader = new MbtilesSourceReader(readOptions);
+     MBTilesTileGetter getter = new MBTilesTileGetter(layerInfo, reader)) {
+    Resource tile = getter.getTileResource(z, x, tmsRow);
+}
+```
+
+同名源文件被替换后会校验文件身份，已有读取完成后才能切换连接池。源文件池满且全部使用中时明确失败，由调用方重试。关闭 Getter 只关闭该 Getter；共享读取器需由其拥有者关闭。
+
+### 统计与瓦片写入协调
+
+`MBTilesTileCache` 的写入和删除按物理文件与 `MbtilesIncrementalStatistics` 共用协调器。等待中的瓦片写入先执行；增量扫描默认每批最多 512 条，时间片目标 25 毫秒，批次之间让出 25 毫秒。出现写入等待时在行边界提前提交。时间片是让行目标，单次底层 I/O、提交和文件系统停顿不构成硬实时保证。持续写入时统计可能等待。
+
+`MbtilesStatisticsOptions` 可配置增量批大小、只读批大小、时间片、让行间隔和写锁等待。协调范围为同一 JVM 内使用该缓存驱动的调用；外部 SQLite 写入仍依靠数据库事务和锁处理。
+
+普通 `statistics` 对普通 rowid 表按批聚合，释放每批读事务，并在并发修改后拒绝发布混合结果。旧视图和 WITHOUT ROWID 表保留兼容聚合方式。需要显示进度时使用独立引擎或缓存驱动入口。
+
+```java
+MbtilesScanProgress readOnly = cache.scanStatistics(layerName, sidecarPath,
+        progress -> recordProgress(progress));
+```
+
+只读扫描始终以 `mode=ro` 打开源库，侧车保存进度；sidecar 为 null 时仅保存内存汇总。即使源库已经安装增量索引，只读请求也不会恢复或推进增量索引。坐标索引可用时先报告各级数量和范围，精确字节数仍需要扫描记录。STALE 或 INTERRUPTED 不能作为当前完整结果。
+
+```java
+MbtilesStatisticsOptions statisticsOptions = new MbtilesStatisticsOptions();
+statisticsOptions.setBatchSize(512);
+MbtilesIncrementalStatistics incremental = new MbtilesIncrementalStatistics(statisticsOptions);
+TransactionalStatsSnapshot result = incremental.scan(mbtilesPath,
+        progress -> recordIncrementalProgress(progress));
+```
+
+增量统计必须显式调用，安装前校验源库。支持普通 rowid 表、标准四列和唯一坐标主键；不兼容的触发器、外键或结构会拒绝安装。初始扫描、游标和汇总在同一事务提交；后续增删改由源库触发器维护。`resume`、`read`、`uninstall` 和 `recalculateBounds` 分别用于继续扫描、读取结果、显式关闭和重新确认边界。边界重算遇到瓦片写入等待会回滚让行，可稍后重试。库不会自行查找文件或恢复业务任务。
+
+只读进度的数量表示物理记录数，字节数为瓦片数据长度；普通缓存 `statistics` 仍排除空瓦片。WAL、SHM 和空闲数据库页属于物理空间开销。
+
+### 原始网格预缓存
+
+`OriginalGridPrecache` 使用源读取器真实矩阵生成范围和级别计划，输入范围为 EPSG:4326，级别按源网格解释。墨卡托范围会裁剪有效纬度后投影；边界筛选使用读取器的实际瓦片边界，保留孔洞和触边语义。行号遵守 Getter 的 TMS 契约，由源读取器与缓存驱动各自处理存储方向。
+
+```java
+OriginalGridPrecache original = new OriginalGridPrecache(layerInfo, cache);
+List<TilePrecacheProgress> levels = original.execute(region4326, 10, 16,
+        downloadWorkers, cancellation, options, progress -> recordProgress(progress));
+```
+
+只写 `<图层名>_original_grid`，使用源格式，不做融合输出。已有、下载、跳过、缺失、失败和超时沿用分段执行器的真实结果；确认写入成功后才计为下载。也可传入现成 Getter 和缓存实例，复用业务已创建的源读取器。接入方维护任务表、身份和权限，可选用下文的公平调度和断点恢复。
+
+### 文件缓存并发
+
+同一缓存根目录下的 `FileTileCache` 实例共用有限数量的分段锁，协调同一列的读取、写入、存在性检查和单张删除，避免读取原地覆盖过程中的半张图片。磁盘布局和过期规则沿用现有实现，锁只在当前 JVM 内生效。
+
+### 本次回归范围
+
+迁移并补充了真实 ZIP 4501 条批次提交、失败回滚、重试去重、同归档重复提交、3D Tiles/S3M 相对资源读取、中文路径、读取器并发和超大 BLOB 拒绝、事务增量冲突与进程异常退出、只读统计失效、写入优先级和取消等待测试。原始网格覆盖墨卡托、经纬度及两种行号原点；并发测试使用真实 SQLite 源数据和缓存，分别让只读统计、增量统计与 1024 张预缓存写入同时执行。验证使用临时数据，不代表客户数百 GB 数据的实际吞吐量。
+
+### 融合完整性与图像处理扩展
+
+新增融合完整性结果、同网格直读工具和统一渲染计划。部分源片不可用时可显式保留可用影像，转换缓存只保存完整结果。图像处理通过可插拔接口读取原始或转换缓存，写入独立结果层，不修改源缓存；PNG/JPEG 按真实内容识别。FILE/MBTiles 可由驱动显式准备输出存储。
+
+接口、示例、兼容边界和测试见 [融合完整性与瓦片图像处理](doc/fusion-image-processing.md)。Google 模板仅为明确调用的可选规则，不是默认处理流程。
+
+### 栅格缓存编码与 MBTiles 维护
+
+新增显式编码策略、混合 PNG/JPEG 缓存适配、原文件可恢复转码、按物理文件协调的独占维护，以及返回真实部分结果的 WAL 合并和空间回收接口。旧工厂不自动启用编码，缓存路径与文件名不变；业务任务与权限由接入方维护。
+
+接入示例、兼容边界和验证说明见 [栅格缓存编码、混合格式和 MBTiles 维护](doc/cache-encoding-maintenance.md)。
+
+### 任务编码与预缓存图像处理组合
+
+新增不可变任务编码快照、显式跨线程绑定，以及下载/读取缓存后继续处理的组合入口。新下载图片在缓存压缩前交给处理器，处理结果单独编码并写入独立结果层；下载、检测和落盘分阶段统计。旧预缓存和只处理已有缓存入口保持原行为。
+
+接入示例、异常/取消和测试边界见 [任务编码与预缓存图像处理组合](doc/precache-image-pipeline.md)。
+
+### 出图、缓存代次与可恢复预缓存
+
+- `TileServiceTran` 在图层禁用缓存时直接访问源。同网格沿用现有行号转换，跨网格按请求范围融合。刷新请求同样绕开缓存。
+- `TileComposer` 按输出矩阵 XYZ 请求组合成员图像，接收经纬度面、多面及范围内外规则。只有裁切后的整张图像无可见像素才读父级。调用方用结果状态判断是否允许缓存；无覆盖结果可以按自己的透明瓦片协议写入。
+- `SegmentedTilePrecache.executeResumable` 和 `OriginalGridPrecache.executeResumable` 共享调用方提供的 `TilePrecacheBatchGate`。同一工作池使用同一个调度器，并把协调线程放在工作池之外。带 `TilePrecacheCheckpoint` 时，每个完成批次在一笔事务中保存范围、计数和失败坐标。调用方提供稳定的源、目标缓存、矩阵原点和图像处理策略身份，相关配置变化后提交新任务。完整续跑补未完成批次，失败补跑仅选择持久化失败坐标。重放时阶段计数记录实际发生的处理次数。
+- `TileRenderQueue` 用接入方提供的键合并在途请求。发布版本、缓存代次和坐标应进入键。独立取消等待不会终止其他调用。`TileCacheGeneration` 原子持久化当前代次，并通过 `writeIfCurrent` 拦住旧请求的写入。接入方管理缓存文件及旧代次清理，单个指针在同一进程内由一个实例维护。
+- `TileImageCodec.encodeForResponse` 可指定 JPEG 质量和不透明底色，输入与目标格式一致时直接复用字节。`WmtsTileFormats` 按 MIME 类型生成对应瓦片模板。`MbtilesSourceReader.sampleTile` 返回所选级别内实际存在的一张瓦片坐标，Y 为文件原始行号。
