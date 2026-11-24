@@ -16,14 +16,15 @@ import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 
 import java.util.BitSet;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
 /** 每段仅保存位图；整块在内/在外直接判定，边界块递归细分。 */
 public class TileRegionMask {
     private final PreparedGeometry region;
-    private final int zoom;
-    private final GirTileConverterOpt grid;
-    private final TileYAxis yAxis;
+    private final BiFunction<Integer,Integer,Envelope> tileBounds;
     private final Runnable checkStop;
+
+    String checkpointGeometry() { return region.getGeometry().norm().toText(); }
 
     public TileRegionMask(Geometry geometry, int zoom, GirTileConverterOpt grid, TileYAxis yAxis) {
         this(
@@ -43,15 +44,23 @@ public class TileRegionMask {
             GirTileConverterOpt grid,
             TileYAxis yAxis,
             Runnable checkStop) {
+        this(geometry, (x,y) -> {
+            BoxReferencedEnvelope box=grid.xyzToTileBox(zoom,x,y,yAxis,4326);
+            return GirAdvTools.getFormatOpt().wktToJtsGeometry(box.getWktString(4326)).getEnvelopeInternal();
+        }, checkStop);
+        Objects.requireNonNull(grid);
+        Objects.requireNonNull(yAxis);
+    }
+
+    /** 使用读取器的真实矩阵计算瓦片边界，支持原始网格的级别定义。 */
+    public TileRegionMask(Geometry geometry, BiFunction<Integer,Integer,Envelope> tileBounds, Runnable checkStop) {
         if (geometry == null
                 || geometry.isEmpty()
                 || !(geometry instanceof Polygon || geometry instanceof MultiPolygon)
                 || !geometry.isValid()) throw new IllegalArgumentException("预缓存范围必须是有效的面或多面");
         this.region = PreparedGeometryFactory.prepare(geometry.copy());
-        this.zoom = zoom;
-        this.grid = Objects.requireNonNull(grid);
-        this.yAxis = Objects.requireNonNull(yAxis);
-        this.checkStop = checkStop;
+        this.tileBounds = Objects.requireNonNull(tileBounds);
+        this.checkStop = Objects.requireNonNull(checkStop);
     }
 
     public BitSet classify(RangeApo range, long rows, long from, long to) {
@@ -95,7 +104,6 @@ public class TileRegionMask {
     }
 
     private Geometry tile(int x, int y) {
-        BoxReferencedEnvelope box = grid.xyzToTileBox(zoom, x, y, yAxis, 4326);
-        return GirAdvTools.getFormatOpt().wktToJtsGeometry(box.getWktString(4326));
+        return region.getGeometry().getFactory().toGeometry(tileBounds.apply(x,y));
     }
 }

@@ -12,6 +12,9 @@ public class TilePrecacheOptions {
     @GaModelField(text = "分段瓦片数量")
     private int segmentSize = 10000;
 
+    @GaModelField(text = "公平调度与断点提交的批次瓦片数")
+    private int batchSize = 256;
+
     @GaModelField(text = "待执行分段窗口")
     private int pendingSegments = 256;
 
@@ -23,6 +26,7 @@ public class TilePrecacheOptions {
 
     public void validate() {
         if (segmentSize <= 0
+                || batchSize <= 0
                 || pendingSegments <= 0
                 || tileTimeoutMillis <= 0
                 || inspectionTimeoutMillis <= 0)
@@ -35,6 +39,7 @@ public class TilePrecacheOptions {
     public TilePrecacheOptions copy() {
         TilePrecacheOptions copy = new TilePrecacheOptions();
         copy.segmentSize = segmentSize;
+        copy.batchSize = batchSize;
         copy.pendingSegments = pendingSegments;
         copy.tileTimeoutMillis = tileTimeoutMillis;
         copy.inspectionTimeoutMillis = inspectionTimeoutMillis;
