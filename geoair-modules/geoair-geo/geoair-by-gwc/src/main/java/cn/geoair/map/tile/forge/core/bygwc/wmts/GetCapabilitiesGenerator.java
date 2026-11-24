@@ -17,7 +17,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 生成GetCapabilities XML文档的工具类
@@ -31,8 +33,6 @@ public class GetCapabilitiesGenerator {
     private static final String XMLNS_OWS = "http://www.opengis.net/ows/1.1";
     private static final String XMLNS_XLINK = "http://www.w3.org/1999/xlink";
 
-    ArcGISCacheLayer layer;
-
     public static GetCapabilitiesGenerator getInstance() {
         return new GetCapabilitiesGenerator();
     }
@@ -45,10 +45,14 @@ public class GetCapabilitiesGenerator {
      * @throws Exception 生成过程中发生的异常
      */
     public String generate(ArcGISCacheLayer layer) throws Exception {
+        return generate(layer, null);
+    }
+
+    /** 每种响应 MIME 类型可提供自己的瓦片地址模板。 */
+    public String generate(ArcGISCacheLayer layer, Map<String, String> formats) throws Exception {
         if (layer == null || layer.getCacheInfo() == null) {
             throw new IllegalArgumentException("图层或缓存信息不能为空");
         }
-        this.layer = layer;
 
         // 创建XML文档
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -75,7 +79,7 @@ public class GetCapabilitiesGenerator {
         addOperationsMetadata(doc, rootElement);
 
         // 添加Contents部分
-        addContents(doc, rootElement, layer);
+        addContents(doc, rootElement, layer, formats == null ? defaultFormats(layer) : formats);
 
         // 转换为XML字符串
         return convertDocumentToString(doc);
@@ -176,12 +180,12 @@ public class GetCapabilitiesGenerator {
     /**
      * 添加内容信息（图层、样式等）
      */
-    private void addContents(Document doc, Element parent, ArcGISCacheLayer layer) {
+    private void addContents(Document doc, Element parent, ArcGISCacheLayer layer, Map<String, String> formats) {
         Element contents = doc.createElement("Contents");
         parent.appendChild(contents);
 
         // 添加图层信息
-        addLayer(doc, contents, layer);
+        addLayer(doc, contents, layer, formats);
 
         // 添加样式信息
         addStyle(doc, contents);
@@ -190,7 +194,7 @@ public class GetCapabilitiesGenerator {
     /**
      * 添加图层信息
      */
-    private void addLayer(Document doc, Element parent, ArcGISCacheLayer layer) {
+    private void addLayer(Document doc, Element parent, ArcGISCacheLayer layer, Map<String, String> formats) {
         CacheInfo cacheInfo = layer.getCacheInfo();
         TileCacheInfo tileCacheInfo = cacheInfo.getTileCacheInfo();
         BoundingBox layerBounds = layer.getLayerBounds();
@@ -199,7 +203,7 @@ public class GetCapabilitiesGenerator {
 
         // 图层基本信息
         Element title = doc.createElement("Title");
-        title.setTextContent(this.layer.getLayerName());
+        title.setTextContent(layer.getLayerName());
         layerElement.appendChild(title);
 
         Element abstractT = doc.createElement("Abstract");
@@ -207,7 +211,7 @@ public class GetCapabilitiesGenerator {
         layerElement.appendChild(abstractT);
 
         Element identifier = doc.createElement("Identifier");
-        identifier.setTextContent(this.layer.getLayerName());
+        identifier.setTextContent(layer.getLayerName());
         layerElement.appendChild(identifier);
 
         // 边界范围
@@ -220,47 +224,40 @@ public class GetCapabilitiesGenerator {
         // 瓦片矩阵集链接
         Element tileMatrixSetLink = doc.createElement("TileMatrixSetLink");
         Element tileMatrixSet = doc.createElement("TileMatrixSet");
-        tileMatrixSet.setTextContent("EPSG:" + this.layer.getGridSet().getSrs().getNumber());
+        tileMatrixSet.setTextContent("EPSG:" + layer.getGridSet().getSrs().getNumber());
         tileMatrixSetLink.appendChild(tileMatrixSet);
         layerElement.appendChild(tileMatrixSetLink);
 
-        // 格式信息
-        TileImageInfo tileImageInfo = cacheInfo.getTileImageInfo();
-        if (tileImageInfo != null && tileImageInfo.getCacheTileFormat() != null) {
-            Element format = doc.createElement("Format");
-            String mimeType = getMimeType(tileImageInfo.getCacheTileFormat());
-            format.setTextContent(mimeType);
-            layerElement.appendChild(format);
-        }
-
-        // 添加ResourceURL信息
-        Element resourceURL = doc.createElement("ResourceURL");
-        resourceURL.setAttribute("format", getMimeType(tileImageInfo.getCacheTileFormat()));
-
-        resourceURL.setAttribute("resourceType", "tile");
-        String template = "/wmts?layer={}&tilematrixset={}";
-        String format = StrUtil.format(template, this.layer.getLayerName(), "EPSG:" + this.layer.getGridSet().getSrs().getNumber());
-        resourceURL.setAttribute("template", format + "&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix={TileMatrix}&TileCol={TileCol}&TileRow={TileRow}");
-        layerElement.appendChild(resourceURL);
+        WmtsTileFormats.append(doc, layerElement, formats);
 
         // 添加所有层级信息
-        addTileMatrixSet(doc, parent, tileCacheInfo);
+        addTileMatrixSet(doc, parent, tileCacheInfo, layer.getGridSet());
 
         parent.appendChild(layerElement);
+    }
+
+    private Map<String, String> defaultFormats(ArcGISCacheLayer layer) {
+        TileImageInfo info = layer.getCacheInfo().getTileImageInfo();
+        if (info == null || info.getCacheTileFormat() == null) return Collections.emptyMap();
+        String mime = getMimeType(info.getCacheTileFormat());
+        String template = StrUtil.format("/wmts?layer={}&tilematrixset={}",
+                layer.getLayerName(), "EPSG:" + layer.getGridSet().getSrs().getNumber());
+        return Collections.singletonMap(mime, template + "&Service=WMTS&Request=GetTile&Version=1.0.0&Format="
+                + mime + "&TileMatrix={TileMatrix}&TileCol={TileCol}&TileRow={TileRow}");
     }
 
     /**
      * 添加瓦片矩阵集信息（包含所有层级）
      */
-    private void addTileMatrixSet(Document doc, Element parent, TileCacheInfo tileCacheInfo) {
+    private void addTileMatrixSet(Document doc, Element parent, TileCacheInfo tileCacheInfo, GridSet gridSet) {
         Element tileMatrixSet = doc.createElement("TileMatrixSet");
 
         Element identifier = doc.createElement("Identifier");
-        identifier.setTextContent("EPSG:" + this.layer.getGridSet().getSrs().getNumber());
+        identifier.setTextContent("EPSG:" + gridSet.getSrs().getNumber());
         tileMatrixSet.appendChild(identifier);
 
         Element supportedCRS = doc.createElement("SupportedCRS");
-        supportedCRS.setTextContent("urn:ogc:def:crs:EPSG::" + this.layer.getGridSet().getSrs().getNumber());
+        supportedCRS.setTextContent("urn:ogc:def:crs:EPSG::" + gridSet.getSrs().getNumber());
         tileMatrixSet.appendChild(supportedCRS);
 
         // 瓦片原点
@@ -269,7 +266,6 @@ public class GetCapabilitiesGenerator {
         // 添加每个层级的瓦片矩阵信息
         List<LODInfo> lodInfos = tileCacheInfo.getLodInfos();
         if (lodInfos != null) {
-            GridSet gridSet = this.layer.getGridSet();
 
             for (int i = 0; i < lodInfos.size(); i++) {
                 LODInfo lodInfo = lodInfos.get(i);
