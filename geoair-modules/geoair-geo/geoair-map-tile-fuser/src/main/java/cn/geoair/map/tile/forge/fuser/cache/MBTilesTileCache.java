@@ -1,10 +1,22 @@
 package cn.geoair.map.tile.forge.fuser.cache;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessCoordinator;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessLease;
 
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
 
 import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.function.Consumer;
+import java.sql.SQLException;
+import cn.geoair.map.tile.forge.fuser.mbtiles.statistics.MbtilesScanProgress;
+import cn.geoair.map.tile.forge.fuser.mbtiles.statistics.MbtilesStatisticsScanner;
+import java.io.IOException;
+import java.util.function.BooleanSupplier;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesWriteCoordinator;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesWriteLease;
 
 import java.util.BitSet;
+import java.util.ArrayList;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -37,6 +49,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public class MBTilesTileCache implements TileCache {
+    /** 大库只读统计入口。sidecar 为 null 时仅保存内存汇总，非空时保存独立进度文件。 */
+    public MbtilesScanProgress scanStatistics(
+            String layerName, Path sidecar,
+            Consumer<MbtilesScanProgress> progress)
+            throws SQLException, IOException {
+        return new MbtilesStatisticsScanner()
+                .scan(Paths.get(getDbPath(layerName)), sidecar, progress);
+    }
+
     @Override
     public BitSet findExisting(TileCacheQuery query, TileOperationContext context) {
         return isEnabled() ? CacheInspection.mbtiles(Paths.get(getDbPath(query.getLayerName())), query, context) : new BitSet();
@@ -127,6 +148,11 @@ public class MBTilesTileCache implements TileCache {
         String safeName = MbtilesUtils.getSafeFileName(layerName);
         return cacheRoot + safeName + ".mbtiles";
     }
+    /** 显式维护入口使用同一物理命名约定，不要求业务拼接文件名。 */
+    public Path layerFile(String layerName) {
+        if(layerName==null||layerName.trim().isEmpty())throw new IllegalArgumentException("图层名称不能为空");
+        return Paths.get(getDbPath(layerName)).toAbsolutePath().normalize();
+    }
 
     /**
      * 获取或创建图层的缓存持有者
@@ -211,6 +237,7 @@ public class MBTilesTileCache implements TileCache {
             return null;
         }
 
+        try (MbtilesAccessLease lease = MbtilesAccessCoordinator.operation(Paths.get(getDbPath(layerName)))) {
         LayerCacheHolder holder = getOrCreateHolder(layerName, false);
         if (holder == null) {
             return null;
@@ -223,10 +250,23 @@ public class MBTilesTileCache implements TileCache {
                     layerName, z, x, y, System.currentTimeMillis() - startTime);
         }
         return data;
+        } catch (InterruptedException stopped) {
+            Thread.currentThread().interrupt(); throw new IllegalStateException("缓存读取已取消", stopped);
+        } catch (IOException failure) { throw new IllegalStateException("无法定位MBTiles缓存文件", failure); }
     }
 
     @Override
     public boolean put(String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
+        return write(layerName, () -> putUncoordinated(layerName, z, x, y, data, format));
+    }
+
+    /** 复用正常写入的协调器与建库路径，不让应用自行创建空数据库文件。 */
+    @Override
+    public boolean prepareLayer(String layerName) {
+        return write(layerName, () -> getOrCreateHolder(layerName, true) != null);
+    }
+
+    private boolean putUncoordinated(String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
         if (!enabled || data == null || data.length == 0) {
             return false;
         }
@@ -246,6 +286,10 @@ public class MBTilesTileCache implements TileCache {
 
     @Override
     public boolean deleteLayerCache(String layerName) {
+        return write(layerName, () -> deleteLayerUncoordinated(layerName));
+    }
+
+    private boolean deleteLayerUncoordinated(String layerName) {
         if (!enabled) {
             return false;
         }
@@ -263,6 +307,10 @@ public class MBTilesTileCache implements TileCache {
 
     @Override
     public boolean delete(String layerName, Integer z, Integer x) {
+        return write(layerName, () -> deleteUncoordinated(layerName, z, x));
+    }
+
+    private boolean deleteUncoordinated(String layerName, Integer z, Integer x) {
         if (!enabled) {
             return false;
         }
@@ -287,6 +335,10 @@ public class MBTilesTileCache implements TileCache {
 
     @Override
     public boolean delete(String layerName, int z, int x, int y, GiMimeType format) {
+        return write(layerName, () -> deleteTileUncoordinated(layerName, z, x, y, format));
+    }
+
+    private boolean deleteTileUncoordinated(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return false;
         }
@@ -299,37 +351,33 @@ public class MBTilesTileCache implements TileCache {
         return holder.delete(z, x, y);
     }
 
+    /** 同一物理库内优先处理瓦片写入，统计使用同一协调器主动退让。 */
+    private boolean write(String layer, BooleanSupplier action) {
+        if (!enabled) return false;
+        try (MbtilesWriteLease ignored = MbtilesWriteCoordinator.write(Paths.get(getDbPath(layer)))) {
+            return action.getAsBoolean();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        } catch (IOException e) {
+            log.error("无法协调 MBTiles 缓存写入", e);
+            return false;
+        }
+    }
     @Override
     public void clearAll() {
         if (!enabled) {
             return;
         }
 
-        // 关闭所有连接
-        for (LayerCacheHolder holder : layerCaches.values()) {
-            holder.close();
-        }
-        layerCaches.clear();
-
-        // 删除所有 .mbtiles 文件
-        try {
-            File dir = new File(cacheRoot);
-            if (dir.exists() && dir.isDirectory()) {
-                File[] files = dir.listFiles((d, name) -> name.endsWith(".mbtiles"));
-                if (files != null) {
-                    for (File file : files) {
-                        if (file.delete()) {
-                            log.debug("删除 MBTiles 文件: {}", file.getName());
-                        }
-                    }
-                }
-                log.info("清空所有 MBTiles 缓存完成");
-            }
-        } catch (Exception e) {
-            log.error("清空 MBTiles 缓存失败", e);
+        // 按文件逐个清理，和瓦片写入、统计共用协调器。
+        for (String layer : new ArrayList<>(layerCaches.keySet())) deleteLayerCache(layer);
+        File[] files = new File(cacheRoot).listFiles((dir, name) -> name.endsWith(".mbtiles"));
+        if (files != null) for (File file : files) {
+            String name = file.getName();
+            deleteLayerCache(name.substring(0, name.length() - ".mbtiles".length()));
         }
     }
-
     @Override
     public long getTotalSize() {
         if (!enabled) {
@@ -355,6 +403,7 @@ public class MBTilesTileCache implements TileCache {
 
     @Override
     public boolean exists(String layerName, int z, int x, int y, GiMimeType format) {
+        try (MbtilesAccessLease lease=MbtilesAccessCoordinator.operation(Paths.get(getDbPath(layerName)))) {
         if (!enabled) {
             return false;
         }
@@ -365,6 +414,8 @@ public class MBTilesTileCache implements TileCache {
         }
 
         return holder.exists(z, x, y);
+        } catch(InterruptedException stopped) { Thread.currentThread().interrupt();throw new IllegalStateException("缓存查询已取消",stopped); }
+        catch(IOException failure) { throw new IllegalStateException("无法定位缓存文件",failure); }
     }
 
     @Override
@@ -387,22 +438,28 @@ public class MBTilesTileCache implements TileCache {
      * 获取指定图层的瓦片数量
      */
     public long getTileCount(String layerName) {
+        try (MbtilesAccessLease lease=MbtilesAccessCoordinator.operation(Paths.get(getDbPath(layerName)))) {
         LayerCacheHolder holder = getOrCreateHolder(layerName);
         if (holder == null) {
             return 0;
         }
         return holder.getTileCount();
+        } catch(InterruptedException stopped) { Thread.currentThread().interrupt();throw new IllegalStateException("缓存查询已取消",stopped); }
+        catch(IOException failure) { throw new IllegalStateException("无法定位缓存文件",failure); }
     }
 
     /**
      * 获取指定图层指定层级的瓦片数量
      */
     public long getTileCountByZoom(String layerName, int zoom) {
+        try (MbtilesAccessLease lease=MbtilesAccessCoordinator.operation(Paths.get(getDbPath(layerName)))) {
         LayerCacheHolder holder = getOrCreateHolder(layerName);
         if (holder == null) {
             return 0;
         }
         return holder.getTileCountByZoom(zoom);
+        } catch(InterruptedException stopped) { Thread.currentThread().interrupt();throw new IllegalStateException("缓存查询已取消",stopped); }
+        catch(IOException failure) { throw new IllegalStateException("无法定位缓存文件",failure); }
     }
 
     // ==================== 内部类 ====================

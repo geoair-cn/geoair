@@ -1,4 +1,11 @@
 package cn.geoair.map.tile.forge.fuser.mbtiles;
+import cn.geoair.map.tile.forge.fuser.mbtiles.maintenance.MbtilesMaintenance;
+import cn.geoair.map.tile.forge.fuser.mbtiles.maintenance.MbtilesReclaimMode;
+import cn.geoair.map.tile.forge.fuser.mbtiles.maintenance.MbtilesMaintenanceStatus;
+import java.nio.file.Paths;
+import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
+
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -438,70 +445,12 @@ public class MbtilesUtils {
      * @return true成功 false失败
      */
     public static boolean vacuum(String dbPath) {
-        if (dbPath == null || GutilObject.isEmpty(dbPath)) {
-            log.error("数据源路径为空，无法执行 VACUUM");
-            return false;
-        }
-        File dbFile = new File(dbPath);
-        if (!dbFile.exists() || !dbFile.isFile()) {
-            log.error("数据库文件不存在: {}", dbPath);
-            return false;
-        }
-        long dbSize = dbFile.length();
-        long freeSpace = dbFile.getParentFile().getUsableSpace();
-        long needMinFree = dbSize + 10L * 1024 * 1024 * 1024;
-        if (freeSpace < needMinFree) {
-            log.error("磁盘空间不足，当前库大小:{}G，最少需要空闲:{}G，实际空闲:{}G",
-                    dbSize / 1024 / 1024 / 1024,
-                    needMinFree / 1024 / 1024 / 1024,
-                    freeSpace / 1024 / 1024 / 1024);
-            return false;
-        }
-        // JDBC URL追加参数，配合PRAGMA双重提速
-        String url = String.format("jdbc:sqlite:%s?busy_timeout=30000", dbPath);
-        DriverManagerDataSource dataSource = new DriverManagerDataSource(url, null, null);
-        try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement()) {
-            // ========== 核心提速PRAGMA 批量执行 ==========
-            // 1. 关闭外键校验，减少重建索引开销
-            stmt.execute("PRAGMA foreign_keys = OFF;");
-            // 2. WAL模式减少日志刷盘阻塞
-            stmt.execute("PRAGMA journal_mode = WAL;");
-            // 3. 临时文件全部放内存
-            stmt.execute("PRAGMA temp_store = MEMORY;");
-            // 4. 缓存大小：-N 代表N KB，这里512MB缓存
-            stmt.execute("PRAGMA cache_size = -524288;");
-            // 5. mmap内存映射120G，减少磁盘随机读
-            stmt.execute("PRAGMA mmap_size = 268435456;");
-            // 6. 维护阶段临时关闭同步，大幅提速（停机执行无断电风险可用）
-            stmt.execute("PRAGMA synchronous = OFF;");
-
-            log.info("开始执行VACUUM，数据库大小:{}GB，磁盘空闲:{}GB",
-                    dbSize / 1024 / 1024 / 1024,
-                    freeSpace / 1024 / 1024 / 1024);
-            long startTime = System.currentTimeMillis();
-
-            // 执行全量真空
-            stmt.execute("VACUUM;");
-            // 顺带更新统计信息，优化后续查询性能
-            stmt.execute("ANALYZE;");
-
-            long costMs = System.currentTimeMillis() - startTime;
-            long costSec = TimeUnit.MILLISECONDS.toSeconds(costMs);
-            long newDbSize = dbFile.length();
-            long shrinkGb = (dbSize - newDbSize) / 1024 / 1024 / 1024;
-
-            log.info("VACUUM执行完成，耗时:{}s，原大小:{}GB，清理后:{}GB，释放空间:{}GB",
-                    costSec,
-                    dbSize / 1024 / 1024 / 1024,
-                    newDbSize / 1024 / 1024 / 1024,
-                    shrinkGb);
-            return true;
-
-        } catch (SQLException e) {
-            log.error("执行VACUUM异常", e);
-            return false;
-        }
+        if(dbPath==null||dbPath.trim().isEmpty())return false;
+        try {
+            return new MbtilesMaintenance().reclaim(Paths.get(dbPath),MbtilesReclaimMode.VACUUM,
+                    () -> Thread.currentThread().isInterrupted(),null).getStatus()==MbtilesMaintenanceStatus.COMPLETED;
+        } catch(InterruptedException stopped) { Thread.currentThread().interrupt();return false; }
+        catch(Exception failure) { log.error("MBTiles完整整理失败，未报告成功: {}",dbPath,failure);return false; }
     }
 
     /**
@@ -542,11 +491,14 @@ public class MbtilesUtils {
             log.info("开始执行 WAL checkpoint (模式: {})...", upperMode);
             long startTime = System.currentTimeMillis();
 
-            stmt.execute("PRAGMA wal_checkpoint(" + upperMode + ")");
+            boolean complete;
+            try(ResultSet result=stmt.executeQuery("PRAGMA wal_checkpoint(" + upperMode + ")")) {
+                complete=result.next() && result.getInt(1)==0 && result.getLong(2)<=result.getLong(3);
+            }
 
             long elapsed = System.currentTimeMillis() - startTime;
             log.info("WAL checkpoint 执行完成，耗时: {} s", elapsed / 1000);
-            return true;
+            return complete;
 
         } catch (SQLException e) {
             log.error("执行 WAL checkpoint 失败 (模式: {})", upperMode, e);
@@ -690,24 +642,8 @@ public class MbtilesUtils {
      * @return 是否执行成功
      */
     public static boolean compactDatabase(String dbPath) {
-        if (dbPath == null) {
-            log.error("数据源无效，无法压缩数据库");
-            return false;
-        }
-
-        log.info("开始压缩数据库...");
-        long startTime = System.currentTimeMillis();
-        DriverManagerDataSource dataSource = new DriverManagerDataSource("jdbc:sqlite:" + dbPath, null, null);
-        if (!walCheckpointFull(dataSource)) {
-            log.warn("WAL checkpoint 执行失败，继续执行 VACUUM...");
-        }
-        // 第二步：执行 VACUUM
-        boolean vacuumResult = vacuum(dbPath);
-
-        long elapsed = System.currentTimeMillis() - startTime;
-        log.info("数据库压缩完成，结果: {}, 耗时: {} s", vacuumResult, elapsed / 1000);
-
-        return vacuumResult;
+        // 保留旧boolean入口；检查点未完成时不能继续重建，更不能把部分完成返回true。
+        return vacuum(dbPath);
     }
 
 
@@ -728,14 +664,17 @@ public class MbtilesUtils {
         }
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(SELECT_TILE_SQL)) {
+             PreparedStatement pstmt = conn.prepareStatement("SELECT length(tile_data) AS tile_bytes,CASE WHEN length(tile_data)<=? THEN tile_data END AS tile_data FROM tiles WHERE zoom_level=? AND tile_column=? AND tile_row=?")) {
 
-            pstmt.setInt(1, z);
-            pstmt.setInt(2, x);
-            pstmt.setInt(3, y);
+            TileOperationContext.checkCurrent();
+            pstmt.setInt(1, TileResourceLimits.getMaxTileBytes());
+            pstmt.setInt(2, z);
+            pstmt.setInt(3, x);
+            pstmt.setInt(4, y);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
+                    if(rs.getLong("tile_bytes")>TileResourceLimits.getMaxTileBytes())throw new IllegalStateException("MBTiles瓦片超过读取大小限制");
                     return MbtilesInfo.of().setZoomLevel(z).setX(x).setY(y).setTileData(rs.getBytes("tile_data"));
                 }
             }
