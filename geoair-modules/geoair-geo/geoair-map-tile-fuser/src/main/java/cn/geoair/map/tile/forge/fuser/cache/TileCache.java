@@ -12,6 +12,8 @@ import java.util.BitSet;
  * @description 定义瓦片缓存的标准操作
  */
 public interface TileCache {
+    /** 显式准备独立输出层；旧驱动默认不支持，不能假装初始化成功。 */
+    default boolean prepareLayer(String layerName) { return false; }
     /** 返回当前分段中有效缓存的位置；旧驱动使用兼容回退，新驱动可批量读取元数据。 */
     default BitSet findExisting(TileCacheQuery query, TileOperationContext context) {
         BitSet found=new BitSet(query.size());

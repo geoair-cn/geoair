@@ -60,7 +60,8 @@ public final class TileResourceLimits {
         TileResourceLimits.maxImagePixels = maxImagePixels;
     }
 
-    static void validateImageDimensions(int width, int height) {
+    /** 解码与融合画布共用相同限制，分配像素数组前调用。 */
+    public static void validateImageDimensions(int width, int height) {
         if (width <= 0 || height <= 0
                 || width > maxImageWidth
                 || height > maxImageHeight

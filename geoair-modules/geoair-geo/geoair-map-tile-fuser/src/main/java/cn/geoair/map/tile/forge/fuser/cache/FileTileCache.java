@@ -1,8 +1,10 @@
 package cn.geoair.map.tile.forge.fuser.cache;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
 
 import java.util.BitSet;
+import java.util.Objects;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -29,6 +31,36 @@ import java.util.stream.Stream;
  */
 
 public class FileTileCache implements TileCache {
+    /** 显式栅格替换，同一列锁内写入并清理旧扩展名，避免PNG/JPEG并发互删。 */
+    public boolean putRaster(String layer,int z,int x,int y,byte[] bytes,GiMimeType actual) {
+        synchronized(lock(layer,z,x)) {
+            boolean saved=put(layer,z,x,y,bytes,actual);
+            if(saved) {
+                if(!"png".equals(actual.getInternalName()))delete(layer,z,x,y,ImageMime.png);
+                if(!"jpeg".equals(actual.getInternalName()))delete(layer,z,x,y,ImageMime.jpeg);
+            }
+            return saved;
+        }
+    }
+    public boolean deleteRaster(String layer,int z,int x,int y,GiMimeType format) {
+        synchronized(lock(layer,z,x)) {
+            boolean removed=delete(layer,z,x,y,format);
+            removed|=delete(layer,z,x,y,ImageMime.png);
+            removed|=delete(layer,z,x,y,ImageMime.jpeg);
+            return removed;
+        }
+    }
+    @Override
+    public boolean prepareLayer(String layerName) {
+        if (!enabled) return false;
+        try {
+            Files.createDirectories(getLayerPath(layerName));
+            return true;
+        } catch (IOException failure) {
+            log.warn("无法初始化文件缓存图层: {}", layerName, failure);
+            return false;
+        }
+    }
     @Override
     public BitSet findExisting(TileCacheQuery query, TileOperationContext context) {
         return isEnabled() ? CacheInspection.file(getLayerPath(query.getLayerName()), expireTime, query, context) : new BitSet();
@@ -39,6 +71,16 @@ public class FileTileCache implements TileCache {
         return CacheInspection.statistics(getLayerPath(layerName), layerName, false, context);
     }
 
+    private static final Object[] FILE_LOCKS = createLocks();
+    private static Object[] createLocks() {
+        Object[] locks = new Object[256];
+        for (int i = 0; i < locks.length; i++) locks[i] = new Object();
+        return locks;
+    }
+    private Object lock(String layer, int z, int x) {
+        int hash = Objects.hash(cacheRootPath, layer, z, x);
+        return FILE_LOCKS[Math.floorMod(hash, FILE_LOCKS.length)];
+    }
     private static GiLogger log = GirLoggerFactory.getLogger();
     private static final ExecutorService DELETE_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
         Thread thread = new Thread(r, "tile-cache-delete");
@@ -129,6 +171,12 @@ public class FileTileCache implements TileCache {
 
     @Override
     public byte[] get(String layerName, int z, int x, int y, GiMimeType format) {
+        synchronized (lock(layerName, z, x)) {
+            return getUncoordinated(layerName, z, x, y, format);
+        }
+    }
+
+    private byte[] getUncoordinated(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return null;
         }
@@ -168,6 +216,12 @@ public class FileTileCache implements TileCache {
 
     @Override
     public boolean put(String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
+        synchronized (lock(layerName, z, x)) {
+            return putUncoordinated(layerName, z, x, y, data, format);
+        }
+    }
+
+    private boolean putUncoordinated(String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
         if (!enabled || data == null || data.length == 0 || data.length > TileResourceLimits.getMaxTileBytes()) {
             return false;
         }
@@ -329,6 +383,12 @@ public class FileTileCache implements TileCache {
 
     @Override
     public boolean delete(String layerName, int z, int x, int y, GiMimeType format) {
+        synchronized (lock(layerName, z, x)) {
+            return deleteUncoordinated(layerName, z, x, y, format);
+        }
+    }
+
+    private boolean deleteUncoordinated(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return false;
         }
@@ -439,6 +499,12 @@ public class FileTileCache implements TileCache {
 
     @Override
     public boolean exists(String layerName, int z, int x, int y, GiMimeType format) {
+        synchronized (lock(layerName, z, x)) {
+            return existsUncoordinated(layerName, z, x, y, format);
+        }
+    }
+
+    private boolean existsUncoordinated(String layerName, int z, int x, int y, GiMimeType format) {
         if (!enabled) {
             return false;
         }
