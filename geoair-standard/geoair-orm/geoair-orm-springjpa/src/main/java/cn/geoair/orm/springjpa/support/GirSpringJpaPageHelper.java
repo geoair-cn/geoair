@@ -6,12 +6,14 @@ import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.gpa.support.GirOrder;
 import cn.geoair.base.gpa.support.GirSort;
-import java.util.Iterator;
-import java.util.function.Function;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+
+import java.util.Iterator;
+import java.util.function.Function;
 
 /**
  * @author ：张俊

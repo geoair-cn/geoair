@@ -32,10 +32,17 @@ public class SqliteAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
         if (StrUtil.isBlank(updateClause)) {
             return StrUtil.format(
                     "INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) DO NOTHING",
-                    tableName, fields, placeholders, conflictFields);
+                    tableName,
+                    fields,
+                    placeholders,
+                    conflictFields);
         }
         return StrUtil.format(
                 "INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) DO UPDATE SET {}",
-                tableName, fields, placeholders, conflictFields, updateClause);
+                tableName,
+                fields,
+                placeholders,
+                conflictFields,
+                updateClause);
     }
 }

@@ -4,8 +4,10 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
+
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
+
 import scala.Tuple2;
 
 import java.io.Serializable;
@@ -19,8 +21,7 @@ import java.util.Map;
 /** V3 专用 Spark 可序列化函数。 */
 final class V3SparkTaskFunctions {
 
-    private V3SparkTaskFunctions() {
-    }
+    private V3SparkTaskFunctions() {}
 
     /** 将一个 V3 图层的要素按瓦片映射为图层分组 value。 */
     static class LayerMapToTileFunction
@@ -58,7 +59,8 @@ final class V3SparkTaskFunctions {
 
     /** 按 tileId 合并多个图层的要素分组。 */
     static class MergeTileFeatureGroupFunction
-            implements Function2<V3TileFeatureGroup, V3TileFeatureGroup, V3TileFeatureGroup>, Serializable {
+            implements Function2<V3TileFeatureGroup, V3TileFeatureGroup, V3TileFeatureGroup>,
+                    Serializable {
 
         private static final long serialVersionUID = 1L;
         private final Map<String, MvtLayerSliceParameter> layersByName;

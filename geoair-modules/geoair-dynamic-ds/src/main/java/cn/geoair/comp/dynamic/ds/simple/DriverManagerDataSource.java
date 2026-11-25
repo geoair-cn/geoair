@@ -2,13 +2,15 @@ package cn.geoair.comp.dynamic.ds.simple;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.db.ds.simple.AbstractDataSource;
+
+import lombok.Data;
+import lombok.Getter;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-import lombok.Data;
-import lombok.Getter;
 
 /**
  * @author ：张逢吉

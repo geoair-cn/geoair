@@ -6,6 +6,13 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 
+import org.geotools.geojson.geom.GeometryJSON;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKBReader;
+import org.locationtech.jts.io.WKBWriter;
+import org.locationtech.jts.io.WKTReader;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -16,18 +23,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.geotools.geojson.geom.GeometryJSON;
-import org.locationtech.jts.geom.*;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKBReader;
-import org.locationtech.jts.io.WKBWriter;
-import org.locationtech.jts.io.WKTReader;
-
 /**
  * 空间格式转换工具的 {@link GirGeoFormatOpt} 实现。
  *
- * <p>支持 GeoJSON、WKT、WKB、JTS Geometry 及运行期可识别的 PostGIS Geometry 对象互转。
- * 实例按 {@link ToolsConfig} 对象身份复用；默认单例入口仅用于兼容旧代码。</p>
+ * <p>支持 GeoJSON、WKT、WKB、JTS Geometry 及运行期可识别的 PostGIS Geometry 对象互转。 实例按 {@link ToolsConfig}
+ * 对象身份复用；默认单例入口仅用于兼容旧代码。
  *
  * @author 张逢吉
  * @date 2024/10/24 15:29
@@ -36,7 +36,9 @@ public class GirFormatUtils implements GirGeoFormatOpt {
 
     /** EWKT 中 SRID 前缀的匹配规则。 */
     private static final Pattern EWKT_PATTERN =
-            Pattern.compile("^\\s*SRID\\s*=\\s*(\\d+)\\s*;\\s*(.+)\\s*$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+            Pattern.compile(
+                    "^\\s*SRID\\s*=\\s*(\\d+)\\s*;\\s*(.+)\\s*$",
+                    Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     // 单例实例（volatile保证可见性，防止指令重排）
     private static volatile GirFormatUtils INSTANCE;
@@ -44,7 +46,6 @@ public class GirFormatUtils implements GirGeoFormatOpt {
     /** 按 ToolsConfig 对象身份复用格式工具，避免同配置下重复创建工具实例。 */
     private static final Map<ToolsConfig, GirFormatUtils> CONFIGURED_INSTANCES =
             Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirFormatUtils>());
-
 
     /** 当前实例使用的格式组件配置。 */
     private final ToolsConfig advToolsConfig;
@@ -199,7 +200,8 @@ public class GirFormatUtils implements GirGeoFormatOpt {
     }
 
     @Override
-    public String jtsGeometryToEwktString(Geometry jtsGeometry, boolean ifExceptionValueReturnNull) {
+    public String jtsGeometryToEwktString(
+            Geometry jtsGeometry, boolean ifExceptionValueReturnNull) {
         if (ObjectUtil.isNull(jtsGeometry)) {
             return ifExceptionValueReturnNull ? null : throwEmptyParamException("jtsGeometry");
         }
@@ -514,7 +516,6 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         return reader;
     }
 
-
     @Override
     public GeometryJSON getGeometryJSON() {
         GeometryJSON geometryJSON = advToolsConfig.getGeometryJsonSupplier().get();
@@ -526,9 +527,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
 
     // ==============================私有工具方法==============================
 
-    /**
-     * 处理几何对象转字符串
-     */
+    /** 处理几何对象转字符串 */
     private String handleGeometryToString(
             Geometry geometry,
             GeometryToStringFunction function,
@@ -544,9 +543,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
     }
 
-    /**
-     * 几何对象类型转换
-     */
+    /** 几何对象类型转换 */
     private <T extends Geometry> T castGeometry(
             Geometry geometry, Class<T> targetClass, boolean ifExceptionValueReturnNull) {
         if (ObjectUtil.isNull(geometry)) {
@@ -567,9 +564,7 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
     }
 
-    /**
-     * 异常处理通用方法
-     */
+    /** 异常处理通用方法 */
     private <T> T handleException(Exception e, boolean ifExceptionValueReturnNull) {
         if (ifExceptionValueReturnNull) {
             return null;
@@ -578,23 +573,17 @@ public class GirFormatUtils implements GirGeoFormatOpt {
         }
     }
 
-    /**
-     * 抛出空参数异常
-     */
+    /** 抛出空参数异常 */
     private <T> T throwEmptyParamException(String paramName) {
         throw new RuntimeException("参数[" + paramName + "]不能为空");
     }
 
-    /**
-     * 抛出通用运行时异常
-     */
+    /** 抛出通用运行时异常 */
     private <T> T throwRuntimeException(String msg) {
         throw new RuntimeException(msg);
     }
 
-    /**
-     * 几何对象转字符串函数式接口
-     */
+    /** 几何对象转字符串函数式接口 */
     @FunctionalInterface
     private interface GeometryToStringFunction {
 

@@ -1,13 +1,9 @@
 package cn.geoair.map.tile.forge.fuser.cache;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
-
-import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
-
-import java.util.BitSet;
-import java.util.Objects;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
 import cn.geoair.web.mime.GiMimeType;
@@ -15,6 +11,8 @@ import cn.hutool.core.io.FileUtil;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.BitSet;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,31 +23,31 @@ import java.util.stream.Stream;
  *
  * @author 张俊
  * @date Created in 2023/12/4
- * @description 将瓦片缓存到本地文件系统，目录结构: layerName/z/x/y.png
- * 注意：
- * 缓存的结果，全部转换成wmts原点
+ * @description 将瓦片缓存到本地文件系统，目录结构: layerName/z/x/y.png 注意： 缓存的结果，全部转换成wmts原点
  */
-
 public class FileTileCache implements TileCache {
     /** 显式栅格替换，同一列锁内写入并清理旧扩展名，避免PNG/JPEG并发互删。 */
-    public boolean putRaster(String layer,int z,int x,int y,byte[] bytes,GiMimeType actual) {
-        synchronized(lock(layer,z,x)) {
-            boolean saved=put(layer,z,x,y,bytes,actual);
-            if(saved) {
-                if(!"png".equals(actual.getInternalName()))delete(layer,z,x,y,ImageMime.png);
-                if(!"jpeg".equals(actual.getInternalName()))delete(layer,z,x,y,ImageMime.jpeg);
+    public boolean putRaster(String layer, int z, int x, int y, byte[] bytes, GiMimeType actual) {
+        synchronized (lock(layer, z, x)) {
+            boolean saved = put(layer, z, x, y, bytes, actual);
+            if (saved) {
+                if (!"png".equals(actual.getInternalName())) delete(layer, z, x, y, ImageMime.png);
+                if (!"jpeg".equals(actual.getInternalName()))
+                    delete(layer, z, x, y, ImageMime.jpeg);
             }
             return saved;
         }
     }
-    public boolean deleteRaster(String layer,int z,int x,int y,GiMimeType format) {
-        synchronized(lock(layer,z,x)) {
-            boolean removed=delete(layer,z,x,y,format);
-            removed|=delete(layer,z,x,y,ImageMime.png);
-            removed|=delete(layer,z,x,y,ImageMime.jpeg);
+
+    public boolean deleteRaster(String layer, int z, int x, int y, GiMimeType format) {
+        synchronized (lock(layer, z, x)) {
+            boolean removed = delete(layer, z, x, y, format);
+            removed |= delete(layer, z, x, y, ImageMime.png);
+            removed |= delete(layer, z, x, y, ImageMime.jpeg);
             return removed;
         }
     }
+
     @Override
     public boolean prepareLayer(String layerName) {
         if (!enabled) return false;
@@ -61,9 +59,13 @@ public class FileTileCache implements TileCache {
             return false;
         }
     }
+
     @Override
     public BitSet findExisting(TileCacheQuery query, TileOperationContext context) {
-        return isEnabled() ? CacheInspection.file(getLayerPath(query.getLayerName()), expireTime, query, context) : new BitSet();
+        return isEnabled()
+                ? CacheInspection.file(
+                        getLayerPath(query.getLayerName()), expireTime, query, context)
+                : new BitSet();
     }
 
     @Override
@@ -72,21 +74,26 @@ public class FileTileCache implements TileCache {
     }
 
     private static final Object[] FILE_LOCKS = createLocks();
+
     private static Object[] createLocks() {
         Object[] locks = new Object[256];
         for (int i = 0; i < locks.length; i++) locks[i] = new Object();
         return locks;
     }
+
     private Object lock(String layer, int z, int x) {
         int hash = Objects.hash(cacheRootPath, layer, z, x);
         return FILE_LOCKS[Math.floorMod(hash, FILE_LOCKS.length)];
     }
+
     private static GiLogger log = GirLoggerFactory.getLogger();
-    private static final ExecutorService DELETE_EXECUTOR = Executors.newSingleThreadExecutor(r -> {
-        Thread thread = new Thread(r, "tile-cache-delete");
-        thread.setDaemon(true);
-        return thread;
-    });
+    private static final ExecutorService DELETE_EXECUTOR =
+            Executors.newSingleThreadExecutor(
+                    r -> {
+                        Thread thread = new Thread(r, "tile-cache-delete");
+                        thread.setDaemon(true);
+                        return thread;
+                    });
     // 缓存根目录
     private final String cacheRoot;
     private final Path cacheRootPath;
@@ -97,7 +104,6 @@ public class FileTileCache implements TileCache {
     // 缓存图层 Y 轴翻转配置
     private final ConcurrentHashMap<String, Boolean> layerReverseCache = new ConcurrentHashMap<>();
 
-
     public FileTileCache() {
         this(FileUtil.getTmpDirPath() + "/tile_cache/", 7 * 24 * 60 * 60 * 1000L, true);
     }
@@ -105,7 +111,6 @@ public class FileTileCache implements TileCache {
     public FileTileCache(String cacheRoot) {
         this(cacheRoot, 7 * 24 * 60 * 60 * 1000L, true);
     }
-
 
     public FileTileCache(String cacheRoot, long expireTime, boolean enabled) {
         this.cacheRootPath = Paths.get(cacheRoot).toAbsolutePath().normalize();
@@ -134,26 +139,32 @@ public class FileTileCache implements TileCache {
      * @return true: 需要翻转（Google 坐标系 → TMS 坐标系）
      */
     private boolean isNeedReverseY(String layerName) {
-        return layerReverseCache.computeIfAbsent(layerName, k ->  FuserCacheUtils.fileCheckIsNeedReverseY(layerName));
+        return layerReverseCache.computeIfAbsent(
+                layerName, k -> FuserCacheUtils.fileCheckIsNeedReverseY(layerName));
     }
 
-
-    /**
-     * 获取缓存文件路径（支持 Y 轴翻转）
-     */
+    /** 获取缓存文件路径（支持 Y 轴翻转） */
     private Path getCachePath(String layerName, int z, int x, int y, GiMimeType format) {
         Path layerPath = getLayerPath(layerName);
         boolean needReverse = isNeedReverseY(layerName);
-        int storeY = FuserCacheUtils.getStoreY(z, y, needReverse, FuserCacheUtils.getCacheGridSrid(layerName));
+        int storeY =
+                FuserCacheUtils.getStoreY(
+                        z, y, needReverse, FuserCacheUtils.getCacheGridSrid(layerName));
         // 使用layerName/z/x/目录结构，文件名为storeY.format
-        return layerPath.resolve(String.valueOf(z)).resolve(String.valueOf(x))
-                .resolve(storeY + "." + format.getFileExtension()).normalize();
+        return layerPath
+                .resolve(String.valueOf(z))
+                .resolve(String.valueOf(x))
+                .resolve(storeY + "." + format.getFileExtension())
+                .normalize();
     }
 
     private Path getLayerPath(String layerName) {
-        if (layerName == null || layerName.trim().isEmpty()
-                || layerName.indexOf('/') >= 0 || layerName.indexOf('\\') >= 0
-                || ".".equals(layerName) || "..".equals(layerName)) {
+        if (layerName == null
+                || layerName.trim().isEmpty()
+                || layerName.indexOf('/') >= 0
+                || layerName.indexOf('\\') >= 0
+                || ".".equals(layerName)
+                || "..".equals(layerName)) {
             throw new IllegalArgumentException("非法缓存图层名称");
         }
         for (int i = 0; i < layerName.length(); i++) {
@@ -167,7 +178,6 @@ public class FileTileCache implements TileCache {
         }
         return layerPath;
     }
-
 
     @Override
     public byte[] get(String layerName, int z, int x, int y, GiMimeType format) {
@@ -221,8 +231,12 @@ public class FileTileCache implements TileCache {
         }
     }
 
-    private boolean putUncoordinated(String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
-        if (!enabled || data == null || data.length == 0 || data.length > TileResourceLimits.getMaxTileBytes()) {
+    private boolean putUncoordinated(
+            String layerName, int z, int x, int y, byte[] data, GiMimeType format) {
+        if (!enabled
+                || data == null
+                || data.length == 0
+                || data.length > TileResourceLimits.getMaxTileBytes()) {
             return false;
         }
 
@@ -236,7 +250,11 @@ public class FileTileCache implements TileCache {
             }
 
             // 写入缓存文件
-            Files.write(cachePath, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.write(
+                    cachePath,
+                    data,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
             log.debug("保存瓦片到缓存成功: {} - ({},{},{})", layerName, z, x, y);
             return true;
 
@@ -266,7 +284,12 @@ public class FileTileCache implements TileCache {
 
         try {
             // 生成临时目录名（原目录名 + 时间戳 + 随机数）
-            String tempDirName = layerName + "_deleting_" + System.currentTimeMillis() + "_" + Thread.currentThread().getId();
+            String tempDirName =
+                    layerName
+                            + "_deleting_"
+                            + System.currentTimeMillis()
+                            + "_"
+                            + Thread.currentThread().getId();
             Path tempPath = cacheRootPath.resolve(tempDirName).normalize();
 
             // 原子性的重命名操作
@@ -298,35 +321,34 @@ public class FileTileCache implements TileCache {
         }
     }
 
-
     private void asyncDeleteDirectory(Path path) {
-        DELETE_EXECUTOR.execute(() -> {
-            try {
-                log.info("开始异步删除临时目录: {}", path);
-                deleteDirectorySync(path);
-                log.info("异步删除临时目录成功: {}", path);
-            } catch (IOException e) {
-                log.error("异步删除临时目录失败: {}", path, e);
-            }
-        });
+        DELETE_EXECUTOR.execute(
+                () -> {
+                    try {
+                        log.info("开始异步删除临时目录: {}", path);
+                        deleteDirectorySync(path);
+                        log.info("异步删除临时目录成功: {}", path);
+                    } catch (IOException e) {
+                        log.error("异步删除临时目录失败: {}", path, e);
+                    }
+                });
     }
-
 
     private void deleteDirectorySync(Path path) throws IOException {
         if (Files.exists(path)) {
             try (Stream<Path> paths = Files.walk(path)) {
-                paths.sorted((a, b) -> -a.compareTo(b))  // 先删除文件，再删除目录
-                        .forEach(p -> {
-                            try {
-                                Files.deleteIfExists(p);
-                            } catch (IOException e) {
-                                log.error("删除文件/目录失败: {}", p, e);
-                            }
-                        });
+                paths.sorted((a, b) -> -a.compareTo(b)) // 先删除文件，再删除目录
+                        .forEach(
+                                p -> {
+                                    try {
+                                        Files.deleteIfExists(p);
+                                    } catch (IOException e) {
+                                        log.error("删除文件/目录失败: {}", p, e);
+                                    }
+                                });
             }
         }
     }
-
 
     @Override
     public boolean delete(String layerName, Integer z, Integer x) {
@@ -344,7 +366,10 @@ public class FileTileCache implements TileCache {
                 targetPath = getLayerPath(layerName).resolve(String.valueOf(z));
             } else {
                 // 删除指定x目录下的所有瓦片
-                targetPath = getLayerPath(layerName).resolve(String.valueOf(z)).resolve(String.valueOf(x));
+                targetPath =
+                        getLayerPath(layerName)
+                                .resolve(String.valueOf(z))
+                                .resolve(String.valueOf(x));
             }
         } catch (IllegalArgumentException e) {
             log.warn("拒绝删除非法图层缓存: {}", layerName);
@@ -357,9 +382,12 @@ public class FileTileCache implements TileCache {
         }
 
         try {
-            String tempDirName = targetPath.getFileName().toString() +
-                                 "_deleting_" + System.currentTimeMillis() +
-                                 "_" + Thread.currentThread().getId();
+            String tempDirName =
+                    targetPath.getFileName().toString()
+                            + "_deleting_"
+                            + System.currentTimeMillis()
+                            + "_"
+                            + Thread.currentThread().getId();
             Path tempPath = targetPath.resolveSibling(tempDirName);
 
             Files.move(targetPath, tempPath, StandardCopyOption.ATOMIC_MOVE);
@@ -419,7 +447,11 @@ public class FileTileCache implements TileCache {
 
         try {
             // 生成临时目录名（根目录 + 时间戳 + 随机数）
-            String tempDirName = "cache_root_deleting_" + System.currentTimeMillis() + "_" + Thread.currentThread().getId();
+            String tempDirName =
+                    "cache_root_deleting_"
+                            + System.currentTimeMillis()
+                            + "_"
+                            + Thread.currentThread().getId();
             Path tempPath = cacheRootPath.resolveSibling(tempDirName);
 
             // 原子性的重命名操作
@@ -450,20 +482,20 @@ public class FileTileCache implements TileCache {
         }
     }
 
-
     private void clearAllSync(Path path) throws IOException {
         if (Files.exists(path)) {
             // 遍历目录，删除所有子文件和子目录，但保留根目录本身
             try (Stream<Path> paths = Files.walk(path)) {
-                paths.filter(p -> !p.equals(path))  // 排除根目录本身
-                        .sorted((a, b) -> -a.compareTo(b))  // 先删除文件，再删除目录
-                        .forEach(p -> {
-                            try {
-                                Files.deleteIfExists(p);
-                            } catch (IOException e) {
-                                log.error("删除文件/目录失败: {}", p, e);
-                            }
-                        });
+                paths.filter(p -> !p.equals(path)) // 排除根目录本身
+                        .sorted((a, b) -> -a.compareTo(b)) // 先删除文件，再删除目录
+                        .forEach(
+                                p -> {
+                                    try {
+                                        Files.deleteIfExists(p);
+                                    } catch (IOException e) {
+                                        log.error("删除文件/目录失败: {}", p, e);
+                                    }
+                                });
             }
             log.info("直接清空缓存根目录成功: {}", path);
         }
@@ -482,13 +514,14 @@ public class FileTileCache implements TileCache {
 
             try (Stream<Path> paths = Files.walk(cacheRootPath)) {
                 return paths.filter(Files::isRegularFile)
-                        .mapToLong(path -> {
-                            try {
-                                return Files.size(path);
-                            } catch (IOException e) {
-                                return 0;
-                            }
-                        })
+                        .mapToLong(
+                                path -> {
+                                    try {
+                                        return Files.size(path);
+                                    } catch (IOException e) {
+                                        return 0;
+                                    }
+                                })
                         .sum();
             }
         } catch (IOException e) {

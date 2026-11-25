@@ -6,27 +6,21 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.dynamic.ds.utils.AdvJdbcUrlUtil;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-
 import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
-import java.util.*;
 
 import org.geotools.api.data.DataStore;
 import org.geotools.api.data.DataStoreFinder;
 import org.geotools.api.data.FeatureSource;
 import org.geotools.api.data.Query;
+import org.geotools.api.feature.Property;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -34,13 +28,17 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.VirtualTable;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.api.feature.Property;
-import org.geotools.api.feature.simple.SimpleFeature;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /** 改造后的 PostGIS 读取器 适配新接口：readHeader 返回 SimpleFeatureType，补全核心读取逻辑 基于 GeoTools 实现，统一要素类型标准 */
-
 public class PostgisGeoFileReader implements GeoFileReader {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private PostgisReadLinkInfo linkInfo;
@@ -77,9 +75,15 @@ public class PostgisGeoFileReader implements GeoFileReader {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put(PostgisNGDataStoreFactory.DBTYPE.key, "postgis");
-            params.put(PostgisNGDataStoreFactory.HOST.key, extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.PORT.key, extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
-            params.put(PostgisNGDataStoreFactory.DATABASE.key, extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.HOST.key,
+                    extractHostFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.PORT.key,
+                    extractPortFromJdbcUrl(linkInfo.getJdbcUrl()));
+            params.put(
+                    PostgisNGDataStoreFactory.DATABASE.key,
+                    extractDbNameFromJdbcUrl(linkInfo.getJdbcUrl()));
             params.put(PostgisNGDataStoreFactory.USER.key, linkInfo.getUsername());
             params.put(PostgisNGDataStoreFactory.PASSWD.key, linkInfo.getPassword());
             params.put(PostgisNGDataStoreFactory.SCHEMA.key, linkInfo.getSchema());
@@ -158,7 +162,8 @@ public class PostgisGeoFileReader implements GeoFileReader {
             if (linkInfo.getSrid() > 0 && featureType != null) {
                 SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
                 typeBuilder.init(featureType);
-                CoordinateReferenceSystem crs = GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
+                CoordinateReferenceSystem crs =
+                        GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
                 typeBuilder.setCRS(crs);
                 this.featureType = typeBuilder.buildFeatureType();
             }

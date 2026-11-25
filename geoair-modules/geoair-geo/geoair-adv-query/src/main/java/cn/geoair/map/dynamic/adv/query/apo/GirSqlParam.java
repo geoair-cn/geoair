@@ -5,7 +5,4 @@ package cn.geoair.map.dynamic.adv.query.apo;
  * @date ：Created in 2026/4/17 09:14
  * @description： 参数顶层接口
  */
-public interface GirSqlParam {
-
-
-}
+public interface GirSqlParam {}

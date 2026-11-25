@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics;
 
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
+
 import java.io.Serializable;
 
 public class FieldStatUtils implements Serializable {

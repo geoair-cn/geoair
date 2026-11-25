@@ -12,14 +12,17 @@ import cn.geoair.base.gpa.dao.GiVisualSelectDao;
 import cn.geoair.base.gpa.entity.GiEntityVisuable;
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.orm.mybatis.impls.MyBatisMapper;
+
+import jakarta.persistence.Id;
+
+import tk.mybatis.mapper.common.example.SelectByExampleMapper;
+import tk.mybatis.mapper.entity.Example;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import jakarta.persistence.Id;
-import tk.mybatis.mapper.common.example.SelectByExampleMapper;
-import tk.mybatis.mapper.entity.Example;
 
 public interface TkVisualSelectMapper<T extends GiEntityVisuable<PK>, PK extends Serializable>
         extends MyBatisMapper<T, PK>,

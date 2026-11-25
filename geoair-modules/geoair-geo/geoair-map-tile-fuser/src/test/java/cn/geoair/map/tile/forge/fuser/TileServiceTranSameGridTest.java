@@ -16,6 +16,7 @@ import cn.geoair.map.tile.forge.fuser.support.TileTestImages;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
 import cn.geoair.web.mime.GiMimeType;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,18 +28,20 @@ public class TileServiceTranSameGridTest {
 
     @Test
     public void existing3857RequestAutomaticallyUsesSameGridTileAndOriginalCache() {
-        FakeLayerTileGetter source = new FakeLayerTileGetter(new byte[]{1, 2, 3});
+        FakeLayerTileGetter source = new FakeLayerTileGetter(new byte[] {1, 2, 3});
         MemoryTileCache cache = new MemoryTileCache();
         TestTileServiceTran service = new TestTileServiceTran(webMercatorLayer(), source, cache);
 
-        TileResponse first = service.grid4490ServiceTo3857RequestForTileResponse(
-                "web-layer", 2, 1, 1, "image/png");
-        TileResponse second = service.grid4490ServiceTo3857RequestForTileResponse(
-                "web-layer", 2, 1, 1, "image/png");
+        TileResponse first =
+                service.grid4490ServiceTo3857RequestForTileResponse(
+                        "web-layer", 2, 1, 1, "image/png");
+        TileResponse second =
+                service.grid4490ServiceTo3857RequestForTileResponse(
+                        "web-layer", 2, 1, 1, "image/png");
 
         Assert.assertTrue(first.isValid());
         Assert.assertTrue(second.isValid());
-        Assert.assertArrayEquals(new byte[]{1, 2, 3}, first.toByteArrays());
+        Assert.assertArrayEquals(new byte[] {1, 2, 3}, first.toByteArrays());
         Assert.assertArrayEquals(first.toByteArrays(), second.toByteArrays());
         Assert.assertEquals(TileServiceOperation.SAME_GRID.getCode(), first.getDataSource());
         Assert.assertEquals("EPSG:3857", first.getGridEpsgStr());
@@ -49,17 +52,17 @@ public class TileServiceTranSameGridTest {
 
     @Test
     public void sameGridUriCanDeleteAndRebuildOriginalTileCache() {
-        FakeLayerTileGetter source = new FakeLayerTileGetter(new byte[]{4, 5, 6});
+        FakeLayerTileGetter source = new FakeLayerTileGetter(new byte[] {4, 5, 6});
         MemoryTileCache cache = new MemoryTileCache();
         TestTileServiceTran service = new TestTileServiceTran(webMercatorLayer(), source, cache);
 
-        String uri = TileServiceTran.buildTileRequestUri(
-                TileServiceOperation.SAME_GRID,
-                "web-layer", 2, 1, 1, "image/png", false);
+        String uri =
+                TileServiceTran.buildTileRequestUri(
+                        TileServiceOperation.SAME_GRID, "web-layer", 2, 1, 1, "image/png", false);
         Assert.assertTrue(service.getTileResponse(uri).isValid());
 
-        TileResponse rebuilt = service.sameGridRequestDelCacheForTileResponse(
-                "web-layer", 2, 1, 1, "image/png");
+        TileResponse rebuilt =
+                service.sameGridRequestDelCacheForTileResponse("web-layer", 2, 1, 1, "image/png");
 
         Assert.assertTrue(rebuilt.isValid());
         Assert.assertEquals(2, source.requestCount);
@@ -70,19 +73,21 @@ public class TileServiceTranSameGridTest {
     @Test
     public void existing4490RequestAutomaticallyUsesSameGridTileAndOriginalCache() {
         GridSubset grid4490 = GridInitUtils.getTdtGrid4490();
-        FakeLayerTileGetter source = new FakeLayerTileGetter(new byte[]{7, 8, 9}, grid4490);
+        FakeLayerTileGetter source = new FakeLayerTileGetter(new byte[] {7, 8, 9}, grid4490);
         MemoryTileCache cache = new MemoryTileCache();
         TestTileServiceTran service = new TestTileServiceTran(grid4490Layer(), source, cache);
-        BoundingBox bounds = grid4490.boundsFromIndex(new long[]{1, 1, 2});
+        BoundingBox bounds = grid4490.boundsFromIndex(new long[] {1, 1, 2});
 
-        TileResponse first = service.buildTileResponse(
-                "grid4490-layer", 2, 1, 0, bounds, "image/png", false, 4490);
-        TileResponse second = service.buildTileResponse(
-                "grid4490-layer", 2, 1, 0, bounds, "image/png", false, 4490);
+        TileResponse first =
+                service.buildTileResponse(
+                        "grid4490-layer", 2, 1, 0, bounds, "image/png", false, 4490);
+        TileResponse second =
+                service.buildTileResponse(
+                        "grid4490-layer", 2, 1, 0, bounds, "image/png", false, 4490);
 
         Assert.assertTrue(first.isValid());
         Assert.assertTrue(second.isValid());
-        Assert.assertArrayEquals(new byte[]{7, 8, 9}, first.toByteArrays());
+        Assert.assertArrayEquals(new byte[] {7, 8, 9}, first.toByteArrays());
         Assert.assertEquals(TileServiceOperation.SAME_GRID.getCode(), first.getDataSource());
         Assert.assertEquals("EPSG:4490", first.getGridEpsgStr());
         Assert.assertEquals(1, source.requestCount);
@@ -92,16 +97,16 @@ public class TileServiceTranSameGridTest {
 
     @Test
     public void strictSameGrid4490ApiUsesLayerGrid() {
-        FakeLayerTileGetter source = new FakeLayerTileGetter(
-                new byte[]{10, 11}, GridInitUtils.getTdtGrid4490());
-        TestTileServiceTran service = new TestTileServiceTran(
-                grid4490Layer(), source, new MemoryTileCache());
+        FakeLayerTileGetter source =
+                new FakeLayerTileGetter(new byte[] {10, 11}, GridInitUtils.getTdtGrid4490());
+        TestTileServiceTran service =
+                new TestTileServiceTran(grid4490Layer(), source, new MemoryTileCache());
 
-        TileResponse response = service.sameGridRequestForTileResponse(
-                "grid4490-layer", 2, 1, 0, "image/png");
+        TileResponse response =
+                service.sameGridRequestForTileResponse("grid4490-layer", 2, 1, 0, "image/png");
 
         Assert.assertTrue(response.isValid());
-        Assert.assertArrayEquals(new byte[]{10, 11}, response.toByteArrays());
+        Assert.assertArrayEquals(new byte[] {10, 11}, response.toByteArrays());
         Assert.assertEquals(TileServiceOperation.SAME_GRID.getCode(), response.getDataSource());
         Assert.assertEquals("EPSG:4490", response.getGridEpsgStr());
         Assert.assertEquals(1, source.lastTmsY);
@@ -109,11 +114,14 @@ public class TileServiceTranSameGridTest {
 
     @Test
     public void strictSameGridApiRejectsFormatConversion() {
-        TestTileServiceTran service = new TestTileServiceTran(
-                webMercatorLayer(), new FakeLayerTileGetter(new byte[]{7}), new MemoryTileCache());
+        TestTileServiceTran service =
+                new TestTileServiceTran(
+                        webMercatorLayer(),
+                        new FakeLayerTileGetter(new byte[] {7}),
+                        new MemoryTileCache());
 
-        TileResponse response = service.sameGridRequestForTileResponse(
-                "web-layer", 2, 1, 1, "image/jpeg");
+        TileResponse response =
+                service.sameGridRequestForTileResponse("web-layer", 2, 1, 1, "image/jpeg");
 
         Assert.assertFalse(response.isSuccess());
         Assert.assertTrue(response.getErrorMessage().contains("不支持格式转换"));
@@ -124,11 +132,24 @@ public class TileServiceTranSameGridTest {
         byte[] png = TileTestImages.solid(0xff0000, "png");
         FakeLayerTileGetter source = new FakeLayerTileGetter(png);
         MemoryTileCache oldCache = new MemoryTileCache();
-        oldCache.put("web-layer" + FuserCacheUtils.ORIGINAL_GRID_SUFFIX, 2, 1, 2, new byte[]{9}, ImageMime.png);
-        TestTileServiceTran service = new TestTileServiceTran(webMercatorLayer().setEnableCache("false"), source, oldCache);
+        oldCache.put(
+                "web-layer" + FuserCacheUtils.ORIGINAL_GRID_SUFFIX,
+                2,
+                1,
+                2,
+                new byte[] {9},
+                ImageMime.png);
+        TestTileServiceTran service =
+                new TestTileServiceTran(
+                        webMercatorLayer().setEnableCache("false"), source, oldCache);
 
-        Assert.assertArrayEquals(png, service.sameGridRequestDelCacheForTileResponse("web-layer", 2, 1, 1, "image/png").toByteArrays());
-        TileResponse projected = service.googleServiceTo4326RequestDelCacheForTileResponse("web-layer", 2, 1, 0, "image/png");
+        Assert.assertArrayEquals(
+                png,
+                service.sameGridRequestDelCacheForTileResponse("web-layer", 2, 1, 1, "image/png")
+                        .toByteArrays());
+        TileResponse projected =
+                service.googleServiceTo4326RequestDelCacheForTileResponse(
+                        "web-layer", 2, 1, 0, "image/png");
         Assert.assertTrue(projected.getErrorMessage(), projected.isValid());
         Assert.assertTrue(source.requestCount > 1);
         Assert.assertEquals(1, oldCache.putCount);
@@ -160,7 +181,8 @@ public class TileServiceTranSameGridTest {
         private final LayerTileGetter source;
         private final TileCache cache;
 
-        private TestTileServiceTran(PxyLayerInfo layerInfo, LayerTileGetter source, TileCache cache) {
+        private TestTileServiceTran(
+                PxyLayerInfo layerInfo, LayerTileGetter source, TileCache cache) {
             this.layerInfo = layerInfo;
             this.source = source;
             this.cache = cache;
@@ -172,13 +194,16 @@ public class TileServiceTranSameGridTest {
         }
 
         @Override
-        protected CachedTileGetter createSameGridTileGetter(PxyLayerInfo ignored, String layerName) {
+        protected CachedTileGetter createSameGridTileGetter(
+                PxyLayerInfo ignored, String layerName) {
             return new CachedTileGetter(
                     source, layerName + FuserCacheUtils.ORIGINAL_GRID_SUFFIX, cache);
         }
 
         @Override
-        protected LayerTileGetter createUncachedTileGetter(PxyLayerInfo ignored) { return source; }
+        protected LayerTileGetter createUncachedTileGetter(PxyLayerInfo ignored) {
+            return source;
+        }
     }
 
     private static class FakeLayerTileGetter implements LayerTileGetter {

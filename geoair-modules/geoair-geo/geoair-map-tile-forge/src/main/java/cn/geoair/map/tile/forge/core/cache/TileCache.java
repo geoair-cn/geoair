@@ -1,12 +1,10 @@
 package cn.geoair.map.tile.forge.core.cache;
 
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.bygwc.config.CacheInfo;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
-import cn.geoair.map.tile.forge.core.TileRequest;
 
-/**
- * 瓦片缓存提供者接口
- */
+/** 瓦片缓存提供者接口 */
 public interface TileCache {
 
     /**
@@ -28,56 +26,33 @@ public interface TileCache {
             cacheKey.append(y);
         }
 
-
         return cacheKey.toString();
     }
 
-    /**
-     * 获取瓦片缓存（包含不存在状态）
-     */
-    TileRequest getTile(String cacheKey,String fileFormat);
+    /** 获取瓦片缓存（包含不存在状态） */
+    TileRequest getTile(String cacheKey, String fileFormat);
 
-    /**
-     * 存储瓦片缓存（支持存储不存在状态）
-     */
-    void putTile(String cacheKey, TileRequest tileRequest,String fileFormat);
+    /** 存储瓦片缓存（支持存储不存在状态） */
+    void putTile(String cacheKey, TileRequest tileRequest, String fileFormat);
 
-    /**
-     * 获取Capabilities缓存
-     */
+    /** 获取Capabilities缓存 */
     String getCapabilities(String cacheKey);
 
-    /**
-     * 存储Capabilities缓存
-     */
+    /** 存储Capabilities缓存 */
     void putCapabilities(String cacheKey, String capabilities);
 
-    /**
-     * 获取BoundingBox缓存
-     */
+    /** 获取BoundingBox缓存 */
     BoundingBox getBoundingBox(String cacheKey);
 
-    /**
-     * 存储BoundingBox缓存
-     */
+    /** 存储BoundingBox缓存 */
     void putBoundingBox(String cacheKey, BoundingBox boundingBox);
 
-    /**
-     * 获取CacheInfo缓存
-     */
+    /** 获取CacheInfo缓存 */
     CacheInfo getCacheInfo(String cacheKey);
 
-    /**
-     * 存储CacheInfo缓存
-     */
+    /** 存储CacheInfo缓存 */
     void putCacheInfo(String cacheKey, CacheInfo cacheInfo);
 
-    /**
-     * 清理指定图层的瓦片缓存
-     */
+    /** 清理指定图层的瓦片缓存 */
     void clearTileCache(String layerName);
-
-
-
-
 }

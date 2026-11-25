@@ -3,6 +3,7 @@ package cn.geoair.base.sp.annotation;
 import cn.geoair.base.sp.GkSpLoader;
 import cn.geoair.base.sp.support.GirBeanFactorySpLoader;
 import cn.geoair.base.sp.support.GirJdkSpLoader;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

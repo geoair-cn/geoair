@@ -20,20 +20,20 @@ import java.util.UUID;
 /**
  * 将 V3 本地瓦片目录归档为标准 MBTiles SQLite 文件。
  *
- * <p>该工具只在 Driver 端单进程执行，避免多个 Spark executor 并发写入同一个 SQLite 文件。</p>
+ * <p>该工具只在 Driver 端单进程执行，避免多个 Spark executor 并发写入同一个 SQLite 文件。
  *
  * @author 张逢吉
  */
 public final class MbtilesArchiveUtils {
 
-    private static final String CREATE_TILES_SQL = "CREATE TABLE tiles ("
-            + "zoom_level INTEGER NOT NULL, tile_column INTEGER NOT NULL, tile_row INTEGER NOT NULL, "
-            + "tile_data BLOB NOT NULL, PRIMARY KEY (zoom_level, tile_column, tile_row))";
-    private static final String CREATE_METADATA_SQL = "CREATE TABLE metadata ("
-            + "name TEXT NOT NULL PRIMARY KEY, value TEXT)";
+    private static final String CREATE_TILES_SQL =
+            "CREATE TABLE tiles ("
+                    + "zoom_level INTEGER NOT NULL, tile_column INTEGER NOT NULL, tile_row INTEGER NOT NULL, "
+                    + "tile_data BLOB NOT NULL, PRIMARY KEY (zoom_level, tile_column, tile_row))";
+    private static final String CREATE_METADATA_SQL =
+            "CREATE TABLE metadata (" + "name TEXT NOT NULL PRIMARY KEY, value TEXT)";
 
-    private MbtilesArchiveUtils() {
-    }
+    private MbtilesArchiveUtils() {}
 
     /**
      * 将中间目录中的 PBF 瓦片归档为 MBTiles。
@@ -46,8 +46,13 @@ public final class MbtilesArchiveUtils {
      * @param metadata 写入 MBTiles metadata 表的键值对
      */
     public static void archive(
-            Path stagingDirectory, Path targetFile, TileYAxis stagingYAxis, boolean overwrite,
-            int batchSize, Map<String, String> metadata) throws IOException {
+            Path stagingDirectory,
+            Path targetFile,
+            TileYAxis stagingYAxis,
+            boolean overwrite,
+            int batchSize,
+            Map<String, String> metadata)
+            throws IOException {
         if (targetFile == null) {
             throw new IllegalArgumentException("MBTiles 输出文件不能为空");
         }
@@ -55,14 +60,16 @@ public final class MbtilesArchiveUtils {
             throw new IllegalArgumentException("MBTiles batchSize 必须大于 0");
         }
         Path archiveFile = targetFile.toAbsolutePath().normalize();
-        List<V3TileArchiveFiles.TileFile> tiles = V3TileArchiveFiles.listTiles(stagingDirectory, stagingYAxis);
+        List<V3TileArchiveFiles.TileFile> tiles =
+                V3TileArchiveFiles.listTiles(stagingDirectory, stagingYAxis);
         Map<String, String> archiveMetadata = new LinkedHashMap<>();
         if (metadata != null) {
             archiveMetadata.putAll(metadata);
         }
         archiveMetadata.put("bounds", calculateBounds(tiles));
         prepareTarget(archiveFile, overwrite);
-        Path temporaryFile = archiveFile.resolveSibling(archiveFile.getFileName() + ".tmp-" + UUID.randomUUID());
+        Path temporaryFile =
+                archiveFile.resolveSibling(archiveFile.getFileName() + ".tmp-" + UUID.randomUUID());
         try {
             writeArchive(temporaryFile, tiles, batchSize, archiveMetadata);
             moveCompletedArchive(temporaryFile, archiveFile, overwrite);
@@ -80,9 +87,11 @@ public final class MbtilesArchiveUtils {
         if (file == null || !Files.isRegularFile(file)) {
             return false;
         }
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + file.toAbsolutePath())) {
-            try (PreparedStatement statement = connection.prepareStatement(
-                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='tiles'")) {
+        try (Connection connection =
+                DriverManager.getConnection("jdbc:sqlite:" + file.toAbsolutePath())) {
+            try (PreparedStatement statement =
+                    connection.prepareStatement(
+                            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='tiles'")) {
                 return statement.executeQuery().next();
             }
         } catch (SQLException e) {
@@ -91,10 +100,14 @@ public final class MbtilesArchiveUtils {
     }
 
     private static void writeArchive(
-            Path output, List<V3TileArchiveFiles.TileFile> tiles, int batchSize,
-            Map<String, String> metadata) throws Exception {
+            Path output,
+            List<V3TileArchiveFiles.TileFile> tiles,
+            int batchSize,
+            Map<String, String> metadata)
+            throws Exception {
         Class.forName("org.sqlite.JDBC");
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + output.toAbsolutePath())) {
+        try (Connection connection =
+                DriverManager.getConnection("jdbc:sqlite:" + output.toAbsolutePath())) {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("PRAGMA journal_mode=DELETE");
                 statement.execute("PRAGMA synchronous=FULL");
@@ -102,8 +115,9 @@ public final class MbtilesArchiveUtils {
                 statement.execute(CREATE_METADATA_SQL);
             }
             connection.setAutoCommit(false);
-            try (PreparedStatement insert = connection.prepareStatement(
-                    "INSERT INTO tiles (zoom_level,tile_column,tile_row,tile_data) VALUES (?,?,?,?)")) {
+            try (PreparedStatement insert =
+                    connection.prepareStatement(
+                            "INSERT INTO tiles (zoom_level,tile_column,tile_row,tile_data) VALUES (?,?,?,?)")) {
                 int count = 0;
                 for (V3TileArchiveFiles.TileFile tile : tiles) {
                     insert.setInt(1, tile.z);
@@ -130,12 +144,14 @@ public final class MbtilesArchiveUtils {
         }
     }
 
-    private static void writeMetadata(Connection connection, Map<String, String> metadata) throws SQLException {
+    private static void writeMetadata(Connection connection, Map<String, String> metadata)
+            throws SQLException {
         if (metadata == null || metadata.isEmpty()) {
             return;
         }
-        try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT OR REPLACE INTO metadata (name,value) VALUES (?,?)")) {
+        try (PreparedStatement statement =
+                connection.prepareStatement(
+                        "INSERT OR REPLACE INTO metadata (name,value) VALUES (?,?)")) {
             for (Map.Entry<String, String> entry : metadata.entrySet()) {
                 statement.setString(1, entry.getKey());
                 statement.setString(2, entry.getValue());
@@ -155,7 +171,8 @@ public final class MbtilesArchiveUtils {
         }
     }
 
-    private static void moveCompletedArchive(Path temporaryFile, Path targetFile, boolean overwrite) throws IOException {
+    private static void moveCompletedArchive(Path temporaryFile, Path targetFile, boolean overwrite)
+            throws IOException {
         if (overwrite) {
             Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
         } else {
@@ -183,7 +200,8 @@ public final class MbtilesArchiveUtils {
     }
 
     /** 构造标准的 MBTiles 元数据 Map。 */
-    public static Map<String, String> metadata(String name, String edition, int minZoom, int maxZoom, String json) {
+    public static Map<String, String> metadata(
+            String name, String edition, int minZoom, int maxZoom, String json) {
         Map<String, String> metadata = new LinkedHashMap<>();
         metadata.put("name", name);
         metadata.put("format", "pbf");

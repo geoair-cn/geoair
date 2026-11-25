@@ -8,14 +8,11 @@ import cn.geoair.map.dynamic.mvt.tools.model.VecConstant;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json.*;
-import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.VectorTileCommonUtils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
-import com.alibaba.fastjson2.JSON;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import com.alibaba.fastjson2.JSON;
 
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -25,8 +22,11 @@ import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
+
 import scala.Tuple2;
 
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class StatisticUtils {
     public static GiLogger log = GirLoggerFactory.getLogger();
@@ -313,9 +313,7 @@ public class StatisticUtils {
         }
     }
 
-    /**
-     * 构建顶层JSON结构（简化逻辑，减少临时对象）
-     */
+    /** 构建顶层JSON结构（简化逻辑，减少临时对象） */
     private static TileStatRoot buildTileStatRoot(
             String layerId,
             String geometryType,
@@ -337,10 +335,10 @@ public class StatisticUtils {
                     attr.getType() == null
                             ? "String"
                             : attr.getType().equalsIgnoreCase("number")
-                            ? "Number"
-                            : attr.getType().equalsIgnoreCase("boolean")
-                            ? "Boolean"
-                            : "String";
+                                    ? "Number"
+                                    : attr.getType().equalsIgnoreCase("boolean")
+                                            ? "Boolean"
+                                            : "String";
             fields.put(attr.getAttribute(), type);
         }
 
@@ -375,9 +373,7 @@ public class StatisticUtils {
         return root;
     }
 
-    /**
-     * 写入JSON到数据库（带重试机制）
-     */
+    /** 写入JSON到数据库（带重试机制） */
     private static void writeJsonToDB(
             TileStatRoot root,
             String staticTableName,

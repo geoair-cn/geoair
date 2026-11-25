@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.mbtiles;
 
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +35,7 @@ public final class MbtilesAccessCoordinator {
         return acquire(
                 file, MbtilesAccessKind.OPERATION, () -> Thread.currentThread().isInterrupted());
     }
+
     /** 后台只读统计按批等待；不占任务名额，维护可以在两批之间进入。 */
     public static MbtilesAccessLease backgroundRead(Path file) throws IOException {
         MbtilesAccessState state = reserve(file);

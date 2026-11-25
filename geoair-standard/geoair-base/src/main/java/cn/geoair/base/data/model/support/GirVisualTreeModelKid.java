@@ -1,6 +1,7 @@
 package cn.geoair.base.data.model.support;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
+
 import java.io.Serializable;
 
 @SuppressWarnings("serial")

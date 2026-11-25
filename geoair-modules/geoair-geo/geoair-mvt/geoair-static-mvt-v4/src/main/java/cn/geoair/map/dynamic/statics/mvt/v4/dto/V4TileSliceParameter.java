@@ -4,8 +4,10 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MultiLayerTileSlic
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
 import cn.hutool.core.codec.Base32;
 import cn.hutool.core.util.URLUtil;
+
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,11 +17,10 @@ import java.util.List;
 /**
  * V4 任务参数：<b>把 V3 的参数整包装进来</b>，再加上 V4 自己的扩展项。
  *
- * <p>为什么不把 V3 的字段抄一份：抄一份就意味着以后 V3 加字段必须有人记得同步，
- * 漏一个就变成"V4 少了 V3 的能力"。装在里面之后，"V4 完整保留 V3 能力"这件事
- * 由结构本身保证 —— V3 的 DTO 加了什么，V4 立刻就有。</p>
+ * <p>为什么不把 V3 的字段抄一份：抄一份就意味着以后 V3 加字段必须有人记得同步， 漏一个就变成"V4 少了 V3 的能力"。装在里面之后，"V4 完整保留 V3 能力"这件事
+ * 由结构本身保证 —— V3 的 DTO 加了什么，V4 立刻就有。
  *
- * <p>票据编解码沿用 V3 的做法（fastjson2 + Base32），只是外层多包一层 options。</p>
+ * <p>票据编解码沿用 V3 的做法（fastjson2 + Base32），只是外层多包一层 options。
  *
  * @author 张逢吉
  */
@@ -53,14 +54,15 @@ public class V4TileSliceParameter implements Serializable {
 
     /**
      * 编码为可传递的 Base32 票据。
-     * <p>内层复用 V3 自己的 {@link MultiLayerTileSliceParameter#toBase32()}：先按 V3 的
-     * 编码走一遍、再解回 JSON 嵌进外层，这样 V3 那部分参数的字段裁剪规则（剔除空值、
-     * 字段名）与 V3 完全一致，不靠人工对齐。</p>
+     *
+     * <p>内层复用 V3 自己的 {@link MultiLayerTileSliceParameter#toBase32()}：先按 V3 的 编码走一遍、再解回 JSON 嵌进外层，这样
+     * V3 那部分参数的字段裁剪规则（剔除空值、 字段名）与 V3 完全一致，不靠人工对齐。
      */
     public String toBase32() {
         JSONObject wrapper = new JSONObject();
         if (base != null) {
-            wrapper.put("base", JSON.parseObject(URLUtil.decode(Base32.decodeStr(base.toBase32()))));
+            wrapper.put(
+                    "base", JSON.parseObject(URLUtil.decode(Base32.decodeStr(base.toBase32()))));
         }
         wrapper.put("options", JSON.parseObject(JSON.toJSONString(resolveOptions())));
         wrapper.entrySet().removeIf(entry -> entry.getValue() == null);
@@ -75,12 +77,14 @@ public class V4TileSliceParameter implements Serializable {
             V4TileSliceParameter parameter = new V4TileSliceParameter();
             Object baseNode = wrapper.get("base");
             if (baseNode != null) {
-                parameter.base = JSON.parseObject(baseNode.toString(), MultiLayerTileSliceParameter.class);
+                parameter.base =
+                        JSON.parseObject(baseNode.toString(), MultiLayerTileSliceParameter.class);
             }
             Object optionsNode = wrapper.get("options");
-            parameter.options = optionsNode == null
-                    ? new V4Options()
-                    : JSON.parseObject(optionsNode.toString(), V4Options.class);
+            parameter.options =
+                    optionsNode == null
+                            ? new V4Options()
+                            : JSON.parseObject(optionsNode.toString(), V4Options.class);
             return parameter;
         } catch (Exception e) {
             throw new IllegalArgumentException("无法解析 V4TileSliceParameter Base32 参数", e);

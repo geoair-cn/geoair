@@ -1,6 +1,5 @@
 package cn.geoair.sdk;
 
-import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Random;
@@ -42,12 +41,13 @@ final class GirSdkSupport {
     }
 
     static void ignoreSsl() {
-        HostnameVerifier hv = new HostnameVerifier() {
-            public boolean verify(String urlHostName, SSLSession session) {
-                GirSdkUtil.logIgnoreSslWarning(urlHostName, session.getPeerHost());
-                return true;
-            }
-        };
+        HostnameVerifier hv =
+                new HostnameVerifier() {
+                    public boolean verify(String urlHostName, SSLSession session) {
+                        GirSdkUtil.logIgnoreSslWarning(urlHostName, session.getPeerHost());
+                        return true;
+                    }
+                };
         trustAllHttpsCertificates();
         HttpsURLConnection.setDefaultHostnameVerifier(hv);
     }
@@ -60,8 +60,7 @@ final class GirSdkSupport {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, null);
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -81,12 +80,9 @@ final class GirSdkSupport {
         }
 
         public void checkServerTrusted(X509Certificate[] certs, String authType)
-                throws CertificateException {
-        }
+                throws CertificateException {}
 
         public void checkClientTrusted(X509Certificate[] certs, String authType)
-                throws CertificateException {
-        }
-
+                throws CertificateException {}
     }
 }

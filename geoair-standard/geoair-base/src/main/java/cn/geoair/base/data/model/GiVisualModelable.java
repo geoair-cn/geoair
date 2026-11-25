@@ -2,6 +2,7 @@ package cn.geoair.base.data.model;
 
 import cn.geoair.base.data.GiVisuable;
 import cn.geoair.base.data.model.support.GirVisualModelKid;
+
 import java.io.Serializable;
 
 public interface GiVisualModelable<ID extends Serializable> extends GiModelable<ID>, GiVisuable {

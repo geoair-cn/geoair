@@ -10,8 +10,7 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3TileOutputType;
  */
 public final class V3TileStoreFactory {
 
-    private V3TileStoreFactory() {
-    }
+    private V3TileStoreFactory() {}
 
     /** 根据输出配置创建一个独立的存储会话。 */
     public static V3TileStore open(V3TileOutputConfig config) {
@@ -21,12 +20,16 @@ public final class V3TileStoreFactory {
         }
         if (config.getOutputType() == V3TileOutputType.MBTILES
                 || config.getOutputType() == V3TileOutputType.PMTILES) {
-            return new V3LocalTileStore(config.getStagingDirectory(), config.isOverwrite(), config.getMetadataFileName());
+            return new V3LocalTileStore(
+                    config.getStagingDirectory(),
+                    config.isOverwrite(),
+                    config.getMetadataFileName());
         }
         if (config.getOutputType() == V3TileOutputType.S3) {
             return new V3S3TileStore(config);
         }
-        throw new IllegalArgumentException("不支持以 TileStore 方式写入的 V3 输出类型: " + config.getOutputType());
+        throw new IllegalArgumentException(
+                "不支持以 TileStore 方式写入的 V3 输出类型: " + config.getOutputType());
     }
 
     /** 校验目录与 S3 输出所需的参数。 */
@@ -42,14 +45,16 @@ public final class V3TileStoreFactory {
             throw new IllegalArgumentException("V3 本地目录输出必须设置 localDirectory");
         }
         if ((config.getOutputType() == V3TileOutputType.MBTILES
-                || config.getOutputType() == V3TileOutputType.PMTILES)
+                        || config.getOutputType() == V3TileOutputType.PMTILES)
                 && isBlank(config.getStagingDirectory())) {
             throw new IllegalArgumentException("V3 归档输出必须设置 stagingDirectory");
         }
-        if (config.getOutputType() == V3TileOutputType.MBTILES && isBlank(config.getMbtilesFile())) {
+        if (config.getOutputType() == V3TileOutputType.MBTILES
+                && isBlank(config.getMbtilesFile())) {
             throw new IllegalArgumentException("V3 MBTiles 输出必须设置 mbtilesFile");
         }
-        if (config.getOutputType() == V3TileOutputType.PMTILES && isBlank(config.getPmtilesFile())) {
+        if (config.getOutputType() == V3TileOutputType.PMTILES
+                && isBlank(config.getPmtilesFile())) {
             throw new IllegalArgumentException("V3 PMTiles 输出必须设置 pmtilesFile");
         }
         if (config.getArchiveBatchSize() <= 0) {

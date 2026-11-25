@@ -23,7 +23,9 @@ final class TileRenderFlight<V> {
         complete(subscriber);
     }
 
-    synchronized void unsubscribe(CompletableFuture<V> subscriber) { subscribers.remove(subscriber); }
+    synchronized void unsubscribe(CompletableFuture<V> subscriber) {
+        subscribers.remove(subscriber);
+    }
 
     void finish(V result, Throwable failure) {
         List<CompletableFuture<V>> pending;

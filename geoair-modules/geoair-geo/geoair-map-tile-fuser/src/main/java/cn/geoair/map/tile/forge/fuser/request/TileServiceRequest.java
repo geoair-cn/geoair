@@ -8,9 +8,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 从 tile-fuser URI 解析出的瓦片请求。
- */
+/** 从 tile-fuser URI 解析出的瓦片请求。 */
 public final class TileServiceRequest {
 
     private final TileServiceOperation operation;
@@ -22,8 +20,13 @@ public final class TileServiceRequest {
     private final boolean deleteCache;
 
     private TileServiceRequest(
-            TileServiceOperation operation, String layerName, Integer z, Integer x, Integer y,
-            String outputFormat, boolean deleteCache) {
+            TileServiceOperation operation,
+            String layerName,
+            Integer z,
+            Integer x,
+            Integer y,
+            String outputFormat,
+            boolean deleteCache) {
         this.operation = operation;
         this.layerName = layerName;
         this.z = z;

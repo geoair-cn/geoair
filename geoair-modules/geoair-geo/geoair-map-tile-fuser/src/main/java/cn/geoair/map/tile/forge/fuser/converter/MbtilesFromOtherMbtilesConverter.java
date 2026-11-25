@@ -12,7 +12,9 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+
 import com.alibaba.druid.pool.DruidDataSource;
+
 import lombok.Getter;
 
 import java.sql.*;
@@ -26,25 +28,23 @@ import java.util.function.Consumer;
  * @date ：Created in 2026/6/24 17:05
  * @description： MBTiles 层级导入工具，支持从一个 MBTiles 导入指定层级到另一个 MBTiles
  */
-
 public class MbtilesFromOtherMbtilesConverter {
-    private static final GiLogger log = GirLoggerFactory.getLogger(MbtilesFromOtherMbtilesConverter.class);
+    private static final GiLogger log =
+            GirLoggerFactory.getLogger(MbtilesFromOtherMbtilesConverter.class);
 
-    /**
-     * 导入配置
-     */
+    /** 导入配置 */
     @Getter
     public static class ImportConfig {
-        private String sourceMbtiles;           // 源 MBTiles 文件路径
-        private String sourceLayerName;         // 源图层名称（如果为空则使用第一个图层）
-        private String targetMbtiles;           // 目标 MBTiles 文件路径
-        private String targetLayerName;         // 目标图层名称（如果为空则使用源图层名称）
-        private List<Integer> zoomLevels;       // 要导入的层级列表（为空则导入所有层级）
-        private boolean overwrite = false;      // 是否覆盖已存在的瓦片
-        private int batchSize = 1000;           // 批量插入大小
-        private int maxPoolSize = 20;           // 连接池大小
-        private int minIdle = 2;                // 最小空闲连接数
-        private boolean copyMetadata = true;    // 是否复制元数据
+        private String sourceMbtiles; // 源 MBTiles 文件路径
+        private String sourceLayerName; // 源图层名称（如果为空则使用第一个图层）
+        private String targetMbtiles; // 目标 MBTiles 文件路径
+        private String targetLayerName; // 目标图层名称（如果为空则使用源图层名称）
+        private List<Integer> zoomLevels; // 要导入的层级列表（为空则导入所有层级）
+        private boolean overwrite = false; // 是否覆盖已存在的瓦片
+        private int batchSize = 1000; // 批量插入大小
+        private int maxPoolSize = 20; // 连接池大小
+        private int minIdle = 2; // 最小空闲连接数
+        private boolean copyMetadata = true; // 是否复制元数据
 
         public ImportConfig setSourceMbtiles(String sourceMbtiles) {
             this.sourceMbtiles = sourceMbtiles;
@@ -95,12 +95,9 @@ public class MbtilesFromOtherMbtilesConverter {
             this.copyMetadata = copyMetadata;
             return this;
         }
-
     }
 
-    /**
-     * 导入结果
-     */
+    /** 导入结果 */
     @Getter
     public static class ImportResult {
         private String sourceMbtiles;
@@ -114,74 +111,81 @@ public class MbtilesFromOtherMbtilesConverter {
         private long failedTiles;
         private long costTime;
 
-
         @Override
         public String toString() {
-            return String.format("ImportResult{source='%s', target='%s', layers=[%s->%s], " +
-                            "totalTiles=%d, successTiles=%d, skippedTiles=%d, failedTiles=%d, costTime=%dms}",
-                    sourceMbtiles, targetMbtiles, sourceLayerName, targetLayerName,
-                    totalTiles, successTiles, skippedTiles, failedTiles, costTime);
+            return String.format(
+                    "ImportResult{source='%s', target='%s', layers=[%s->%s], "
+                            + "totalTiles=%d, successTiles=%d, skippedTiles=%d, failedTiles=%d, costTime=%dms}",
+                    sourceMbtiles,
+                    targetMbtiles,
+                    sourceLayerName,
+                    targetLayerName,
+                    totalTiles,
+                    successTiles,
+                    skippedTiles,
+                    failedTiles,
+                    costTime);
         }
     }
 
-    /**
-     * 便捷方法：导入单个层级
-     */
-    public static ImportResult importZoomLevel(String sourceMbtiles, String targetMbtiles,
-                                               String layerName, int zoomLevel) {
-        ImportConfig config = new ImportConfig()
-                .setSourceMbtiles(sourceMbtiles)
-                .setTargetMbtiles(targetMbtiles)
-                .setSourceLayerName(layerName)
-                .setTargetLayerName(layerName)
-                .setZoomLevels(ListUtil.of(zoomLevel));
+    /** 便捷方法：导入单个层级 */
+    public static ImportResult importZoomLevel(
+            String sourceMbtiles, String targetMbtiles, String layerName, int zoomLevel) {
+        ImportConfig config =
+                new ImportConfig()
+                        .setSourceMbtiles(sourceMbtiles)
+                        .setTargetMbtiles(targetMbtiles)
+                        .setSourceLayerName(layerName)
+                        .setTargetLayerName(layerName)
+                        .setZoomLevels(ListUtil.of(zoomLevel));
         return importLayers(config);
     }
 
-    /**
-     * 便捷方法：导入多个层级
-     */
-    public static ImportResult importZoomLevels(String sourceMbtiles, String targetMbtiles,
-                                                String layerName, List<Integer> zoomLevels) {
-        ImportConfig config = new ImportConfig()
-                .setSourceMbtiles(sourceMbtiles)
-                .setTargetMbtiles(targetMbtiles)
-                .setSourceLayerName(layerName)
-                .setTargetLayerName(layerName)
-                .setZoomLevels(zoomLevels);
+    /** 便捷方法：导入多个层级 */
+    public static ImportResult importZoomLevels(
+            String sourceMbtiles,
+            String targetMbtiles,
+            String layerName,
+            List<Integer> zoomLevels) {
+        ImportConfig config =
+                new ImportConfig()
+                        .setSourceMbtiles(sourceMbtiles)
+                        .setTargetMbtiles(targetMbtiles)
+                        .setSourceLayerName(layerName)
+                        .setTargetLayerName(layerName)
+                        .setZoomLevels(zoomLevels);
         return importLayers(config);
     }
 
-    /**
-     * 便捷方法：导入所有层级
-     */
-    public static ImportResult importAllZoomLevels(String sourceMbtiles, String targetMbtiles,
-                                                   String layerName) {
-        ImportConfig config = new ImportConfig()
-                .setSourceMbtiles(sourceMbtiles)
-                .setTargetMbtiles(targetMbtiles)
-                .setSourceLayerName(layerName)
-                .setTargetLayerName(layerName);
+    /** 便捷方法：导入所有层级 */
+    public static ImportResult importAllZoomLevels(
+            String sourceMbtiles, String targetMbtiles, String layerName) {
+        ImportConfig config =
+                new ImportConfig()
+                        .setSourceMbtiles(sourceMbtiles)
+                        .setTargetMbtiles(targetMbtiles)
+                        .setSourceLayerName(layerName)
+                        .setTargetLayerName(layerName);
         return importLayers(config);
     }
 
-    /**
-     * 便捷方法：导入并覆盖已存在的瓦片
-     */
-    public static ImportResult importOverwrite(String sourceMbtiles, String targetMbtiles,
-                                               String sourceLayerName, String targetLayerName) {
-        ImportConfig config = new ImportConfig()
-                .setSourceMbtiles(sourceMbtiles)
-                .setTargetMbtiles(targetMbtiles)
-                .setSourceLayerName(sourceLayerName)
-                .setTargetLayerName(targetLayerName)
-                .setOverwrite(true);
+    /** 便捷方法：导入并覆盖已存在的瓦片 */
+    public static ImportResult importOverwrite(
+            String sourceMbtiles,
+            String targetMbtiles,
+            String sourceLayerName,
+            String targetLayerName) {
+        ImportConfig config =
+                new ImportConfig()
+                        .setSourceMbtiles(sourceMbtiles)
+                        .setTargetMbtiles(targetMbtiles)
+                        .setSourceLayerName(sourceLayerName)
+                        .setTargetLayerName(targetLayerName)
+                        .setOverwrite(true);
         return importLayers(config);
     }
 
-    /**
-     * 执行导入
-     */
+    /** 执行导入 */
     public static ImportResult importLayers(ImportConfig config) {
         long startTime = System.currentTimeMillis();
 
@@ -205,20 +209,20 @@ public class MbtilesFromOtherMbtilesConverter {
 
         try {
             // 连接源数据库（只读）
-            sourceDataSource = MbtilesUtils.createDataSource(
-                    config.getSourceMbtiles(),
-                    true,
-                    config.getMaxPoolSize(),
-                    config.getMinIdle()
-            );
+            sourceDataSource =
+                    MbtilesUtils.createDataSource(
+                            config.getSourceMbtiles(),
+                            true,
+                            config.getMaxPoolSize(),
+                            config.getMinIdle());
 
             // 连接目标数据库（读写）
-            targetDataSource = MbtilesUtils.createDataSource(
-                    config.getTargetMbtiles(),
-                    false,
-                    config.getMaxPoolSize(),
-                    config.getMinIdle()
-            );
+            targetDataSource =
+                    MbtilesUtils.createDataSource(
+                            config.getTargetMbtiles(),
+                            false,
+                            config.getMaxPoolSize(),
+                            config.getMinIdle());
 
             // 初始化目标数据库（如果文件不存在则创建）
             if (!MbtilesUtils.initDatabase(targetDataSource)) {
@@ -230,7 +234,8 @@ public class MbtilesFromOtherMbtilesConverter {
             GutilShutdownHook.getInstance().registerTask(targetDataSource::close);
 
             // 获取源图层名称
-            String sourceLayer = MbtilesUtils.getLayerName(sourceDataSource, config.getSourceLayerName());
+            String sourceLayer =
+                    MbtilesUtils.getLayerName(sourceDataSource, config.getSourceLayerName());
             if (sourceLayer == null) {
                 log.error("源图层不存在: {}", config.getSourceLayerName());
                 result.failedTiles = -1;
@@ -262,12 +267,22 @@ public class MbtilesFromOtherMbtilesConverter {
                 return result;
             }
 
-            log.info("开始导入层级: {}, 层级列表: {}, 源图层: {}, 目标图层: {}",
-                    zoomLevels.size(), zoomLevels, sourceLayer, targetLayer);
+            log.info(
+                    "开始导入层级: {}, 层级列表: {}, 源图层: {}, 目标图层: {}",
+                    zoomLevels.size(),
+                    zoomLevels,
+                    sourceLayer,
+                    targetLayer);
 
             // 执行导入
-            ConvertStats stats = importTiles(sourceDataSource, targetDataSource,
-                    sourceLayer, targetLayer, zoomLevels, config);
+            ConvertStats stats =
+                    importTiles(
+                            sourceDataSource,
+                            targetDataSource,
+                            sourceLayer,
+                            targetLayer,
+                            zoomLevels,
+                            config);
 
             // 填充结果
             result.totalTiles = stats.total;
@@ -290,9 +305,7 @@ public class MbtilesFromOtherMbtilesConverter {
         }
     }
 
-    /**
-     * 验证配置
-     */
+    /** 验证配置 */
     private static boolean validateConfig(ImportConfig config) {
         if (config.getSourceMbtiles() == null || config.getSourceMbtiles().isEmpty()) {
             log.error("源 MBTiles 路径不能为空");
@@ -317,16 +330,13 @@ public class MbtilesFromOtherMbtilesConverter {
         return true;
     }
 
-
-    /**
-     * 获取所有层级
-     */
+    /** 获取所有层级 */
     private static List<Integer> getZoomLevels(DruidDataSource dataSource, String layerName) {
         List<Integer> zoomLevels = new ArrayList<>();
         String sql = "SELECT DISTINCT zoom_level FROM tiles ORDER BY zoom_level";
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 zoomLevels.add(rs.getInt(1));
             }
@@ -336,12 +346,12 @@ public class MbtilesFromOtherMbtilesConverter {
         return zoomLevels;
     }
 
-    /**
-     * 复制元数据
-     */
-    private static void copyMetadata(DruidDataSource sourceDataSource,
-                                     DruidDataSource targetDataSource,
-                                     String sourceLayer, String targetLayer) {
+    /** 复制元数据 */
+    private static void copyMetadata(
+            DruidDataSource sourceDataSource,
+            DruidDataSource targetDataSource,
+            String sourceLayer,
+            String targetLayer) {
         // 检查目标图层是否已存在
         if (MbtilesUtils.layerExists(targetDataSource, targetLayer)) {
             log.info("目标图层已存在，跳过元数据复制: {}", targetLayer);
@@ -350,21 +360,25 @@ public class MbtilesFromOtherMbtilesConverter {
 
         String sql = "SELECT name, value FROM metadata WHERE name != 'name'";
         try (Connection sourceConn = sourceDataSource.getConnection();
-             PreparedStatement pstmt = sourceConn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+                PreparedStatement pstmt = sourceConn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
 
             // 先插入图层名称
-            MbtilesUtils.initMetadata(targetDataSource,
-                    "name", targetLayer,
-                    "format", "png",
-                    "version", "1.0",
-                    "type", "overlay"
-            );
+            MbtilesUtils.initMetadata(
+                    targetDataSource,
+                    "name",
+                    targetLayer,
+                    "format",
+                    "png",
+                    "version",
+                    "1.0",
+                    "type",
+                    "overlay");
 
             // 复制其他元数据
             String insertSql = "INSERT OR REPLACE INTO metadata (name, value) VALUES (?, ?)";
             try (Connection targetConn = targetDataSource.getConnection();
-                 PreparedStatement insertStmt = targetConn.prepareStatement(insertSql)) {
+                    PreparedStatement insertStmt = targetConn.prepareStatement(insertSql)) {
                 targetConn.setAutoCommit(false);
 
                 while (rs.next()) {
@@ -388,78 +402,94 @@ public class MbtilesFromOtherMbtilesConverter {
         }
     }
 
-
-    /**
-     * 导入瓦片数据
-     */
-    private static ConvertStats importTiles(DruidDataSource sourceDataSource,
-                                            DruidDataSource targetDataSource,
-                                            String sourceLayer, String targetLayer,
-                                            List<Integer> zoomLevels,
-                                            ImportConfig config) {
+    /** 导入瓦片数据 */
+    private static ConvertStats importTiles(
+            DruidDataSource sourceDataSource,
+            DruidDataSource targetDataSource,
+            String sourceLayer,
+            String targetLayer,
+            List<Integer> zoomLevels,
+            ImportConfig config) {
         ConvertStats stats = new ConvertStats();
         // 构建查询和插入 SQL
-        String selectSql = "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = {} order by tile_column, tile_row,zoom_level  LIMIT {} OFFSET {} ";
+        String selectSql =
+                "SELECT tile_column, tile_row, tile_data FROM tiles WHERE zoom_level = {} order by tile_column, tile_row,zoom_level  LIMIT {} OFFSET {} ";
         try {
             for (int zoom : zoomLevels) {
                 log.info("开始导入层级: z={}", zoom);
                 long tileCountByZoom = MbtilesUtils.getTileCountByZoom(sourceDataSource, zoom);
-                MbtilesInfoBatchPutConsumer batchPutConsumer = new MbtilesInfoBatchPutConsumer(false,
-                        config.isOverwrite(),
-                        config.getBatchSize(),
-                        targetDataSource,
-                        zoom,
-                        tileCountByZoom);
-                GirAdvTools.getPageActuatorOpt(new PageConditionDef<MbtilesInfo>() {
-                    @Override
-                    public Consumer<MbtilesInfo> getEachRecordConsumer() {
-                        return batchPutConsumer;
-                    }
+                MbtilesInfoBatchPutConsumer batchPutConsumer =
+                        new MbtilesInfoBatchPutConsumer(
+                                false,
+                                config.isOverwrite(),
+                                config.getBatchSize(),
+                                targetDataSource,
+                                zoom,
+                                tileCountByZoom);
+                GirAdvTools.getPageActuatorOpt(
+                                new PageConditionDef<MbtilesInfo>() {
+                                    @Override
+                                    public Consumer<MbtilesInfo> getEachRecordConsumer() {
+                                        return batchPutConsumer;
+                                    }
 
-                    @Override
-                    public Long getTotalRecordCount() {
-                        return tileCountByZoom;
-                    }
+                                    @Override
+                                    public Long getTotalRecordCount() {
+                                        return tileCountByZoom;
+                                    }
 
-                    @Override
-                    public void setPageConfig(PageConfig pageConfig) {
-                        pageConfig.setPageSize((long) config.getBatchSize())
-//                                .setParallelConsumeRecordIs(false)
-//                                .setParallelExecPageIs(false)
-                                .setPageNumStartByZero(true);
-                    }
+                                    @Override
+                                    public void setPageConfig(PageConfig pageConfig) {
+                                        pageConfig
+                                                .setPageSize((long) config.getBatchSize())
+                                                //
+                                                // .setParallelConsumeRecordIs(false)
+                                                //
+                                                // .setParallelExecPageIs(false)
+                                                .setPageNumStartByZero(true);
+                                    }
 
-                    @Override
-                    public List<MbtilesInfo> getPageRecords(Integer pageNo, Integer pageSize) {
-                        Connection sourceConn = null;
-                        List<MbtilesInfo> mbtilesInfos = new ArrayList<>();
-                        try {
-                            int offset = pageNo * pageSize;
-                            sourceConn = sourceDataSource.getConnection();
-                            String sql = StrUtil.format(selectSql, zoom, pageSize, offset);
-                            PreparedStatement selectStmt = sourceConn.prepareStatement(sql);
-                            log.info("sql:{}", sql);
-                            try (ResultSet rs = selectStmt.executeQuery()) {
-                                while (rs.next()) {
-                                    int x = rs.getInt(1);
-                                    int y = rs.getInt(2);
-                                    byte[] data = rs.getBytes(3);
-                                    MbtilesInfo mbtilesInfo = MbtilesInfo.of().setZoomLevel(zoom).setTileColumn(x).setTileRow(y).setTileData(data);
-                                    mbtilesInfos.add(mbtilesInfo);
-                                }
-                            }
-                            IoUtil.close(sourceConn);
-                            return mbtilesInfos;
-                        } catch (Exception e) {
-                            log.info(e.getMessage());
-                        } finally {
-                            if (sourceConn != null) {
-                                IoUtil.close(sourceConn);
-                            }
-                        }
-                        return mbtilesInfos;
-                    }
-                }).execute();
+                                    @Override
+                                    public List<MbtilesInfo> getPageRecords(
+                                            Integer pageNo, Integer pageSize) {
+                                        Connection sourceConn = null;
+                                        List<MbtilesInfo> mbtilesInfos = new ArrayList<>();
+                                        try {
+                                            int offset = pageNo * pageSize;
+                                            sourceConn = sourceDataSource.getConnection();
+                                            String sql =
+                                                    StrUtil.format(
+                                                            selectSql, zoom, pageSize, offset);
+                                            PreparedStatement selectStmt =
+                                                    sourceConn.prepareStatement(sql);
+                                            log.info("sql:{}", sql);
+                                            try (ResultSet rs = selectStmt.executeQuery()) {
+                                                while (rs.next()) {
+                                                    int x = rs.getInt(1);
+                                                    int y = rs.getInt(2);
+                                                    byte[] data = rs.getBytes(3);
+                                                    MbtilesInfo mbtilesInfo =
+                                                            MbtilesInfo.of()
+                                                                    .setZoomLevel(zoom)
+                                                                    .setTileColumn(x)
+                                                                    .setTileRow(y)
+                                                                    .setTileData(data);
+                                                    mbtilesInfos.add(mbtilesInfo);
+                                                }
+                                            }
+                                            IoUtil.close(sourceConn);
+                                            return mbtilesInfos;
+                                        } catch (Exception e) {
+                                            log.info(e.getMessage());
+                                        } finally {
+                                            if (sourceConn != null) {
+                                                IoUtil.close(sourceConn);
+                                            }
+                                        }
+                                        return mbtilesInfos;
+                                    }
+                                })
+                        .execute();
                 // 执行剩余的批量插入
                 batchPutConsumer.close();
                 stats.total += batchPutConsumer.getStats().total;
@@ -476,73 +506,74 @@ public class MbtilesFromOtherMbtilesConverter {
         return stats;
     }
 
-
     public static void main(String[] args) {
         // ==================== 1. 最简单的用法 ====================
         // 导入单个层级
-        MbtilesFromOtherMbtilesConverter.ImportResult result1 = MbtilesFromOtherMbtilesConverter.importZoomLevel(
-                "D:/mbtiles/source.mbtiles",      // 源文件
-                "D:/mbtiles/target.mbtiles",      // 目标文件
-                "imagery",                         // 图层名称
-                5                                  // 层级
-        );
+        MbtilesFromOtherMbtilesConverter.ImportResult result1 =
+                MbtilesFromOtherMbtilesConverter.importZoomLevel(
+                        "D:/mbtiles/source.mbtiles", // 源文件
+                        "D:/mbtiles/target.mbtiles", // 目标文件
+                        "imagery", // 图层名称
+                        5 // 层级
+                        );
         System.out.println("导入结果: " + result1);
 
         // ==================== 2. 导入多个层级 ====================
         List<Integer> zoomLevels = Arrays.asList(0, 1, 2, 3, 4, 5);
-        MbtilesFromOtherMbtilesConverter.ImportResult result2 = MbtilesFromOtherMbtilesConverter.importZoomLevels(
-                "D:/mbtiles/source.mbtiles",
-                "D:/mbtiles/target.mbtiles",
-                "imagery",
-                zoomLevels
-        );
+        MbtilesFromOtherMbtilesConverter.ImportResult result2 =
+                MbtilesFromOtherMbtilesConverter.importZoomLevels(
+                        "D:/mbtiles/source.mbtiles",
+                        "D:/mbtiles/target.mbtiles",
+                        "imagery",
+                        zoomLevels);
         System.out.println("导入结果: " + result2);
 
         // ==================== 3. 导入所有层级 ====================
-        MbtilesFromOtherMbtilesConverter.ImportResult result3 = MbtilesFromOtherMbtilesConverter.importAllZoomLevels(
-                "D:/mbtiles/source.mbtiles",
-                "D:/mbtiles/target.mbtiles",
-                "imagery"
-        );
+        MbtilesFromOtherMbtilesConverter.ImportResult result3 =
+                MbtilesFromOtherMbtilesConverter.importAllZoomLevels(
+                        "D:/mbtiles/source.mbtiles", "D:/mbtiles/target.mbtiles", "imagery");
         System.out.println("导入结果: " + result3);
 
         // ==================== 4. 导入并覆盖已有瓦片 ====================
-        MbtilesFromOtherMbtilesConverter.ImportResult result4 = MbtilesFromOtherMbtilesConverter.importOverwrite(
-                "D:/mbtiles/source.mbtiles",
-                "D:/mbtiles/target.mbtiles",
-                "source_layer",      // 源图层名
-                "target_layer"       // 目标图层名（可以不同）
-        );
+        MbtilesFromOtherMbtilesConverter.ImportResult result4 =
+                MbtilesFromOtherMbtilesConverter.importOverwrite(
+                        "D:/mbtiles/source.mbtiles",
+                        "D:/mbtiles/target.mbtiles",
+                        "source_layer", // 源图层名
+                        "target_layer" // 目标图层名（可以不同）
+                        );
         System.out.println("导入结果: " + result4);
 
-
         // ==================== 5. 完整配置（推荐） ====================
-        MbtilesFromOtherMbtilesConverter.ImportConfig config = new MbtilesFromOtherMbtilesConverter.ImportConfig()
-                .setSourceMbtiles("D:/mbtiles/source.mbtiles")
-                .setSourceLayerName("imagery")
-                .setTargetMbtiles("D:/mbtiles/target.mbtiles")
-                .setTargetLayerName("imagery_backup")
-                .setZoomLevels(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8))
-                .setOverwrite(true)                // 覆盖已存在的瓦片
-                .setBatchSize(2000)                // 批量插入大小
-                .setCopyMetadata(true)             // 复制元数据
-                .setMaxPoolSize(20)                // 连接池大小
-                .setMinIdle(2);                    // 最小空闲连接数
+        MbtilesFromOtherMbtilesConverter.ImportConfig config =
+                new MbtilesFromOtherMbtilesConverter.ImportConfig()
+                        .setSourceMbtiles("D:/mbtiles/source.mbtiles")
+                        .setSourceLayerName("imagery")
+                        .setTargetMbtiles("D:/mbtiles/target.mbtiles")
+                        .setTargetLayerName("imagery_backup")
+                        .setZoomLevels(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8))
+                        .setOverwrite(true) // 覆盖已存在的瓦片
+                        .setBatchSize(2000) // 批量插入大小
+                        .setCopyMetadata(true) // 复制元数据
+                        .setMaxPoolSize(20) // 连接池大小
+                        .setMinIdle(2); // 最小空闲连接数
 
-        MbtilesFromOtherMbtilesConverter.ImportResult result5 = MbtilesFromOtherMbtilesConverter.importLayers(config);
+        MbtilesFromOtherMbtilesConverter.ImportResult result5 =
+                MbtilesFromOtherMbtilesConverter.importLayers(config);
         System.out.println("导入结果: " + result5);
 
         // ==================== 6. 同一文件不同图层之间导入 ====================
         // 从同一个 MBTiles 文件的 layer1 导入到 layer2
-        MbtilesFromOtherMbtilesConverter.ImportResult result6 = MbtilesFromOtherMbtilesConverter.importLayers(
-                new MbtilesFromOtherMbtilesConverter.ImportConfig()
-                        .setSourceMbtiles("D:/mbtiles/merged.mbtiles")
-                        .setSourceLayerName("layer1")
-                        .setTargetMbtiles("D:/mbtiles/merged.mbtiles")
-                        .setTargetLayerName("layer2")
-                        .setZoomLevels(Arrays.asList(0, 1, 2, 3))
-                        .setOverwrite(false)        // 不覆盖，跳过已存在的
-        );
+        MbtilesFromOtherMbtilesConverter.ImportResult result6 =
+                MbtilesFromOtherMbtilesConverter.importLayers(
+                        new MbtilesFromOtherMbtilesConverter.ImportConfig()
+                                .setSourceMbtiles("D:/mbtiles/merged.mbtiles")
+                                .setSourceLayerName("layer1")
+                                .setTargetMbtiles("D:/mbtiles/merged.mbtiles")
+                                .setTargetLayerName("layer2")
+                                .setZoomLevels(Arrays.asList(0, 1, 2, 3))
+                                .setOverwrite(false) // 不覆盖，跳过已存在的
+                        );
         System.out.println("导入结果: " + result6);
     }
 }

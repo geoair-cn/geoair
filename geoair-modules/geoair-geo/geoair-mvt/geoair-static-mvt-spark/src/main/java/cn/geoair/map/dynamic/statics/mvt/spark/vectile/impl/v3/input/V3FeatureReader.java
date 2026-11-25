@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.input;
 
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
+
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.SparkSession;
 
@@ -20,5 +21,6 @@ public interface V3FeatureReader {
      * @return 延迟执行的 Spark RDD
      * @throws Exception 输入配置或读取准备失败
      */
-    JavaRDD<GirAdvOneRow> read(SparkSession sparkSession, MvtLayerSliceParameter layer) throws Exception;
+    JavaRDD<GirAdvOneRow> read(SparkSession sparkSession, MvtLayerSliceParameter layer)
+            throws Exception;
 }

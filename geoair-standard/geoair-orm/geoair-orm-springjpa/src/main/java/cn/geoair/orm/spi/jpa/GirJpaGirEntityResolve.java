@@ -1,24 +1,24 @@
-//package cn.geoair.orm.spi.jpa;
+// package cn.geoair.orm.spi.jpa;
 //
-//import cn.geoair.base.Gir;
-//import cn.geoair.base.log.GiLogger;
-//import cn.geoair.base.log.GirLogger;
-//import cn.geoair.orm.spi.GirEntityResolve;
-//import cn.geoair.orm.spi.entity.GirEntityColumn;
-//import cn.geoair.orm.spi.entity.GirEntityField;
-//import cn.geoair.orm.spi.entity.GirEntityTable;
-//import cn.geoair.orm.spi.support.GirFieldHelper;
-//import cn.geoair.orm.spi.support.GirSimpleTypeUtil;
-//import java.util.LinkedHashSet;
-//import java.util.List;
-//import jakarta.persistence.*;
+// import cn.geoair.base.Gir;
+// import cn.geoair.base.log.GiLogger;
+// import cn.geoair.base.log.GirLogger;
+// import cn.geoair.orm.spi.GirEntityResolve;
+// import cn.geoair.orm.spi.entity.GirEntityColumn;
+// import cn.geoair.orm.spi.entity.GirEntityField;
+// import cn.geoair.orm.spi.entity.GirEntityTable;
+// import cn.geoair.orm.spi.support.GirFieldHelper;
+// import cn.geoair.orm.spi.support.GirSimpleTypeUtil;
+// import java.util.LinkedHashSet;
+// import java.util.List;
+// import jakarta.persistence.*;
 //
-///**
+/// **
 // * jpa实体类的解析器
 // *
 // * @author zhangjun
 // */
-//public class GirJpaGirEntityResolve implements GirEntityResolve {
+// public class GirJpaGirEntityResolve implements GirEntityResolve {
 //
 //    private final GiLogger log = GirLogger.getLoger(GirJpaGirEntityResolve.class);
 //
@@ -98,7 +98,8 @@
 //            String entityTableField =
 //                    Gir.beans
 //                            .getBean(EntityManagerProvider.class)
-//                            .getEntityTableField(girEntityTable.getEntityClass(), field.getName());
+//                            .getEntityTableField(girEntityTable.getEntityClass(),
+// field.getName());
 //            girEntityColumn.setColumn(entityTableField);
 //        }
 //        girEntityColumn.setJavaType(field.getJavaType());
@@ -106,7 +107,8 @@
 //            log.warn(
 //                    "警告信息: <["
 //                            + girEntityColumn
-//                            + "]> 使用了基本类型，基本类型在动态 SQL 中由于存在默认值，因此任何时候都不等于 null，建议修改基本类型为对应的包装类型!");
+//                            + "]> 使用了基本类型，基本类型在动态 SQL 中由于存在默认值，因此任何时候都不等于
+// null，建议修改基本类型为对应的包装类型!");
 //        }
 //        // OrderBy
 //        processOrderBy(girEntityTable, field, girEntityColumn);
@@ -125,7 +127,8 @@
 //     * @param girEntityColumn
 //     */
 //    protected void processOrderBy(
-//            GirEntityTable girEntityTable, GirEntityField field, GirEntityColumn girEntityColumn) {
+//            GirEntityTable girEntityTable, GirEntityField field, GirEntityColumn girEntityColumn)
+// {
 //        if (field.isAnnotationPresent(OrderBy.class)) {
 //            OrderBy orderBy = field.getAnnotation(OrderBy.class);
 //            if ("".equals(orderBy.value())) {
@@ -135,4 +138,4 @@
 //            }
 //        }
 //    }
-//}
+// }

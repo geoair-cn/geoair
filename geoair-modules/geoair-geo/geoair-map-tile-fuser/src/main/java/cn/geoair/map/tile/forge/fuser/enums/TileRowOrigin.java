@@ -1,12 +1,13 @@
 package cn.geoair.map.tile.forge.fuser.enums;
 
 import cn.geoair.base.data.GiVisualValuable;
+
 import lombok.Getter;
 
 /**
  * 瓦片行号的原点方向。
  *
- * <p>该枚举只描述 Y 行号的方向，不代表服务协议或坐标参考系；网格由 gridSrid 单独定义。</p>
+ * <p>该枚举只描述 Y 行号的方向，不代表服务协议或坐标参考系；网格由 gridSrid 单独定义。
  */
 @Getter
 public enum TileRowOrigin implements GiVisualValuable<String> {

@@ -1,24 +1,24 @@
-//package cn.geoair.orm.spi.jpa;
+// package cn.geoair.orm.spi.jpa;
 //
-//import cn.geoair.base.Gir;
-//import java.beans.PropertyDescriptor;
-//import java.util.Map;
-//import jakarta.persistence.EntityManager;
-//import jakarta.persistence.EntityManagerFactory;
-//import jakarta.persistence.PersistenceContext;
-//import org.hibernate.metamodel.internal.MetamodelImpl;
-//import org.hibernate.persister.entity.EntityPersister;
-//import org.hibernate.persister.entity.SingleTableEntityPersister;
-//import org.hibernate.persister.walking.spi.AttributeDefinition;
-//import org.springframework.beans.BeanUtils;
-//import org.springframework.stereotype.Component;
+// import cn.geoair.base.Gir;
+// import java.beans.PropertyDescriptor;
+// import java.util.Map;
+// import jakarta.persistence.EntityManager;
+// import jakarta.persistence.EntityManagerFactory;
+// import jakarta.persistence.PersistenceContext;
+// import org.hibernate.metamodel.internal.MetamodelImpl;
+// import org.hibernate.persister.entity.EntityPersister;
+// import org.hibernate.persister.entity.SingleTableEntityPersister;
+// import org.hibernate.persister.walking.spi.AttributeDefinition;
+// import org.springframework.beans.BeanUtils;
+// import org.springframework.stereotype.Component;
 //
-///**
+/// **
 // * @author ：张俊
 // * @date ：Created in 2022/7/1 14:05 @description： EntityManager提供者
 // */
-//@Component
-//public class EntityManagerProvider {
+// @Component
+// public class EntityManagerProvider {
 //
 //    @PersistenceContext EntityManager entityManager;
 //
@@ -40,7 +40,8 @@
 //            Gir.log.info("类名：" + entityName + " => 表名：" + tableName);
 //            for (AttributeDefinition attr : attributes) {
 //                String propertyName = attr.getName(); // 在entity中的属性名称
-//                String[] columnName = persister.getPropertyColumnNames(propertyName); // 对应数据库表中的字段名
+//                String[] columnName = persister.getPropertyColumnNames(propertyName); //
+// 对应数据库表中的字段名
 //                String type = "";
 //                // attr.getSource().
 //                PropertyDescriptor targetPd =
@@ -70,4 +71,4 @@
 //        String[] columnName = entityPersister.getPropertyColumnNames(propertyName);
 //        return columnName[0];
 //    }
-//}
+// }

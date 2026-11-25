@@ -3,7 +3,6 @@ package cn.geoair.map.dynamic.adv.query.utils;
 import cn.geoair.base.lang.caller.GkCallerUtil;
 import cn.geoair.base.log.*;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.comp.dynamic.ds.IDataSourceGetter;
 import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 
@@ -14,13 +13,10 @@ import java.util.List;
  * @date 2026/4/24
  * @description SQL 日志（智能换行，不截断单词 + 动态长度分割线）
  */
-
 public class AdvLogSql extends GirLogWrapper {
-
 
     // 全局开关
     public static boolean logEnable = true;
-
 
     // 一行最大长度
     public static final int MAX_LINE_LENGTH = 180;
@@ -29,7 +25,6 @@ public class AdvLogSql extends GirLogWrapper {
     private static final String SPLIT_LINE;
 
     static {
-
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < MAX_LINE_LENGTH; i++) {
             sb.append("=");
@@ -37,7 +32,8 @@ public class AdvLogSql extends GirLogWrapper {
         SPLIT_LINE = sb.toString();
     }
 
-    protected void recordLog(GemLogLevel level, String message, LoggerInfo loggerInfo, Object... arguments) {
+    protected void recordLog(
+            GemLogLevel level, String message, LoggerInfo loggerInfo, Object... arguments) {
         Class<?> caller = GkCallerUtil.getCaller(3);
         if (!getEnableByClassName(caller)) {
             return;
@@ -45,8 +41,12 @@ public class AdvLogSql extends GirLogWrapper {
         super.recordLog(level, message, loggerInfo, arguments);
     }
 
-
-    protected void recordLogWithThrowable(GemLogLevel level, String message, Throwable t, LoggerInfo loggerInfo, Object... arguments) {
+    protected void recordLogWithThrowable(
+            GemLogLevel level,
+            String message,
+            Throwable t,
+            LoggerInfo loggerInfo,
+            Object... arguments) {
         Class<?> caller = GkCallerUtil.getCaller(3);
         if (!getEnableByClassName(caller)) {
             return;
@@ -67,11 +67,10 @@ public class AdvLogSql extends GirLogWrapper {
 
     private final AdvQueryGlobalConfig advQueryGlobalConfig;
 
-
-    public static AdvLogSql of(IDsDataSourceOpt dsDataSourceOpt, AdvQueryGlobalConfig advQueryGlobalConfig) {
+    public static AdvLogSql of(
+            IDsDataSourceOpt dsDataSourceOpt, AdvQueryGlobalConfig advQueryGlobalConfig) {
         return new AdvLogSql(dsDataSourceOpt, advQueryGlobalConfig);
     }
-
 
     private AdvLogSql(IDsDataSourceOpt dsDataSourceOpt, AdvQueryGlobalConfig advQueryGlobalConfig) {
         this.dsDataSourceOpt = dsDataSourceOpt;
@@ -87,7 +86,8 @@ public class AdvLogSql extends GirLogWrapper {
         String[] tokens = sql.split("(?<=\\s|,|\\()|(?=\\s|,|\\))");
 
         for (String token : tokens) {
-            if (currentLine.length() + token.length() > MAX_LINE_LENGTH && currentLine.length() > 0) {
+            if (currentLine.length() + token.length() > MAX_LINE_LENGTH
+                    && currentLine.length() > 0) {
                 result.append(currentLine).append("\n");
                 currentLine = new StringBuilder();
             }
@@ -102,59 +102,164 @@ public class AdvLogSql extends GirLogWrapper {
     }
 
     // ===================== 带Class =====================
-    public void logExecuteSql(Class callerClass, String methodName, String sql, long lastTaskTimeMillis) {
+    public void logExecuteSql(
+            Class callerClass, String methodName, String sql, long lastTaskTimeMillis) {
         if (!logEnable) return;
         if (!getEnableByClassName(callerClass)) {
             return;
         }
-        super.getTargetLoggerInfo(callerClass.getName()).getLogger().info("\n" + GRAY + SPLIT_LINE + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n" + GRAY + SPLIT_LINE + RESET,
-                getDatabaseName(), getSchemaName(), lastTaskTimeMillis,
-                callerClass.getSimpleName(), methodName, wrapSql(sql));
+        super.getTargetLoggerInfo(callerClass.getName())
+                .getLogger()
+                .info(
+                        "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET
+                                + "\n数据库 ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | Schema ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | 耗时："
+                                + YELLOW
+                                + "{}ms"
+                                + RESET
+                                + "\n执行方法：{}.{}"
+                                + "\nSQL 语句："
+                                + "\n"
+                                + BOLD
+                                + "{}"
+                                + RESET
+                                + "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET,
+                        getDatabaseName(),
+                        getSchemaName(),
+                        lastTaskTimeMillis,
+                        callerClass.getSimpleName(),
+                        methodName,
+                        wrapSql(sql));
     }
 
     // ===================== 带Class + 影响行数 =====================
-    public void logExecuteSql(Class callerClass, String methodName, String sql, long lastTaskTimeMillis, Number rows) {
+    public void logExecuteSql(
+            Class callerClass,
+            String methodName,
+            String sql,
+            long lastTaskTimeMillis,
+            Number rows) {
         if (!logEnable) return;
         if (!getEnableByClassName(callerClass)) {
             return;
         }
         try {
-            super.getTargetLoggerInfo(callerClass.getName()).getLogger().info("\n" + GRAY + SPLIT_LINE + RESET
-                            + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
-                            + "\n执行方法：{}.{}"
-                            + "\nSQL 语句："
-                            + "\n" + BOLD + "{}" + RESET
-                            + "\n" + GRAY + SPLIT_LINE + RESET,
-                    getDatabaseName(), getSchemaName(), lastTaskTimeMillis, rows,
-                    callerClass.getSimpleName(), methodName, wrapSql(sql));
+            super.getTargetLoggerInfo(callerClass.getName())
+                    .getLogger()
+                    .info(
+                            "\n"
+                                    + GRAY
+                                    + SPLIT_LINE
+                                    + RESET
+                                    + "\n数据库 ："
+                                    + CYAN
+                                    + "{}"
+                                    + RESET
+                                    + " | Schema ："
+                                    + CYAN
+                                    + "{}"
+                                    + RESET
+                                    + " | 耗时："
+                                    + YELLOW
+                                    + "{}ms"
+                                    + RESET
+                                    + " | 影响行数："
+                                    + BLUE
+                                    + "{}"
+                                    + RESET
+                                    + "\n执行方法：{}.{}"
+                                    + "\nSQL 语句："
+                                    + "\n"
+                                    + BOLD
+                                    + "{}"
+                                    + RESET
+                                    + "\n"
+                                    + GRAY
+                                    + SPLIT_LINE
+                                    + RESET,
+                            getDatabaseName(),
+                            getSchemaName(),
+                            lastTaskTimeMillis,
+                            rows,
+                            callerClass.getSimpleName(),
+                            methodName,
+                            wrapSql(sql));
         } catch (Exception e) {
 
         }
-
     }
 
     // ===================== 带Class + 参数 + 影响行数 =====================
-    public void logExecuteSql(Class callerClass, String methodName, String sql, List<Object> params, long lastTaskTimeMillis, Number rows) {
+    public void logExecuteSql(
+            Class callerClass,
+            String methodName,
+            String sql,
+            List<Object> params,
+            long lastTaskTimeMillis,
+            Number rows) {
         if (!logEnable) return;
         if (!getEnableByClassName(callerClass)) {
             return;
         }
-        super.getTargetLoggerInfo(callerClass.getName()).getLogger().info("\n" + GRAY + SPLIT_LINE + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET + " | 影响行数：" + BLUE + "{}" + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n参数列表：" + GREEN + "{}" + RESET
-                        + "\n" + GRAY + SPLIT_LINE + RESET,
-                getDatabaseName(), getSchemaName(), lastTaskTimeMillis, rows,
-                callerClass.getSimpleName(), methodName, wrapSql(sql), params);
+        super.getTargetLoggerInfo(callerClass.getName())
+                .getLogger()
+                .info(
+                        "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET
+                                + "\n数据库 ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | Schema ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | 耗时："
+                                + YELLOW
+                                + "{}ms"
+                                + RESET
+                                + " | 影响行数："
+                                + BLUE
+                                + "{}"
+                                + RESET
+                                + "\n执行方法：{}.{}"
+                                + "\nSQL 语句："
+                                + "\n"
+                                + BOLD
+                                + "{}"
+                                + RESET
+                                + "\n参数列表："
+                                + GREEN
+                                + "{}"
+                                + RESET
+                                + "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET,
+                        getDatabaseName(),
+                        getSchemaName(),
+                        lastTaskTimeMillis,
+                        rows,
+                        callerClass.getSimpleName(),
+                        methodName,
+                        wrapSql(sql),
+                        params);
     }
-
 
     public void logExecuteError(Class callerClass, String methodName, String sql, Exception e) {
         if (!logEnable) return;
@@ -162,128 +267,281 @@ public class AdvLogSql extends GirLogWrapper {
             return;
         }
         try {
-            super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
-                            + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET
-                            + "\n执行方法：{}.{}"
-                            + "\n【SQL 执行异常】"
-                            + "\nSQL 语句："
-                            + "\n" + BOLD + "{}" + RESET
-                            + "\n异常信息：" + YELLOW + "{}" + RESET
-                            + "\n" + GRAY + SPLIT_LINE + RESET,
-                    getDatabaseName(), getSchemaName(),
-                    callerClass.getSimpleName(), methodName,
-                    wrapSql(sql),
-                    e.getMessage());
+            super.getTargetLoggerInfo(callerClass.getName())
+                    .getLogger()
+                    .error(
+                            "\n"
+                                    + GRAY
+                                    + SPLIT_LINE
+                                    + RESET
+                                    + "\n数据库 ："
+                                    + CYAN
+                                    + "{}"
+                                    + RESET
+                                    + " | Schema ："
+                                    + CYAN
+                                    + "{}"
+                                    + RESET
+                                    + "\n执行方法：{}.{}"
+                                    + "\n【SQL 执行异常】"
+                                    + "\nSQL 语句："
+                                    + "\n"
+                                    + BOLD
+                                    + "{}"
+                                    + RESET
+                                    + "\n异常信息："
+                                    + YELLOW
+                                    + "{}"
+                                    + RESET
+                                    + "\n"
+                                    + GRAY
+                                    + SPLIT_LINE
+                                    + RESET,
+                            getDatabaseName(),
+                            getSchemaName(),
+                            callerClass.getSimpleName(),
+                            methodName,
+                            wrapSql(sql),
+                            e.getMessage());
         } catch (Exception e2) {
         }
-
     }
 
     // ===================== 异常日志：带耗时 =====================
-    public void logExecuteError(Class callerClass, String methodName, String sql, long lastTaskTimeMillis, Exception e) {
+    public void logExecuteError(
+            Class callerClass,
+            String methodName,
+            String sql,
+            long lastTaskTimeMillis,
+            Exception e) {
         if (!logEnable) return;
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\n【SQL 执行异常】"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n异常信息：" + YELLOW + "{}" + RESET
-                        + "\n" + GRAY + SPLIT_LINE + RESET,
-                getDatabaseName(), getSchemaName(), lastTaskTimeMillis,
-                callerClass.getSimpleName(), methodName,
-                wrapSql(sql),
-                e.getMessage());
+        super.getTargetLoggerInfo(callerClass.getName())
+                .getLogger()
+                .error(
+                        "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET
+                                + "\n数据库 ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | Schema ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | 耗时："
+                                + YELLOW
+                                + "{}ms"
+                                + RESET
+                                + "\n执行方法：{}.{}"
+                                + "\n【SQL 执行异常】"
+                                + "\nSQL 语句："
+                                + "\n"
+                                + BOLD
+                                + "{}"
+                                + RESET
+                                + "\n异常信息："
+                                + YELLOW
+                                + "{}"
+                                + RESET
+                                + "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET,
+                        getDatabaseName(),
+                        getSchemaName(),
+                        lastTaskTimeMillis,
+                        callerClass.getSimpleName(),
+                        methodName,
+                        wrapSql(sql),
+                        e.getMessage());
     }
 
     // ===================== 异常日志：带参数 + 耗时 =====================
-    public void logExecuteErrorSimple(Class callerClass, String methodName, String sql, List<Object> params, Exception e) {
+    public void logExecuteErrorSimple(
+            Class callerClass, String methodName, String sql, List<Object> params, Exception e) {
         if (!logEnable) return;
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\n【SQL 执行异常】"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n参数列表：" + GREEN + "{}" + RESET
-                        + "\n异常信息：" + YELLOW + "{}" + RESET
-                        + "\n" + GRAY + SPLIT_LINE + RESET,
-                getDatabaseName(), getSchemaName(),
-                callerClass.getSimpleName(), methodName,
-                wrapSql(sql),
-                params,
-                e.getMessage());
+        super.getTargetLoggerInfo(callerClass.getName())
+                .getLogger()
+                .error(
+                        "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET
+                                + "\n数据库 ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | Schema ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + RESET
+                                + "\n执行方法：{}.{}"
+                                + "\n【SQL 执行异常】"
+                                + "\nSQL 语句："
+                                + "\n"
+                                + BOLD
+                                + "{}"
+                                + RESET
+                                + "\n参数列表："
+                                + GREEN
+                                + "{}"
+                                + RESET
+                                + "\n异常信息："
+                                + YELLOW
+                                + "{}"
+                                + RESET
+                                + "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET,
+                        getDatabaseName(),
+                        getSchemaName(),
+                        callerClass.getSimpleName(),
+                        methodName,
+                        wrapSql(sql),
+                        params,
+                        e.getMessage());
     }
 
     // ===================== 异常日志  =====================
-    public void logExecuteErrorWithStack(Class callerClass, String methodName, String sql, List<Object> params, String lastTaskTimeMillis, Exception e) {
+    public void logExecuteErrorWithStack(
+            Class callerClass,
+            String methodName,
+            String sql,
+            List<Object> params,
+            String lastTaskTimeMillis,
+            Exception e) {
         if (!logEnable) return;
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
         try {
-            super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
-                            + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
-                            + "\n执行方法：{}.{}"
-                            + "\n【SQL 执行异常 - 堆栈】"
-                            + "\nSQL 语句："
-                            + "\n" + BOLD + "{}" + RESET
-                            + "\n参数列表：" + GREEN + "{}" + RESET
-                            + "\n异常堆栈：",
-                    getDatabaseName(), getSchemaName(), lastTaskTimeMillis,
-                    callerClass.getSimpleName(), methodName,
-                    wrapSql(sql),
-                    params,
-                    e);
+            super.getTargetLoggerInfo(callerClass.getName())
+                    .getLogger()
+                    .error(
+                            "\n"
+                                    + GRAY
+                                    + SPLIT_LINE
+                                    + RESET
+                                    + "\n数据库 ："
+                                    + CYAN
+                                    + "{}"
+                                    + RESET
+                                    + " | Schema ："
+                                    + CYAN
+                                    + "{}"
+                                    + RESET
+                                    + " | 耗时："
+                                    + YELLOW
+                                    + "{}ms"
+                                    + RESET
+                                    + "\n执行方法：{}.{}"
+                                    + "\n【SQL 执行异常 - 堆栈】"
+                                    + "\nSQL 语句："
+                                    + "\n"
+                                    + BOLD
+                                    + "{}"
+                                    + RESET
+                                    + "\n参数列表："
+                                    + GREEN
+                                    + "{}"
+                                    + RESET
+                                    + "\n异常堆栈：",
+                            getDatabaseName(),
+                            getSchemaName(),
+                            lastTaskTimeMillis,
+                            callerClass.getSimpleName(),
+                            methodName,
+                            wrapSql(sql),
+                            params,
+                            e);
         } catch (Exception ex) {
 
         }
-
     }
 
-    public void logExecuteErrorWithStack(Class callerClass, String methodName, String sql, List<Object> params, Exception e) {
+    public void logExecuteErrorWithStack(
+            Class callerClass, String methodName, String sql, List<Object> params, Exception e) {
         logExecuteErrorWithStack(callerClass, methodName, sql, params, "不统计", e);
     }
 
-
-    public void logExecuteError(Class<?> callerClass, String methodName, String sql, List<Object> params, String lastTaskTimeMillis, Exception e) {
+    public void logExecuteError(
+            Class<?> callerClass,
+            String methodName,
+            String sql,
+            List<Object> params,
+            String lastTaskTimeMillis,
+            Exception e) {
         if (!logEnable) return;
         if (!getEnableErrorLog(callerClass)) {
             return;
         }
-        super.getTargetLoggerInfo(callerClass.getName()).getLogger().error("\n" + GRAY + SPLIT_LINE + RESET
-                        + "\n数据库 ：" + CYAN + "{}" + RESET + " | Schema ：" + CYAN + "{}" + RESET + " | 耗时：" + YELLOW + "{}ms" + RESET
-                        + "\n执行方法：{}.{}"
-                        + "\n【SQL 执行异常】"
-                        + "\nSQL 语句："
-                        + "\n" + BOLD + "{}" + RESET
-                        + "\n拼接后可直接执行SQL："
-                        + "\n" + GREEN + "{}" + RESET
-                        + "\n参数列表：{}"
-                        + "\n异常信息：" + YELLOW + "{}" + RESET
-                        + "\n" + GRAY + SPLIT_LINE + RESET,
-                getDatabaseName(), getSchemaName(), lastTaskTimeMillis,
-                callerClass.getSimpleName(), methodName,
-                wrapSql(sql),
-                splicingSql(wrapSql(sql), params), // 自动拼接
-                params,
-                e.getMessage()
-        );
+        super.getTargetLoggerInfo(callerClass.getName())
+                .getLogger()
+                .error(
+                        "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET
+                                + "\n数据库 ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | Schema ："
+                                + CYAN
+                                + "{}"
+                                + RESET
+                                + " | 耗时："
+                                + YELLOW
+                                + "{}ms"
+                                + RESET
+                                + "\n执行方法：{}.{}"
+                                + "\n【SQL 执行异常】"
+                                + "\nSQL 语句："
+                                + "\n"
+                                + BOLD
+                                + "{}"
+                                + RESET
+                                + "\n拼接后可直接执行SQL："
+                                + "\n"
+                                + GREEN
+                                + "{}"
+                                + RESET
+                                + "\n参数列表：{}"
+                                + "\n异常信息："
+                                + YELLOW
+                                + "{}"
+                                + RESET
+                                + "\n"
+                                + GRAY
+                                + SPLIT_LINE
+                                + RESET,
+                        getDatabaseName(),
+                        getSchemaName(),
+                        lastTaskTimeMillis,
+                        callerClass.getSimpleName(),
+                        methodName,
+                        wrapSql(sql),
+                        splicingSql(wrapSql(sql), params), // 自动拼接
+                        params,
+                        e.getMessage());
     }
 
-    public void logExecuteError(Class<?> callerClass, String methodName, String sql, List<Object> params, Exception e) {
+    public void logExecuteError(
+            Class<?> callerClass, String methodName, String sql, List<Object> params, Exception e) {
         logExecuteError(callerClass, methodName, sql, params, "不统计", e);
     }
 
-    /**
-     * 把 ? 参数和 params 列表拼接成真实可执行 SQL（简单版）
-     */
+    /** 把 ? 参数和 params 列表拼接成真实可执行 SQL（简单版） */
     private String splicingSql(String sql, List<Object> params) {
         if (sql == null || params == null || params.isEmpty()) {
             return sql;
@@ -312,7 +570,6 @@ public class AdvLogSql extends GirLogWrapper {
             return "参数拼接失败：" + e.getMessage();
         }
     }
-
 
     // ===================== 工具方法 =====================
     protected String getSchemaName() {

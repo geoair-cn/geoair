@@ -1,6 +1,7 @@
 package cn.geoair.base.lang;
 
 import cn.geoair.base.util.GutilType;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;

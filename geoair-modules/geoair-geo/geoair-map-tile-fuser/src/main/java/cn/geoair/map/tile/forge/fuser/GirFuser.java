@@ -17,6 +17,4 @@ public class GirFuser {
     public static PxyLayerInfo getPxyLayerInfo(String layerName) {
         return GirFuserLayerTileHelper.getInstance().getPxyLayerInfo(layerName);
     }
-
-
 }

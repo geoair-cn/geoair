@@ -19,6 +19,7 @@ import cn.geoair.map.dynamic.tools.page.PageActuator;
 import cn.geoair.map.dynamic.tools.page.PageConditionDef;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
+
 import lombok.Getter;
 
 import java.util.Collections;
@@ -28,10 +29,9 @@ import java.util.Map;
 /**
  * 地理空间工具的配置化入口。
  *
- * <p>一个 {@link ToolsConfig} 对象对应一个入口实例及其格式转换、SRID 转换等共享组件。
- * {@link #getInstance(ToolsConfig)} 按配置对象的<strong>引用身份</strong>缓存，而不是按配置字段值比较；
- * 因此需要复用缓存时，应复用同一个 {@code ToolsConfig} 实例。未传配置时使用
- * {@link #defaultInstance()} 的默认配置。</p>
+ * <p>一个 {@link ToolsConfig} 对象对应一个入口实例及其格式转换、SRID 转换等共享组件。 {@link #getInstance(ToolsConfig)}
+ * 按配置对象的<strong>引用身份</strong>缓存，而不是按配置字段值比较； 因此需要复用缓存时，应复用同一个 {@code ToolsConfig} 实例。未传配置时使用 {@link
+ * #defaultInstance()} 的默认配置。
  *
  * @author 张逢吉
  */
@@ -50,7 +50,6 @@ public class GirGeoTools implements GirGeoToolsInterface {
     private final GirGeoFormatOpt formatOpt;
     private final GirGeoMeasureOpt measureOpt;
     private final GirSridConvertOpt sridOpt;
-
 
     /**
      * 使用指定配置创建工具入口。
@@ -114,7 +113,6 @@ public class GirGeoTools implements GirGeoToolsInterface {
         return defaultInstance();
     }
 
-
     @Override
     public GirGeom2ArrayOpt getGeom2ArrayOpt() {
         return GirGeom2ArrayUtils.getInstance(advToolsConfig);
@@ -133,12 +131,10 @@ public class GirGeoTools implements GirGeoToolsInterface {
     /**
      * 取 EPSG:4326 经纬度瓦片网格。
      *
-     * <p>返回标准网格：{@code 2^z} 列 × {@code 2^(z-1)} 行，纬度覆盖 {@code ±90°}，
-     * 与 WMTS 的 EPSG:4326 矩阵集一致。</p>
+     * <p>返回标准网格：{@code 2^z} 列 × {@code 2^(z-1)} 行，纬度覆盖 {@code ±90°}， 与 WMTS 的 EPSG:4326 矩阵集一致。
      *
-     * <p>该方法历史上返回的是 {@code Wgs84EqualAxisTileUtils}（把纬度裁剪到 Web Mercator
-     * 有效纬度 ±85.0511287798，且反算范围时会产出不存在的行号）。该实现已废弃并改为继承
-     * {@link Wgs84SeparateAxisTileUtils}，两条入口现在指向同一套网格。</p>
+     * <p>该方法历史上返回的是 {@code Wgs84EqualAxisTileUtils}（把纬度裁剪到 Web Mercator 有效纬度
+     * ±85.0511287798，且反算范围时会产出不存在的行号）。该实现已废弃并改为继承 {@link Wgs84SeparateAxisTileUtils}，两条入口现在指向同一套网格。
      */
     @Override
     public GirTileConverterOpt getTileGrid4326Opt() {
@@ -148,8 +144,8 @@ public class GirGeoTools implements GirGeoToolsInterface {
     /**
      * 取 EPSG:4326 经纬度瓦片网格（非等轴入口，与 {@link #getTileGrid4326Opt()} 等价）。
      *
-     * <p>该入口原先用于区分非等轴网格，合并后与 {@link #getTileGrid4326Opt()} 返回同一套
-     * 网格。既有调用点只用到其中的 XYZ/TMS 行号换算，行数与纬度覆盖无关，行为不变。</p>
+     * <p>该入口原先用于区分非等轴网格，合并后与 {@link #getTileGrid4326Opt()} 返回同一套 网格。既有调用点只用到其中的 XYZ/TMS
+     * 行号换算，行数与纬度覆盖无关，行为不变。
      */
     @Override
     public GirTileConverterOpt getTileGrid4326SeparateOpt() {

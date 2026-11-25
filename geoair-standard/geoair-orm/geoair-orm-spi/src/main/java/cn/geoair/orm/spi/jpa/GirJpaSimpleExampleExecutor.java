@@ -1,31 +1,31 @@
-//package cn.geoair.orm.spi.jpa;
+// package cn.geoair.orm.spi.jpa;
 //
-//import java.util.List;
+// import java.util.List;
 //
-//import jakarta.annotation.Resource;
-//import jakarta.persistence.EntityManager;
-//import jakarta.persistence.Query;
+// import jakarta.annotation.Resource;
+// import jakarta.persistence.EntityManager;
+// import jakarta.persistence.Query;
 //
-//import org.hibernate.SQLQuery;
-//import org.hibernate.transform.Transformers;
-//import org.springframework.stereotype.Component;
-//import org.springframework.transaction.annotation.Transactional;
+// import org.hibernate.SQLQuery;
+// import org.hibernate.transform.Transformers;
+// import org.springframework.stereotype.Component;
+// import org.springframework.transaction.annotation.Transactional;
 //
-//import cn.geoair.base.data.page.GiPageParam;
-//import cn.geoair.base.data.page.GiPager;
-//import cn.geoair.base.data.page.support.GirPager;
-//import cn.geoair.base.data.tuples.GkPair;
-//import cn.geoair.base.json.GirJSON;
-//import cn.geoair.base.log.GiLogger;
-//import cn.geoair.base.log.GirLogger;
-//import cn.geoair.orm.spi.GirExampleExecutor;
+// import cn.geoair.base.data.page.GiPageParam;
+// import cn.geoair.base.data.page.GiPager;
+// import cn.geoair.base.data.page.support.GirPager;
+// import cn.geoair.base.data.tuples.GkPair;
+// import cn.geoair.base.json.GirJSON;
+// import cn.geoair.base.log.GiLogger;
+// import cn.geoair.base.log.GirLogger;
+// import cn.geoair.orm.spi.GirExampleExecutor;
 //// import javafx.util.GkPair;
-//import cn.geoair.orm.spi.support.GirExample;
-//import cn.geoair.orm.spi.support.GirSimpleExampleParser;
+// import cn.geoair.orm.spi.support.GirExample;
+// import cn.geoair.orm.spi.support.GirSimpleExampleParser;
 //
-///** 简单的 jpa Example 查询条件器的 执行器 */
-//@Component
-//public class GirJpaSimpleExampleExecutor implements GirExampleExecutor {
+/// ** 简单的 jpa Example 查询条件器的 执行器 */
+// @Component
+// public class GirJpaSimpleExampleExecutor implements GirExampleExecutor {
 //
 //	private final GiLogger log = GirLogger.getLoger(GirJpaSimpleExampleExecutor.class);
 //
@@ -141,7 +141,8 @@
 //	@Override
 //	@Transactional
 //	public Integer updateByExampleSelective(Object updateEntity, GirExample girExample) {
-//		GkPair<String, List<Object>> pair = girSimpleExampleParser.updateByExampleSelective(updateEntity, girExample);
+//		GkPair<String, List<Object>> pair =
+// girSimpleExampleParser.updateByExampleSelective(updateEntity, girExample);
 //		String key = pair.getValue0();
 //		log.info(" updateByExampleSelective sql语句:{}", pair.getValue0());
 //		log.info("执行参数:{}", GirJSON.toJson(pair.getValue1()).toJSONString());
@@ -156,7 +157,8 @@
 //	@Override
 //	@Transactional
 //	public Integer updateByExample(Object updateEntity, GirExample girExample) {
-//		GkPair<String, List<Object>> pair = girSimpleExampleParser.updateByExample(updateEntity, girExample);
+//		GkPair<String, List<Object>> pair = girSimpleExampleParser.updateByExample(updateEntity,
+// girExample);
 //		String key = pair.getValue0();
 //		log.info(" updateByExample sql语句:{}", pair.getValue0());
 //		log.info("执行参数:{}", GirJSON.toJson(pair.getValue1()).toJSONString());
@@ -168,4 +170,4 @@
 //		return nativeQuery.executeUpdate();
 //	}
 //
-//}
+// }

@@ -22,11 +22,11 @@ public class SqliteAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     private final AdvTypeHandlerRegistry typeHandlerRegistry;
 
     public SqliteAdvBaseOpt(
-            IDataSourceGetter dataSourceGetter,
-            Supplier<AdvQueryGlobalConfig> configGetter) {
+            IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configGetter) {
         super(dataSourceGetter, configGetter);
-        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
-                DialectName.SQLITE3, configGetter.get().getTypeHandlers());
+        this.typeHandlerRegistry =
+                AdvTypeHandlerRegistry.create(
+                        DialectName.SQLITE3, configGetter.get().getTypeHandlers());
     }
 
     @Override

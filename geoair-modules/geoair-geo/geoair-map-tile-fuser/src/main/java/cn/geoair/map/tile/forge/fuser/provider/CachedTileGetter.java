@@ -1,39 +1,35 @@
 package cn.geoair.map.tile.forge.fuser.provider;
 
-import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
-
-import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.tile.forge.core.bygwc.core.mime.*;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
+import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.CustomTileCacheHelper;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
-import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.*;
-import cn.geoair.web.mime.GiMimeType;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
+
 import lombok.Getter;
 
 /**
- * 带缓存功能的瓦片获取器代理类
- * 通过代理模式为真实的瓦片获取器添加缓存功能
+ * 带缓存功能的瓦片获取器代理类 通过代理模式为真实的瓦片获取器添加缓存功能
  *
  * @author 张俊
  * @date Created in 2026/6/15
  */
-
 public class CachedTileGetter implements LayerTileGetter {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     private final LayerTileGetter target;
-    @Getter
-    private final TileCache tileCache;
+    @Getter private final TileCache tileCache;
     private final String layerCachePreFix;
     private final boolean cacheEnabled;
 
     /**
      * 构造函数
      *
-     * @param target           真实的瓦片获取器
+     * @param target 真实的瓦片获取器
      * @param layerCachePreFix 图层名称（用于缓存key）
      */
     public CachedTileGetter(LayerTileGetter target, String layerCachePreFix) {
@@ -43,14 +39,17 @@ public class CachedTileGetter implements LayerTileGetter {
     /**
      * 构造函数
      *
-     * @param target           真实的瓦片获取器
+     * @param target 真实的瓦片获取器
      * @param layerCachePreFix 图层名称（用于缓存key）
-     * @param tileCache        缓存实现，如果为null则使用默认缓存
+     * @param tileCache 缓存实现，如果为null则使用默认缓存
      */
     public CachedTileGetter(LayerTileGetter target, String layerCachePreFix, TileCache tileCache) {
         this.target = target;
         this.layerCachePreFix = layerCachePreFix;
-        this.tileCache = tileCache != null ? tileCache : CustomTileCacheHelper.getInstance().getTileCache(layerCachePreFix);
+        this.tileCache =
+                tileCache != null
+                        ? tileCache
+                        : CustomTileCacheHelper.getInstance().getTileCache(layerCachePreFix);
         this.cacheEnabled = this.tileCache.isEnabled();
         log.debug("初始化缓存代理 - layerName: {}, cacheEnabled: {}", layerCachePreFix, cacheEnabled);
     }
@@ -61,12 +60,15 @@ public class CachedTileGetter implements LayerTileGetter {
         // 先尝试从缓存读取
         if (cacheEnabled) {
             try {
-                byte[] cachedData = tileCache.get(layerCachePreFix, z, x, y, target.getSrcFormat()); // tms 原点
+                byte[] cachedData =
+                        tileCache.get(layerCachePreFix, z, x, y, target.getSrcFormat()); // tms 原点
                 if (cachedData != null && cachedData.length > 0) {
                     log.debug("从缓存获取瓦片成功: {} - ({},{},{})", layerCachePreFix, z, x, y);
                     return new ByteArrayResource(cachedData);
                 }
-            } catch (TileOperationException e) { throw e; } catch (Exception e) {
+            } catch (TileOperationException e) {
+                throw e;
+            } catch (Exception e) {
                 log.error("从缓存读取瓦片失败: {} - ({},{},{})", layerCachePreFix, z, x, y, e);
             }
         }
@@ -84,7 +86,9 @@ public class CachedTileGetter implements LayerTileGetter {
                     tileCache.put(layerCachePreFix, z, x, y, data, target.getSrcFormat());
                     log.debug("瓦片已保存到缓存: {} - ({},{},{})", layerCachePreFix, z, x, y);
                 }
-            } catch (TileOperationException e) { throw e; } catch (Exception e) {
+            } catch (TileOperationException e) {
+                throw e;
+            } catch (Exception e) {
                 log.error("保存瓦片到缓存失败: {} - ({},{},{})", layerCachePreFix, z, x, y, e);
             }
         }
@@ -102,9 +106,7 @@ public class CachedTileGetter implements LayerTileGetter {
         return target.getSrcGridSubset();
     }
 
-    /**
-     * 清除当前图层的所有缓存
-     */
+    /** 清除当前图层的所有缓存 */
     public boolean clearCache() {
         if (cacheEnabled) {
             return tileCache.deleteLayerCache(layerCachePreFix);
@@ -112,9 +114,7 @@ public class CachedTileGetter implements LayerTileGetter {
         return false;
     }
 
-    /**
-     * 清除指定瓦片的缓存
-     */
+    /** 清除指定瓦片的缓存 */
     public boolean clearTileCache(int z, int x, int y) {
         if (cacheEnabled) {
             return tileCache.delete(layerCachePreFix, z, x, y, target.getSrcFormat());
@@ -122,16 +122,12 @@ public class CachedTileGetter implements LayerTileGetter {
         return false;
     }
 
-    /**
-     * 获取原始目标对象
-     */
+    /** 获取原始目标对象 */
     public LayerTileGetter getTarget() {
         return target;
     }
 
-    /**
-     * 检查缓存是否启用
-     */
+    /** 检查缓存是否启用 */
     public boolean isCacheEnabled() {
         return cacheEnabled;
     }

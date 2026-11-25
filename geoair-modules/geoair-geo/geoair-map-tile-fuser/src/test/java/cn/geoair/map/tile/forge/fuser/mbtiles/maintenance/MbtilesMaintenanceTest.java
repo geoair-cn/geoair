@@ -9,6 +9,12 @@ import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessLease;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesMaintenanceException;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesSourceReader;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.sqlite.SQLiteDataSource;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -22,10 +28,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.sqlite.SQLiteDataSource;
 
 /** 验证门面实际效果、旧入口兼容以及读写端遵守同一物理文件维护租约。 */
 public class MbtilesMaintenanceTest {

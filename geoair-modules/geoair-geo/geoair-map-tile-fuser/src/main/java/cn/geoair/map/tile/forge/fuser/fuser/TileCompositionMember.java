@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -25,14 +26,25 @@ public final class TileCompositionMember {
     private final TileBoundaryMask boundary;
     private final Function<TileZxyApo, TileFusionResult> reader;
 
-    public TileCompositionMember(int minRequestZoom, int maxRequestZoom, int minReadZoom, int maxReadZoom,
-            int fallbackDepth, Geometry coverageLonLat, boolean outside, boolean clipBoundary,
+    public TileCompositionMember(
+            int minRequestZoom,
+            int maxRequestZoom,
+            int minReadZoom,
+            int maxReadZoom,
+            int fallbackDepth,
+            Geometry coverageLonLat,
+            boolean outside,
+            boolean clipBoundary,
             Function<TileZxyApo, TileFusionResult> reader) {
-        if (minRequestZoom < 0 || minReadZoom < 0 || maxRequestZoom < minRequestZoom
-                || maxReadZoom < minReadZoom || fallbackDepth < 0)
-            throw new IllegalArgumentException("组合成员级别范围无效");
-        if (coverageLonLat != null && (!(coverageLonLat instanceof Polygonal)
-                || coverageLonLat.isEmpty() || !coverageLonLat.isValid()))
+        if (minRequestZoom < 0
+                || minReadZoom < 0
+                || maxRequestZoom < minRequestZoom
+                || maxReadZoom < minReadZoom
+                || fallbackDepth < 0) throw new IllegalArgumentException("组合成员级别范围无效");
+        if (coverageLonLat != null
+                && (!(coverageLonLat instanceof Polygonal)
+                        || coverageLonLat.isEmpty()
+                        || !coverageLonLat.isValid()))
             throw new IllegalArgumentException("覆盖范围必须为有效的面或多面");
         this.minRequestZoom = minRequestZoom;
         this.maxRequestZoom = maxRequestZoom;
@@ -63,10 +75,12 @@ public final class TileCompositionMember {
         return depth <= fallbackDepth && zoom >= minReadZoom && zoom <= maxReadZoom;
     }
 
-    int fallbackDepth() { return fallbackDepth; }
+    int fallbackDepth() {
+        return fallbackDepth;
+    }
 
     TileFusionResult read(int z, int x, int y) {
-        return Objects.requireNonNull(reader.apply(TileZxyApo.of().setZ(z).setX(x).setY(y)),
-                "组合成员必须返回读取结果");
+        return Objects.requireNonNull(
+                reader.apply(TileZxyApo.of().setZ(z).setX(x).setY(y)), "组合成员必须返回读取结果");
     }
 }

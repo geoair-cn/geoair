@@ -1,18 +1,18 @@
-//package cn.geoair.orm.spi.support;
+// package cn.geoair.orm.spi.support;
 //
 //// import javafx.util.GkPair;
-//import java.util.*;
+// import java.util.*;
 //
-///**
+/// **
 // * @author ：张俊
 // * @date ：Created in 2022/6/30 19:00
 // * @description： 拼常用SQL的工具类
 // */
-//import cn.geoair.base.data.tuples.GkPair;
-//import cn.geoair.base.util.GutilStr;
-//import cn.geoair.orm.spi.entity.GirEntityColumn;
+// import cn.geoair.base.data.tuples.GkPair;
+// import cn.geoair.base.util.GutilStr;
+// import cn.geoair.orm.spi.entity.GirEntityColumn;
 //
-//public class SqlHelper {
+// public class SqlHelper {
 //
 //	/**
 //	 * 获取所有查询列，如id,name,code...
@@ -233,7 +233,8 @@
 //	 * @param contidion 查询条件
 //	 * @return
 //	 */
-//	public static GkPair<String, List<Object>> exampleWhereClause(GirExample girExample, List<Object> contidion) {
+//	public static GkPair<String, List<Object>> exampleWhereClause(GirExample girExample, List<Object>
+// contidion) {
 //		GkPair<String, List<Object>> returnpair = null;
 //		StringBuilder sql = new StringBuilder();
 //		if (girExample == null) {
@@ -299,7 +300,8 @@
 //
 //				}
 //
-//				applyPrefix(criterionSql, criterionSql.toString().toUpperCase(Locale.ENGLISH), prefixOverrides, "(");
+//				applyPrefix(criterionSql, criterionSql.toString().toUpperCase(Locale.ENGLISH),
+// prefixOverrides, "(");
 //				applySuffix(criterionSql, criterionSql.toString().toUpperCase(Locale.ENGLISH), null, " ) ");
 //				oredCriterionSql.append(criterionSql);
 //			}
@@ -382,7 +384,8 @@
 //
 //				}
 //
-//				applyPrefix(criterionSql, criterionSql.toString().toUpperCase(Locale.ENGLISH), prefixOverrides, "(");
+//				applyPrefix(criterionSql, criterionSql.toString().toUpperCase(Locale.ENGLISH),
+// prefixOverrides, "(");
 //				applySuffix(criterionSql, criterionSql.toString().toUpperCase(Locale.ENGLISH), null, " ) ");
 //				oredCriterionSql.append(criterionSql);
 //			}
@@ -405,7 +408,8 @@
 //	 * @param prefixesToOverride 需要修剪的 前缀
 //	 * @param prefix 前缀
 //	 */
-//	private static void applyPrefix(StringBuilder sql, String trimmedUppercaseSql, List<String> prefixesToOverride,
+//	private static void applyPrefix(StringBuilder sql, String trimmedUppercaseSql, List<String>
+// prefixesToOverride,
 //			String prefix) {
 //		if (prefixesToOverride != null) {
 //			for (String toRemove : prefixesToOverride) {
@@ -422,7 +426,8 @@
 //		}
 //	}
 //
-//	private static void applySuffix(StringBuilder sql, String trimmedUppercaseSql, List<String> suffixesToOverride,
+//	private static void applySuffix(StringBuilder sql, String trimmedUppercaseSql, List<String>
+// suffixesToOverride,
 //			String suffix) {
 //		if (suffixesToOverride != null) {
 //			for (String toRemove : suffixesToOverride) {
@@ -461,4 +466,4 @@
 //		throw new RuntimeException("不允许不安全的全部删除操作");
 //	}
 //
-//}
+// }

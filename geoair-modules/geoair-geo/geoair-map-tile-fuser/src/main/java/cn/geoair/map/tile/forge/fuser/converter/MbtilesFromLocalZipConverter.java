@@ -11,6 +11,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+
 import com.alibaba.druid.pool.DruidDataSource;
 
 import lombok.Data;
@@ -36,93 +37,88 @@ public class MbtilesFromLocalZipConverter {
     private static final int BUF_SIZE = 8192;
     private static final int DEFAULT_BATCH_SIZE = 5000;
 
-
-    /**
-     * 导入配置
-     */
+    /** 导入配置 */
     @Data
     @Accessors(chain = true)
     public static class ImportConfig {
-        private String zipPath;                 // ZIP 文件路径
-        private String targetMbtiles;           // 目标 MBTiles 文件路径
-        private String layerName;               // 图层名称
-        private String format = "png";          // 图片格式
+        private String zipPath; // ZIP 文件路径
+        private String targetMbtiles; // 目标 MBTiles 文件路径
+        private String layerName; // 图层名称
+        private String format = "png"; // 图片格式
         Boolean overwrite = false; // 存在是否覆盖
-        private int batchSize = DEFAULT_BATCH_SIZE;  // 批量插入大小
-        private int maxPoolSize = 20;           // 连接池大小
-        private int minIdle = 2;                // 最小空闲连接数
-        private TileNameProcessor processor = TileNameProcessor.DEFAULT_PROCESSOR;  // 文件名处理器
-        private List<String> extensions = ListUtil.of(".png", ".jpg");  // 允许的扩展名
+        private int batchSize = DEFAULT_BATCH_SIZE; // 批量插入大小
+        private int maxPoolSize = 20; // 连接池大小
+        private int minIdle = 2; // 最小空闲连接数
+        private TileNameProcessor processor = TileNameProcessor.DEFAULT_PROCESSOR; // 文件名处理器
+        private List<String> extensions = ListUtil.of(".png", ".jpg"); // 允许的扩展名
+
         /** ZIP 内单个瓦片的最大解压后字节数。 */
         private long maxEntryBytes = 10L * 1024 * 1024;
+
         /** ZIP 文件本身允许的最大字节数。 */
         private long maxZipFileBytes = 4L * 1024 * 1024 * 1024;
+
         /** ZIP 导入期间允许读取的最大解压后总字节数。 */
         private long maxTotalUncompressedBytes = 4L * 1024 * 1024 * 1024;
+
         /** ZIP 中允许的最大条目数（包含目录）。 */
         private int maxEntries = 1_000_000;
+
         /** 已知压缩大小时允许的最大压缩比。 */
         private int maxCompressionRatio = 1_000;
     }
 
-    /**
-     * 导入结果
-     */
+    /** 导入结果 */
     @Data
     public static class ImportResult {
         private String zipPath;
         private String targetMbtiles;
         private String layerName;
-        private long totalTiles;        // 总瓦片数（有效）
-        private long failedTiles;       // 读取失败的瓦片数
-        private long skipDir;           // 跳过的目录数
-        private long costTime;          // 耗时（毫秒）
+        private long totalTiles; // 总瓦片数（有效）
+        private long failedTiles; // 读取失败的瓦片数
+        private long skipDir; // 跳过的目录数
+        private long costTime; // 耗时（毫秒）
     }
 
     // ==================== 便捷方法 ====================
 
-    /**
-     * 便捷方法：使用默认配置导入
-     */
+    /** 便捷方法：使用默认配置导入 */
     public static ImportResult importZip(String zipPath, String targetMbtiles, String layerName) {
-        ImportConfig config = new ImportConfig()
-                .setZipPath(zipPath)
-                .setTargetMbtiles(targetMbtiles)
-                .setLayerName(layerName);
+        ImportConfig config =
+                new ImportConfig()
+                        .setZipPath(zipPath)
+                        .setTargetMbtiles(targetMbtiles)
+                        .setLayerName(layerName);
         return importZip(config);
     }
 
-    /**
-     * 便捷方法：自定义处理器导入
-     */
-    public static ImportResult importZip(String zipPath, String targetMbtiles,
-                                         String layerName, TileNameProcessor processor) {
-        ImportConfig config = new ImportConfig()
-                .setZipPath(zipPath)
-                .setTargetMbtiles(targetMbtiles)
-                .setLayerName(layerName)
-                .setProcessor(processor);
+    /** 便捷方法：自定义处理器导入 */
+    public static ImportResult importZip(
+            String zipPath, String targetMbtiles, String layerName, TileNameProcessor processor) {
+        ImportConfig config =
+                new ImportConfig()
+                        .setZipPath(zipPath)
+                        .setTargetMbtiles(targetMbtiles)
+                        .setLayerName(layerName)
+                        .setProcessor(processor);
         return importZip(config);
     }
 
-    /**
-     * 便捷方法：自定义批量大小
-     */
-    public static ImportResult importZip(String zipPath, String targetMbtiles,
-                                         String layerName, int batchSize) {
-        ImportConfig config = new ImportConfig()
-                .setZipPath(zipPath)
-                .setTargetMbtiles(targetMbtiles)
-                .setLayerName(layerName)
-                .setBatchSize(batchSize);
+    /** 便捷方法：自定义批量大小 */
+    public static ImportResult importZip(
+            String zipPath, String targetMbtiles, String layerName, int batchSize) {
+        ImportConfig config =
+                new ImportConfig()
+                        .setZipPath(zipPath)
+                        .setTargetMbtiles(targetMbtiles)
+                        .setLayerName(layerName)
+                        .setBatchSize(batchSize);
         return importZip(config);
     }
 
     // ==================== 核心方法 ====================
 
-    /**
-     * 执行 ZIP 导入
-     */
+    /** 执行 ZIP 导入 */
     public static ImportResult importZip(ImportConfig config) {
         long startTime = System.currentTimeMillis();
 
@@ -152,12 +148,12 @@ public class MbtilesFromLocalZipConverter {
             MbtilesUtils.ensureDirectoryExists(config.getTargetMbtiles());
 
             // 创建数据源
-            dataSource = MbtilesUtils.createDataSource(
-                    config.getTargetMbtiles(),
-                    false,
-                    config.getMaxPoolSize(),
-                    config.getMinIdle()
-            );
+            dataSource =
+                    MbtilesUtils.createDataSource(
+                            config.getTargetMbtiles(),
+                            false,
+                            config.getMaxPoolSize(),
+                            config.getMinIdle());
             GutilShutdownHook.getInstance().registerTask(dataSource::close);
             // 初始化数据库
             if (!MbtilesUtils.initDatabase(dataSource)) {
@@ -168,12 +164,16 @@ public class MbtilesFromLocalZipConverter {
             }
 
             // 初始化元数据
-            MbtilesUtils.initMetadata(dataSource,
-                    "name", config.getLayerName(),
-                    "format", config.getFormat(),
-                    "version", "1.0",
-                    "type", "overlay"
-            );
+            MbtilesUtils.initMetadata(
+                    dataSource,
+                    "name",
+                    config.getLayerName(),
+                    "format",
+                    config.getFormat(),
+                    "version",
+                    "1.0",
+                    "type",
+                    "overlay");
             // 处理 ZIP 文件
             ZipFile zipFile = null;
             try {
@@ -191,13 +191,14 @@ public class MbtilesFromLocalZipConverter {
                 IoUtil.close(zipFile);
                 return result;
             }
-            MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(false,
-                    config.getOverwrite(),
-                    config.batchSize,
-                    dataSource,
-                    0,
-                    zipFile.size()
-            );
+            MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer =
+                    new MbtilesInfoBatchPutConsumer(
+                            false,
+                            config.getOverwrite(),
+                            config.batchSize,
+                            dataSource,
+                            0,
+                            zipFile.size());
             // 处理 ZIP 文件
             try {
                 Enumeration<? extends ZipEntry> entryEnum = zipFile.entries();
@@ -283,7 +284,7 @@ public class MbtilesFromLocalZipConverter {
                 result.failedTiles = -1;
                 result.costTime = System.currentTimeMillis() - startTime;
                 return result;
-            }finally {
+            } finally {
                 IoUtil.close(zipFile);
             }
 
@@ -302,9 +303,7 @@ public class MbtilesFromLocalZipConverter {
 
     // ==================== 私有方法 ====================
 
-    /**
-     * 验证配置
-     */
+    /** 验证配置 */
     private static boolean validateConfig(ImportConfig config) {
         if (config == null) {
             System.err.println("ZIP 导入配置不能为空");
@@ -330,17 +329,18 @@ public class MbtilesFromLocalZipConverter {
             System.err.println("瓦片处理器不能为空");
             return false;
         }
-        if (config.getMaxEntryBytes() <= 0 || config.getMaxZipFileBytes() <= 0 || config.getMaxTotalUncompressedBytes() <= 0
-                || config.getMaxEntries() <= 0 || config.getMaxCompressionRatio() <= 0) {
+        if (config.getMaxEntryBytes() <= 0
+                || config.getMaxZipFileBytes() <= 0
+                || config.getMaxTotalUncompressedBytes() <= 0
+                || config.getMaxEntries() <= 0
+                || config.getMaxCompressionRatio() <= 0) {
             System.err.println("ZIP 安全限制必须大于 0");
             return false;
         }
         return true;
     }
 
-    /**
-     * 检查文件扩展名是否允许
-     */
+    /** 检查文件扩展名是否允许 */
     private static boolean isAllowedExtension(String fileName, List<String> extensions) {
         for (String ext : extensions) {
             if (fileName.endsWith(ext)) {
@@ -350,16 +350,17 @@ public class MbtilesFromLocalZipConverter {
         return false;
     }
 
-    /**
-     * 读取 ZipEntry 完整二进制
-     */
-    private static byte[] readEntryBytes(ZipFile zipFile, ZipEntry entry, long maxEntryBytes) throws IOException {
+    /** 读取 ZipEntry 完整二进制 */
+    private static byte[] readEntryBytes(ZipFile zipFile, ZipEntry entry, long maxEntryBytes)
+            throws IOException {
         long expectedSize = entry.getSize();
         if (expectedSize > maxEntryBytes) {
             throw new IOException("ZIP 条目超过大小限制: " + expectedSize);
         }
         try (InputStream is = zipFile.getInputStream(entry);
-             ByteArrayOutputStream bos = new ByteArrayOutputStream((int) Math.min(Math.max(expectedSize, 0), BUF_SIZE))) {
+                ByteArrayOutputStream bos =
+                        new ByteArrayOutputStream(
+                                (int) Math.min(Math.max(expectedSize, 0), BUF_SIZE))) {
 
             byte[] buf = new byte[BUF_SIZE];
             int len;
@@ -390,9 +391,7 @@ public class MbtilesFromLocalZipConverter {
         return uncompressedSize / compressedSize <= config.getMaxCompressionRatio();
     }
 
-    /**
-     * 批量插入
-     */
+    /** 批量插入 */
     private static void batchInsert(DruidDataSource dataSource, List<MbtilesInfo> batchList) {
         if (batchList.isEmpty()) {
             return;
@@ -401,91 +400,98 @@ public class MbtilesFromLocalZipConverter {
         MbtilesUtils.putTileBatch(dataSource, true, batchList);
     }
 
-
     // ==================== main 测试 ====================
 
     public static void main(String[] args) {
         // ==================== 1. 最简单的用法（使用默认处理器） ====================
-        ImportResult result1 = MbtilesFromLocalZipConverter.importZip(
-                "D:\\mapcache\\xj\\16.zip",
-                "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles",
-                "arcgis16_2023"
-        );
+        ImportResult result1 =
+                MbtilesFromLocalZipConverter.importZip(
+                        "D:\\mapcache\\xj\\16.zip",
+                        "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles",
+                        "arcgis16_2023");
         log.info("导入结果: " + result1);
 
         // ==================== 2. 使用自定义处理器 ====================
-        ImportResult result2 = MbtilesFromLocalZipConverter.importZip(
-                "D:\\mapcache\\xj\\16.zip",
-                "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles",
-                "arcgis16_2023",
-                (entryName, tileData) -> {
-                    // 自定义解析逻辑
-                    String[] pathArr = entryName.split("/");
-                    if (pathArr.length != 3) {
-                        return null;
-                    }
-                    // 自定义解析...
-                    return null;
-                }
-        );
+        ImportResult result2 =
+                MbtilesFromLocalZipConverter.importZip(
+                        "D:\\mapcache\\xj\\16.zip",
+                        "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles",
+                        "arcgis16_2023",
+                        (entryName, tileData) -> {
+                            // 自定义解析逻辑
+                            String[] pathArr = entryName.split("/");
+                            if (pathArr.length != 3) {
+                                return null;
+                            }
+                            // 自定义解析...
+                            return null;
+                        });
         log.info("导入结果: " + result2);
 
         // ==================== 3. 完整配置（推荐） ====================
-        ImportConfig config = new ImportConfig()
-                .setZipPath("D:\\mapcache\\xj\\16.zip")
-                .setTargetMbtiles("G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles")
-                .setLayerName("arcgis16_2023")
-                .setFormat("png")
-                .setBatchSize(5000)
-                .setMaxPoolSize(20)
-                .setMinIdle(2)
-                .setProcessor((entryName, tileData) -> {
-                    // 自定义处理器：可以在这里添加额外的逻辑
-                    // 例如：校验数据大小、过滤特定范围的瓦片等
-                    String[] pathArr = entryName.split("/");
-                    if (pathArr.length != 3) {
-                        return null;
-                    }
-                    try {
-                        int z = Integer.parseInt(pathArr[0]);
-                        int y = Integer.parseInt(pathArr[1]);
-                        String yFile = pathArr[2];
-                        int x = Integer.parseInt(yFile.replaceAll("\\.(png|jpg)$", ""));
-                        int reverseY = GirAdvTools.getTileGrid3857Opt().convertY(z, y, TileYAxis.XYZ, TileYAxis.TMS);
+        ImportConfig config =
+                new ImportConfig()
+                        .setZipPath("D:\\mapcache\\xj\\16.zip")
+                        .setTargetMbtiles(
+                                "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles")
+                        .setLayerName("arcgis16_2023")
+                        .setFormat("png")
+                        .setBatchSize(5000)
+                        .setMaxPoolSize(20)
+                        .setMinIdle(2)
+                        .setProcessor(
+                                (entryName, tileData) -> {
+                                    // 自定义处理器：可以在这里添加额外的逻辑
+                                    // 例如：校验数据大小、过滤特定范围的瓦片等
+                                    String[] pathArr = entryName.split("/");
+                                    if (pathArr.length != 3) {
+                                        return null;
+                                    }
+                                    try {
+                                        int z = Integer.parseInt(pathArr[0]);
+                                        int y = Integer.parseInt(pathArr[1]);
+                                        String yFile = pathArr[2];
+                                        int x =
+                                                Integer.parseInt(
+                                                        yFile.replaceAll("\\.(png|jpg)$", ""));
+                                        int reverseY =
+                                                GirAdvTools.getTileGrid3857Opt()
+                                                        .convertY(
+                                                                z, y, TileYAxis.XYZ, TileYAxis.TMS);
 
-                        // 可以在这里添加额外过滤逻辑
-                        // if (x < 0 || x > 100) return null;
+                                        // 可以在这里添加额外过滤逻辑
+                                        // if (x < 0 || x > 100) return null;
 
-                        return MbtilesInfo.of()
-                                .setX(x)
-                                .setZoomLevel(z)
-                                .setY(reverseY)
-                                .setTileData(tileData);
-                    } catch (NumberFormatException e) {
-                        return null;
-                    }
-                });
+                                        return MbtilesInfo.of()
+                                                .setX(x)
+                                                .setZoomLevel(z)
+                                                .setY(reverseY)
+                                                .setTileData(tileData);
+                                    } catch (NumberFormatException e) {
+                                        return null;
+                                    }
+                                });
 
         ImportResult result3 = MbtilesFromLocalZipConverter.importZip(config);
         log.info("导入结果: " + result3);
 
         // ==================== 4. 使用预定义的处理器 ====================
         // 使用 z/x/y 格式（注意顺序）
-        ImportResult result4 = MbtilesFromLocalZipConverter.importZip(
-                "D:\\mapcache\\xj\\16.zip",
-                "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles",
-                "arcgis16_2023",
-                TileNameProcessor.PROCESSOR_ZXY
-        );
+        ImportResult result4 =
+                MbtilesFromLocalZipConverter.importZip(
+                        "D:\\mapcache\\xj\\16.zip",
+                        "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles",
+                        "arcgis16_2023",
+                        TileNameProcessor.PROCESSOR_ZXY);
         log.info("导入结果: " + result4);
 
         // 使用不翻转 Y 的处理器
-        ImportResult result5 = MbtilesFromLocalZipConverter.importZip(
-                "D:\\mapcache\\xj\\16.zip",
-                "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles",
-                "arcgis16_2023",
-                TileNameProcessor.PROCESSOR_ZYX_NO_REVERSE
-        );
+        ImportResult result5 =
+                MbtilesFromLocalZipConverter.importZip(
+                        "D:\\mapcache\\xj\\16.zip",
+                        "G:\\GTC_CACHE_DIR\\gwc_fuser\\tile_cache\\arcgis16_2023.mbtiles",
+                        "arcgis16_2023",
+                        TileNameProcessor.PROCESSOR_ZYX_NO_REVERSE);
         log.info("导入结果: " + result5);
     }
 }

@@ -98,7 +98,6 @@ public class GirConsoleLog implements GiLogger {
         }
         FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
         log(GemLogLevel.FATAL, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
-
     }
 
     @Override
@@ -173,7 +172,6 @@ public class GirConsoleLog implements GiLogger {
     public void info(String format, Object... arguments) {
         FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
         log(GemLogLevel.INFO, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
-
     }
 
     @Override
@@ -197,7 +195,6 @@ public class GirConsoleLog implements GiLogger {
     public void debug(String format, Object... arguments) {
         FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
         log(GemLogLevel.DEBUG, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
-
     }
 
     @Override
@@ -220,7 +217,6 @@ public class GirConsoleLog implements GiLogger {
     public void trace(String format, Object... arguments) {
         FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
         log(GemLogLevel.TRACE, tp.getThrowable(), tp.getMessage(), tp.getArgArray());
-
     }
 
     @Override

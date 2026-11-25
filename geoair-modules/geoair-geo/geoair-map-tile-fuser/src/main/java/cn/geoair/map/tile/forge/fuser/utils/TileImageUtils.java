@@ -1,8 +1,5 @@
 package cn.geoair.map.tile.forge.fuser.utils;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,20 +8,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
 /** 瓦片图片的受限读取和编码工具。 */
 public final class TileImageUtils {
 
     private static final int BUFFER_SIZE = 8192;
 
-    private TileImageUtils() {
-    }
+    private TileImageUtils() {}
 
     public static BufferedImage readImage(byte[] imageBytes) throws IOException {
         if (imageBytes == null || imageBytes.length == 0) {
             return null;
         }
         validateByteSize(imageBytes.length);
-        try (ImageInputStream input = ImageIO.createImageInputStream(new ByteArrayInputStream(imageBytes))) {
+        try (ImageInputStream input =
+                ImageIO.createImageInputStream(new ByteArrayInputStream(imageBytes))) {
             return readImage(input);
         }
     }
@@ -40,7 +41,8 @@ public final class TileImageUtils {
     }
 
     public static byte[] readAllLimited(InputStream input) throws IOException {
-        try (LimitedByteArrayOutputStream output = new LimitedByteArrayOutputStream(TileResourceLimits.getMaxTileBytes())) {
+        try (LimitedByteArrayOutputStream output =
+                new LimitedByteArrayOutputStream(TileResourceLimits.getMaxTileBytes())) {
             byte[] buffer = new byte[BUFFER_SIZE];
             int length;
             while ((length = input.read(buffer)) != -1) {
@@ -55,7 +57,8 @@ public final class TileImageUtils {
             return null;
         }
         TileResourceLimits.validateImageDimensions(image.getWidth(), image.getHeight());
-        try (LimitedByteArrayOutputStream output = new LimitedByteArrayOutputStream(TileResourceLimits.getMaxTileBytes())) {
+        try (LimitedByteArrayOutputStream output =
+                new LimitedByteArrayOutputStream(TileResourceLimits.getMaxTileBytes())) {
             if (!ImageIO.write(image, format, output)) {
                 throw new IOException("不支持的图片输出格式: " + format);
             }

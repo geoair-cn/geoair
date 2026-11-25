@@ -7,9 +7,7 @@ import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 
 import java.util.function.Supplier;
 
-/**
- * SQL Server 基础查询实现。@author 张逢吉
- */
+/** SQL Server 基础查询实现。@author 张逢吉 */
 public class SqlServerAdvBaseSelectOpt extends AbstractExecAdvBaseSelectOpt {
     public SqlServerAdvBaseSelectOpt(
             Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {

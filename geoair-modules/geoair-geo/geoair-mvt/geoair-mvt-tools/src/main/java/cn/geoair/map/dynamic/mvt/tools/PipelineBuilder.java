@@ -4,11 +4,13 @@
  */
 package cn.geoair.map.dynamic.mvt.tools;
 
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.referencing.operation.MathTransform2D;
+import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
@@ -20,11 +22,9 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
 import org.locationtech.jts.simplify.TopologyPreservingSimplifier;
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.api.referencing.operation.MathTransform;
-import org.geotools.api.referencing.operation.MathTransform2D;
-import org.geotools.api.referencing.operation.TransformException;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
 
 /** 从geoserver里面抄过来的 ,空间坐标转屏幕坐标 */
 public class PipelineBuilder {
@@ -69,7 +69,8 @@ public class PipelineBuilder {
         Double xmax = extent.getMaxX();
         Double ymin = extent.getMinY();
         Double ymax = extent.getMaxY();
-        CoordinateReferenceSystem sourceCrs = GirGeoTools.defaultInstance().getSridOpt().getCRS(srid);
+        CoordinateReferenceSystem sourceCrs =
+                GirGeoTools.defaultInstance().getSridOpt().getCRS(srid);
         Rectangle paintArea = new Rectangle(0, 0, 4096, 4096);
         ReferencedEnvelope mapArea = new ReferencedEnvelope(xmin, xmax, ymin, ymax, sourceCrs);
         Context context = new Context();

@@ -2,121 +2,85 @@ package cn.geoair.comp.dynamic.ds.utils;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.sql.DataSource;
 import java.util.function.Consumer;
+
+import javax.sql.DataSource;
 
 /**
  * HikariCP 数据源快速创建工具类
- * <p>
- * 注意：HikariCP 官方推荐 minimumIdle = maximumPoolSize 以获得最佳性能
+ *
+ * <p>注意：HikariCP 官方推荐 minimumIdle = maximumPoolSize 以获得最佳性能
  */
 @Data
 @Accessors(chain = true)
 public class DataSourceHikariFastCreate {
 
     // ==================== 必须配置 ====================
-    private String jdbcUrl;      // 对应 Druid 的 url
+    private String jdbcUrl; // 对应 Druid 的 url
     private String username;
     private String password;
 
     // ==================== 连接池核心配置 ====================
     /**
-     * 最大连接数（对应 Druid 的 maxActive）
-     * 官方建议：根据 ((core_count * 2) + effective_spindle_count) 公式计算
-     * 默认值：10
+     * 最大连接数（对应 Druid 的 maxActive） 官方建议：根据 ((core_count * 2) + effective_spindle_count) 公式计算 默认值：10
      */
     private Integer maximumPoolSize = 10;
 
-    /**
-     * 最小空闲连接数（对应 Druid 的 minIdle）
-     * HikariCP 官方建议设为与 maximumPoolSize 相同，避免动态扩缩容开销
-     */
+    /** 最小空闲连接数（对应 Druid 的 minIdle） HikariCP 官方建议设为与 maximumPoolSize 相同，避免动态扩缩容开销 */
     private Integer minimumIdle = 10;
 
-    /**
-     * 获取连接的超时时间（毫秒）（对应 Druid 的 maxWait）
-     * 默认值：30000 (30秒)
-     * 建议调小至 1000~3000，让业务快速失败
-     */
+    /** 获取连接的超时时间（毫秒）（对应 Druid 的 maxWait） 默认值：30000 (30秒) 建议调小至 1000~3000，让业务快速失败 */
     private Long connectionTimeout = 30000L;
 
-    /**
-     * 连接空闲超时时间（毫秒）（对应 Druid 的 minEvictableIdleTimeMillis）
-     * 默认值：600000 (10分钟)
-     * 注意：必须小于 maxLifetime
-     */
+    /** 连接空闲超时时间（毫秒）（对应 Druid 的 minEvictableIdleTimeMillis） 默认值：600000 (10分钟) 注意：必须小于 maxLifetime */
     private Long idleTimeout = 600000L;
 
-    /**
-     * 连接最大存活时间（毫秒）
-     * 默认值：1800000 (30分钟)
-     * 必须小于数据库的 wait_timeout（如 MySQL 默认 8 小时）
-     */
+    /** 连接最大存活时间（毫秒） 默认值：1800000 (30分钟) 必须小于数据库的 wait_timeout（如 MySQL 默认 8 小时） */
     private Long maxLifetime = 1800000L;
 
     // ==================== 连接健康检查 ====================
-    /**
-     * 连接池名称（便于监控定位）
-     */
+    /** 连接池名称（便于监控定位） */
     private String poolName = "HikariPool";
 
     /**
-     * 验证查询 SQL（对应 Druid 的 validationQuery）
-     * 对于支持 JDBC4 的驱动（MySQL 5+、PostgreSQL 8+），通常无需设置
+     * 验证查询 SQL（对应 Druid 的 validationQuery） 对于支持 JDBC4 的驱动（MySQL 5+、PostgreSQL 8+），通常无需设置
      * 若必须设置，推荐：SELECT 1
      */
     private String connectionTestQuery;
 
-    /**
-     * 验证超时时间（毫秒）
-     * 默认值：5000 (5秒)
-     */
+    /** 验证超时时间（毫秒） 默认值：5000 (5秒) */
     private Long validationTimeout = 5000L;
 
-    /**
-     * 连接泄漏检测阈值（毫秒）
-     * 当连接持有时间超过此值，会打印堆栈日志（0 表示关闭）
-     * 推荐开发/测试环境设置为 30000~60000，生产环境谨慎开启
-     */
+    /** 连接泄漏检测阈值（毫秒） 当连接持有时间超过此值，会打印堆栈日志（0 表示关闭） 推荐开发/测试环境设置为 30000~60000，生产环境谨慎开启 */
     private Long leakDetectionThreshold;
 
-    /**
-     * 是否自动提交事务
-     * 默认值：true
-     */
+    /** 是否自动提交事务 默认值：true */
     private Boolean autoCommit = true;
 
-    /**
-     * 连接初始化 SQL（连接创建后立即执行）
-     * 例如：SET NAMES utf8mb4 或 SET time_zone = '+8:00'
-     */
+    /** 连接初始化 SQL（连接创建后立即执行） 例如：SET NAMES utf8mb4 或 SET time_zone = '+8:00' */
     private String connectionInitSql;
 
-    /**
-     * 是否允许在池中暂停连接（Druid 无此概念，保留为可选）
-     */
+    /** 是否允许在池中暂停连接（Druid 无此概念，保留为可选） */
     private Boolean allowPoolSuspension = false;
 
-    /**
-     * 数据源缓存相关配置
-     */
+    /** 数据源缓存相关配置 */
     private Long catalog;
+
     private Long schema;
-    private Boolean readOnly;   // 是否只读数据源
+    private Boolean readOnly; // 是否只读数据源
 
+    private Consumer<HikariConfig> configurator = t -> {};
 
-    private Consumer<HikariConfig> configurator = t -> {
-
-    };
     // ==================== 静态工厂方法 ====================
 
     /**
      * 快速创建数据源（仅使用必需参数）
      *
-     * @param jdbcUrl  数据库连接URL
+     * @param jdbcUrl 数据库连接URL
      * @param username 用户名
      * @param password 密码
      * @return HikariCP 数据源
@@ -133,6 +97,7 @@ public class DataSourceHikariFastCreate {
      * 使用 Consumer 配置模式创建数据源
      *
      * <p>使用示例：
+     *
      * <pre>
      * DataSource ds = DataSourceHikariFastCreate.create(builder -> builder
      *     .setJdbcUrl("jdbc:mysql://localhost:3306/test")
@@ -156,6 +121,7 @@ public class DataSourceHikariFastCreate {
      * 创建 HikariCP 数据源（支持自定义配置扩展）
      *
      * <p>使用示例：
+     *
      * <pre>
      * DataSource ds = DataSourceHikariFastCreate.create(
      *     "jdbc:mysql://localhost:3306/test",
@@ -169,27 +135,29 @@ public class DataSourceHikariFastCreate {
      * );
      * </pre>
      *
-     * @param jdbcUrl    数据库连接URL
-     * @param username   用户名
-     * @param password   密码
+     * @param jdbcUrl 数据库连接URL
+     * @param username 用户名
+     * @param password 密码
      * @param configurer 额外配置函数
      * @return HikariCP 数据源
      */
-    public static DataSource create(String jdbcUrl, String username, String password,
-                                    Consumer<DataSourceHikariFastCreate> configurer) {
-        DataSourceHikariFastCreate builder = new DataSourceHikariFastCreate()
-                .setJdbcUrl(jdbcUrl)
-                .setUsername(username)
-                .setPassword(password);
+    public static DataSource create(
+            String jdbcUrl,
+            String username,
+            String password,
+            Consumer<DataSourceHikariFastCreate> configurer) {
+        DataSourceHikariFastCreate builder =
+                new DataSourceHikariFastCreate()
+                        .setJdbcUrl(jdbcUrl)
+                        .setUsername(username)
+                        .setPassword(password);
         if (configurer != null) {
             configurer.accept(builder);
         }
         return builder.toDataSource();
     }
 
-    /**
-     * 创建 HikariCP 数据源
-     */
+    /** 创建 HikariCP 数据源 */
     public DataSource toDataSource() {
         HikariConfig config = new HikariConfig();
 

@@ -1,36 +1,31 @@
 package cn.geoair.map.tile.forge.core.caches;
 
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.config.GirS3ConfigProperties;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.hutool.core.util.StrUtil;
+
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.amazonaws.services.s3.model.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
- 
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-/**
- * 基于S3对象存储的缓存实现
- */
- 
+/** 基于S3对象存储的缓存实现 */
 public class S3CacheProvider implements FileCacheProvider {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private final AmazonS3 s3Client;
@@ -57,11 +52,15 @@ public class S3CacheProvider implements FileCacheProvider {
     /**
      * 构造函数（指定存储桶和前缀）
      *
-     * @param bucketName  存储桶名称
+     * @param bucketName 存储桶名称
      * @param cachePrefix 缓存前缀
      */
     public S3CacheProvider(String bucketName, String cachePrefix) {
-        this(S3ClientGetter.getInstance().getClient(),bucketName,cachePrefix,GirS3ConfigProperties.getInstance().getDomain());
+        this(
+                S3ClientGetter.getInstance().getClient(),
+                bucketName,
+                cachePrefix,
+                GirS3ConfigProperties.getInstance().getDomain());
     }
 
     /** 允许复用接入方管理的客户端，也便于在模拟存储环境验证流式传输。 */
@@ -74,32 +73,25 @@ public class S3CacheProvider implements FileCacheProvider {
         initBucket();
     }
 
-    /**
-     * 初始化存储桶（不存在则创建）
-     */
+    /** 初始化存储桶（不存在则创建） */
     private void initBucket() {
         if (!s3Client.doesBucketExistV2(bucketName)) {
             s3Client.createBucket(bucketName);
         }
     }
 
-    /**
-     * 将缓存键转换为S3对象键
-     */
+    /** 将缓存键转换为S3对象键 */
     private String getObjectKey(Object key) {
         // 安全转换键名，避免特殊字符
-        String keyStr = key.toString()
-                .replaceAll("[^a-zA-Z0-9-_./]", "_")
-                .replaceAll("//+", "/"); // 合并连续斜杠
-        while (keyStr.endsWith("/")) {  // 移除最后的文件符号，以防被解析成文件夹
+        String keyStr =
+                key.toString().replaceAll("[^a-zA-Z0-9-_./]", "_").replaceAll("//+", "/"); // 合并连续斜杠
+        while (keyStr.endsWith("/")) { // 移除最后的文件符号，以防被解析成文件夹
             keyStr = StrUtil.replaceLast(keyStr, "/", "");
         }
         return cachePrefix + keyStr;
     }
 
-    /**
-     * 获取对象的完整访问URL
-     */
+    /** 获取对象的完整访问URL */
     private String getObjectUrl(String objectKey) {
         return domain + "/" + objectKey;
     }
@@ -134,8 +126,9 @@ public class S3CacheProvider implements FileCacheProvider {
             }
             // 上传到S3
             ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
-            PutObjectRequest putRequest = new PutObjectRequest(bucketName, objectKey, inputStream, metadata)
-                    .withCannedAcl(CannedAccessControlList.Private);
+            PutObjectRequest putRequest =
+                    new PutObjectRequest(bucketName, objectKey, inputStream, metadata)
+                            .withCannedAcl(CannedAccessControlList.Private);
 
             // 如果需要公共访问，可以设置为PublicRead
             // putRequest.withCannedAcl(CannedAccessControlList.PublicRead);
@@ -165,24 +158,33 @@ public class S3CacheProvider implements FileCacheProvider {
     /** SDK 直接读取文件流，沿用原有对象键和原始字节格式。 */
     @Override
     public void putFile(Object key, Path source, long milliseconds) throws IOException {
-        ObjectMetadata metadata=new ObjectMetadata();
+        ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(Files.size(source));
-        if(milliseconds!=-1) metadata.addUserMetadata(EXPIRATION_METADATA_KEY,
-                String.valueOf(Math.addExact(System.currentTimeMillis(),milliseconds)));
-        PutObjectRequest request=new PutObjectRequest(bucketName,getObjectKey(key),source.toFile())
-                .withMetadata(metadata).withCannedAcl(CannedAccessControlList.Private);
+        if (milliseconds != -1)
+            metadata.addUserMetadata(
+                    EXPIRATION_METADATA_KEY,
+                    String.valueOf(Math.addExact(System.currentTimeMillis(), milliseconds)));
+        PutObjectRequest request =
+                new PutObjectRequest(bucketName, getObjectKey(key), source.toFile())
+                        .withMetadata(metadata)
+                        .withCannedAcl(CannedAccessControlList.Private);
         // SDK 按大小选择分片上传，超大索引也不受单次 PutObject 的大小限制。
-        TransferManager transfer=TransferManagerBuilder.standard().withS3Client(s3Client).build();
-        Upload upload=null;
+        TransferManager transfer = TransferManagerBuilder.standard().withS3Client(s3Client).build();
+        Upload upload = null;
         try {
-            upload=transfer.upload(request);
+            upload = transfer.upload(request);
             upload.waitForCompletion();
-        } catch(InterruptedException e) {
-            if(upload!=null) try { upload.abort(); } catch(RuntimeException cleanup) { e.addSuppressed(cleanup); }
+        } catch (InterruptedException e) {
+            if (upload != null)
+                try {
+                    upload.abort();
+                } catch (RuntimeException cleanup) {
+                    e.addSuppressed(cleanup);
+                }
             Thread.currentThread().interrupt();
-            throw new IOException("S3 索引备份已中断",e);
-        } catch(Exception e) {
-            throw new IOException("S3 索引备份失败",e);
+            throw new IOException("S3 索引备份已中断", e);
+        } catch (Exception e) {
+            throw new IOException("S3 索引备份失败", e);
         } finally {
             transfer.shutdownNow(false);
         }
@@ -190,15 +192,15 @@ public class S3CacheProvider implements FileCacheProvider {
 
     @Override
     public boolean copyTo(Object key, Path target) throws IOException {
-        try(S3Object object=s3Client.getObject(bucketName,getObjectKey(key))) {
-            if(isExpired(object.getObjectMetadata())) return false;
-            Files.copy(object.getObjectContent(),target,StandardCopyOption.REPLACE_EXISTING);
+        try (S3Object object = s3Client.getObject(bucketName, getObjectKey(key))) {
+            if (isExpired(object.getObjectMetadata())) return false;
+            Files.copy(object.getObjectContent(), target, StandardCopyOption.REPLACE_EXISTING);
             return true;
-        } catch(AmazonS3Exception e) {
-            if(e.getStatusCode()==404) return false;
-            throw new IOException("S3 索引恢复失败",e);
-        } catch(RuntimeException e) {
-            throw new IOException("S3 索引恢复失败",e);
+        } catch (AmazonS3Exception e) {
+            if (e.getStatusCode() == 404) return false;
+            throw new IOException("S3 索引恢复失败", e);
+        } catch (RuntimeException e) {
+            throw new IOException("S3 索引恢复失败", e);
         }
     }
 
@@ -254,7 +256,7 @@ public class S3CacheProvider implements FileCacheProvider {
             }
             s3Object.close(); // 关闭流
 
-//            return deserializeValue(outputStream.toByteArray());
+            //            return deserializeValue(outputStream.toByteArray());
             return outputStream.toByteArray();
         } catch (Exception e) {
             // 读取失败或异常时返回null
@@ -357,9 +359,7 @@ public class S3CacheProvider implements FileCacheProvider {
         evictByPreFix("");
     }
 
-    /**
-     * 序列化对象（支持多种类型）
-     */
+    /** 序列化对象（支持多种类型） */
     private byte[] serializeValue(Object value) throws IOException {
         if (value == null) {
             return new byte[0];
@@ -382,9 +382,7 @@ public class S3CacheProvider implements FileCacheProvider {
         return value.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    /**
-     * 反序列化对象
-     */
+    /** 反序列化对象 */
     private Object deserializeValue(byte[] data) throws IOException {
         if (data.length == 0) {
             return null;
@@ -399,9 +397,7 @@ public class S3CacheProvider implements FileCacheProvider {
         }
     }
 
-    /**
-     * 检查对象是否过期
-     */
+    /** 检查对象是否过期 */
     private boolean isExpired(ObjectMetadata metadata) {
         String expiresAtStr = metadata.getUserMetadata().get(EXPIRATION_METADATA_KEY);
         if (expiresAtStr == null) {
@@ -416,9 +412,7 @@ public class S3CacheProvider implements FileCacheProvider {
         }
     }
 
-    /**
-     * 获取缓存对象的URL（如果需要对外访问）
-     */
+    /** 获取缓存对象的URL（如果需要对外访问） */
     public String getObjectUrl(Object key) {
         String objectKey = getObjectKey(key);
         if (s3Client.doesObjectExist(bucketName, objectKey)) {
@@ -427,9 +421,7 @@ public class S3CacheProvider implements FileCacheProvider {
         return null;
     }
 
-    /**
-     * 关闭资源（建议在应用销毁时调用）
-     */
+    /** 关闭资源（建议在应用销毁时调用） */
     public void destroy() {
         // 如果需要关闭客户端连接，可以在这里处理
         // s3Client.shutdown();

@@ -19,10 +19,7 @@ package cn.geoair.map.dynamic.file.geojson.geotools;
 import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/**
- * Support class providing {@link ObjectMapper} instances configured
- * with the desired settings.
- */
+/** Support class providing {@link ObjectMapper} instances configured with the desired settings. */
 class ObjectMapperFactory {
 
     private static ObjectMapper DEFAULT_MAPPER;

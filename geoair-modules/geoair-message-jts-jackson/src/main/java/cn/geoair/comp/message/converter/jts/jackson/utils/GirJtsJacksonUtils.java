@@ -11,6 +11,7 @@ import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.net.NetPGG
 import cn.geoair.comp.message.converter.jts.jackson.serializer.pggeom.org.OrgPGGeometryModule;
 import cn.geoair.map.dynamic.tools.convert.GirOracleTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.locationtech.spatial4j.io.jackson.ShapesAsGeoJSONModule;
@@ -20,15 +21,13 @@ import org.locationtech.spatial4j.io.jackson.ShapesAsWKTModule;
  * @author ：张俊
  * @date ：Created in 2026/3/19 18:47 @description： TODO
  */
-
 public class GirJtsJacksonUtils {
 
     static ObjectMapper objectMapper = new ObjectMapper();
 
     public static GiLogger log = GirLoggerFactory.getLogger();
-    /**
-     * jts对象转换为wkt，如果为false，就转换为geojson
-     */
+
+    /** jts对象转换为wkt，如果为false，就转换为geojson */
     public static boolean jtsToWkt = false;
 
     static {
@@ -47,7 +46,7 @@ public class GirJtsJacksonUtils {
             objectMapper.registerModule(new ShapesAsGeoJSONModule());
             log.debug("ShapesAsGeoJSONModule注册");
         }
-//        objectMapper.registerModule(new JtsModule());
+        //        objectMapper.registerModule(new JtsModule());
 
         objectMapper.registerModule(new JtsExtModule());
         log.debug("JtsExtModule注册");
@@ -74,7 +73,6 @@ public class GirJtsJacksonUtils {
             log.debug("SdoGeometryModule 注册");
         }
     }
-
 
     public static ObjectMapper getJtsObjectMapper() {
         return objectMapper;

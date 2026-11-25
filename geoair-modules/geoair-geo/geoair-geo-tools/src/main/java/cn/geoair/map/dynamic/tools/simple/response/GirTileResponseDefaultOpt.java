@@ -11,9 +11,9 @@ import cn.geoair.map.dynamic.tools.simple.GirServletUtil;
 import cn.geoair.web.GirWeb;
 import cn.geoair.web.mime.GirImageMime;
 import cn.hutool.core.util.StrUtil;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
@@ -23,8 +23,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
- * 瓦片响应构建工具
- * 基于TileResponse对象进行响应构建
+ * 瓦片响应构建工具 基于TileResponse对象进行响应构建
  *
  * @author 张俊
  * @date 2026/7/13
@@ -33,10 +32,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
     private static final GiLogger log = GirLoggerFactory.getLogger();
 
-
-    /**
-     * 从TileResponse对象构建响应
-     */
+    /** 从TileResponse对象构建响应 */
     @Override
     public void buildFromException(Exception exception, HttpServletResponse response) {
         TileResponse error = TileResponse.error(exception.getMessage());
@@ -48,9 +44,8 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         buildFromTileResponse(tileResponse, response, null);
     }
 
-
-    public static void buildFromTileResponse(TileResponse tileResponse, HttpServletResponse response, Integer cacheMaxAge) {
-
+    public static void buildFromTileResponse(
+            TileResponse tileResponse, HttpServletResponse response, Integer cacheMaxAge) {
 
         if (tileResponse == null) {
             handleNotFound(HttpServletResponse.SC_NO_CONTENT, response);
@@ -63,7 +58,6 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             handleError(GutilObject.isNotEmpty(httpCode) ? httpCode : 422, response, tileResponse);
             return;
         }
-
 
         byte[] finalBytes;
         SharpeningResult sharpeningResult = null;
@@ -85,7 +79,6 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             setSharpeningHeaders(response, sharpeningResult);
         }
 
-
         Long contentLength = tileResponse.getContentLength();
         // 输入流响应在未知长度时不应伪造 Content-Length，让 Servlet 容器使用流式传输。
         if (contentLength != null && contentLength >= 0) {
@@ -104,26 +97,24 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
         InputStream inputStream = tileResponse.toInputStream();
         if (GutilObject.isNotEmpty(inputStream)) {
-            GirServletUtil.toResponse(response, inputStream, tileResponse.getMimeType().getFormat());
+            GirServletUtil.toResponse(
+                    response, inputStream, tileResponse.getMimeType().getFormat());
         } else {
             handleNotFound(HttpServletResponse.SC_NO_CONTENT, response);
         }
-
-
     }
 
     // ==================== 锐化处理相关 ====================
 
-    /**
-     * 锐化结果封装
-     */
+    /** 锐化结果封装 */
     public static class SharpeningResult {
         private final byte[] data;
         private final boolean applied;
         private final SharpeningParams params;
         private final long elapsedTime;
 
-        public SharpeningResult(byte[] data, boolean applied, SharpeningParams params, long elapsedTime) {
+        public SharpeningResult(
+                byte[] data, boolean applied, SharpeningParams params, long elapsedTime) {
             this.data = data;
             this.applied = applied;
             this.params = params;
@@ -146,21 +137,18 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             return elapsedTime;
         }
 
-        /**
-         * 获取锐化信息用于写入Header
-         */
+        /** 获取锐化信息用于写入Header */
         public String getInfoHeader() {
             if (!applied || params == null) {
                 return "none";
             }
-            return String.format("applied;amount=%.2f;radius=%.2f;threshold=%d;time=%dms",
+            return String.format(
+                    "applied;amount=%.2f;radius=%.2f;threshold=%d;time=%dms",
                     params.getAmount(), params.getRadius(), params.getThreshold(), elapsedTime);
         }
     }
 
-    /**
-     * 判断是否需要应用锐化
-     */
+    /** 判断是否需要应用锐化 */
     private static boolean shouldApplySharpening() {
         HttpServletRequest request = GirWeb.getRequest();
         if (request == null) {
@@ -177,12 +165,12 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         String radius = request.getParameter(TileParamEnums.SHARPEN_RADIUS.getValue());
         String threshold = request.getParameter(TileParamEnums.SHARPEN_THRESHOLD.getValue());
 
-        return StrUtil.isNotBlank(amount) || StrUtil.isNotBlank(radius) || StrUtil.isNotBlank(threshold);
+        return StrUtil.isNotBlank(amount)
+                || StrUtil.isNotBlank(radius)
+                || StrUtil.isNotBlank(threshold);
     }
 
-    /**
-     * 解析锐化参数
-     */
+    /** 解析锐化参数 */
     private static SharpeningParams parseSharpeningParams() {
         HttpServletRequest request = GirWeb.getRequest();
         if (request == null) {
@@ -212,9 +200,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         return new SharpeningParams(amount, radius, threshold);
     }
 
-    /**
-     * 执行瓦片锐化
-     */
+    /** 执行瓦片锐化 */
     private static byte[] enhanceTile(byte[] tileData, float radius, float amount, int threshold) {
         // 参数校验
         if (tileData == null || tileData.length == 0) {
@@ -255,9 +241,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
     }
 
-    /**
-     * 预锐化处理（带结果返回）
-     */
+    /** 预锐化处理（带结果返回） */
     public static SharpeningResult applySharpeningIfNeededWithResult(TileResponse tileResponse) {
         long startTime = System.currentTimeMillis();
 
@@ -272,7 +256,9 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
         try {
             byte[] bytes = tileResponse.toByteArrays();
-            byte[] enhancedData = enhanceTile(bytes, params.getRadius(), params.getAmount(), params.getThreshold());
+            byte[] enhancedData =
+                    enhanceTile(
+                            bytes, params.getRadius(), params.getAmount(), params.getThreshold());
             long elapsedTime = System.currentTimeMillis() - startTime;
 
             boolean applied = enhancedData != bytes && enhancedData.length > 0;
@@ -283,11 +269,9 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
     }
 
-
-    /**
-     * 设置锐化信息到响应头
-     */
-    private static void setSharpeningHeaders(HttpServletResponse response, SharpeningResult sharpeningResult) {
+    /** 设置锐化信息到响应头 */
+    private static void setSharpeningHeaders(
+            HttpServletResponse response, SharpeningResult sharpeningResult) {
         if (sharpeningResult == null || !sharpeningResult.isApplied()) {
             return;
         }
@@ -298,7 +282,8 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         response.setHeader("X-Sharpen-Amount", String.format("%.2f", params.getAmount()));
         response.setHeader("X-Sharpen-Radius", String.format("%.2f", params.getRadius()));
         response.setHeader("X-Sharpen-Threshold", String.valueOf(params.getThreshold()));
-        response.setHeader("X-Sharpen-Elapsed-Time", String.format("%dms", sharpeningResult.getElapsedTime()));
+        response.setHeader(
+                "X-Sharpen-Elapsed-Time", String.format("%dms", sharpeningResult.getElapsedTime()));
         response.setHeader("X-Sharpen-Info", sharpeningResult.getInfoHeader());
     }
 
@@ -307,11 +292,12 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
     /**
      * 设置缓存头（基于TileResponse）
      *
-     * @param response     HttpServletResponse
+     * @param response HttpServletResponse
      * @param tileResponse TileResponse对象
-     * @param cacheMaxAge  缓存时间（秒），-1表示不缓存，null表示使用默认值
+     * @param cacheMaxAge 缓存时间（秒），-1表示不缓存，null表示使用默认值
      */
-    private static void setCacheHeaders(HttpServletResponse response, TileResponse tileResponse, Integer cacheMaxAge) {
+    private static void setCacheHeaders(
+            HttpServletResponse response, TileResponse tileResponse, Integer cacheMaxAge) {
         // 判断是否需要禁用缓存
         if (cacheMaxAge != null && cacheMaxAge == -1) {
             // 不缓存响应头
@@ -343,7 +329,6 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         response.setHeader("Expires", formatHttpDate(expires));
     }
 
-
     private static void setSysHeaders(HttpServletResponse response, TileResponse tileResponse) {
         String dataSource = tileResponse.getDataSource();
         if (GutilObject.isNotEmpty(dataSource)) {
@@ -357,13 +342,9 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         if (GutilObject.isNotEmpty(gridEpsgStr)) {
             response.setHeader("X-Tile-Grid-Epsg", gridEpsgStr);
         }
-
-
     }
 
-    /**
-     * 格式化HTTP日期
-     */
+    /** 格式化HTTP日期 */
     private static String formatHttpDate(long timestamp) {
         return DateTimeFormatter.RFC_1123_DATE_TIME
                 .withZone(ZoneId.of("GMT"))
@@ -372,19 +353,15 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
 
     // ==================== 错误处理 ====================
 
-    /**
-     * 处理瓦片不存在
-     */
+    /** 处理瓦片不存在 */
     private static void handleNotFound(int httpCode, HttpServletResponse response) {
         response.setStatus(httpCode);
         response.setHeader("Cache-Control", "no-cache");
     }
 
-
-    /**
-     * 处理错误（带错误码和消息）
-     */
-    public static void handleError(int httpCode, HttpServletResponse response, TileResponse tileResponse) {
+    /** 处理错误（带错误码和消息） */
+    public static void handleError(
+            int httpCode, HttpServletResponse response, TileResponse tileResponse) {
         TileZxyApo coordinate = tileResponse.getCoordinate();
         setSysHeaders(response, tileResponse);
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -394,7 +371,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             } catch (Exception e) {
             }
         }
-        if(httpCode==204){
+        if (httpCode == 204) {
             response.setStatus(httpCode);
             return;
         }
@@ -404,13 +381,14 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
         GiResult result = GiResult.failureMsg(errorMessage).andCode(httpCode);
         String json = GirJSON.toJson(result).toJSONString();
-        GirServletUtil.toResponse(response, json.getBytes(StandardCharsets.UTF_8), "application/json;charset=utf-8", httpCode);
+        GirServletUtil.toResponse(
+                response,
+                json.getBytes(StandardCharsets.UTF_8),
+                "application/json;charset=utf-8",
+                httpCode);
     }
 
-
-    /**
-     * 解析浮点数（带范围限制）
-     */
+    /** 解析浮点数（带范围限制） */
     private static float parseFloat(String value, float defaultValue, float min, float max) {
         if (StrUtil.isBlank(value)) {
             return defaultValue;
@@ -424,9 +402,7 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
         }
     }
 
-    /**
-     * 解析整数（带范围限制）
-     */
+    /** 解析整数（带范围限制） */
     private static int parseInt(String value, int defaultValue, int min, int max) {
         if (StrUtil.isBlank(value)) {
             return defaultValue;
@@ -465,18 +441,15 @@ public class GirTileResponseDefaultOpt implements GirTileResponseOpt {
             return threshold;
         }
 
-        /**
-         * 检查参数是否有效
-         */
+        /** 检查参数是否有效 */
         public boolean isValid() {
             return amount > 0 && radius > 0 && threshold >= 0;
         }
 
         @Override
         public String toString() {
-            return String.format("amount=%.2f, radius=%.2f, threshold=%d", amount, radius, threshold);
+            return String.format(
+                    "amount=%.2f, radius=%.2f, threshold=%d", amount, radius, threshold);
         }
     }
-
-
 }

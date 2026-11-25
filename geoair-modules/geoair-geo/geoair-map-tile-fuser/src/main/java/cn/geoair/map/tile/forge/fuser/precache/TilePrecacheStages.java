@@ -3,10 +3,12 @@ package cn.geoair.map.tile.forge.fuser.precache;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationStatus;
 import cn.geoair.map.tile.forge.fuser.image.TileImageProcessingState;
 import cn.geoair.map.tile.forge.fuser.image.TileImageWriteState;
+
+import lombok.Getter;
+
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
-import lombok.Getter;
 
 /** 不可变阶段累计；阶段数量互相重叠，不得相加作为整张处理进度。 */
 @Getter

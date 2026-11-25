@@ -13,6 +13,5 @@ public enum AdvEnumsKeyTran implements Serializable {
     转换成驼峰,
     转换成大小写不敏感,
     不转换,
-
     ;
 }

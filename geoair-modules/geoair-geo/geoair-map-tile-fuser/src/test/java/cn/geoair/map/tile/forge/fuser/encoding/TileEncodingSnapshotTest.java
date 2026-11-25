@@ -2,11 +2,12 @@ package cn.geoair.map.tile.forge.fuser.encoding;
 
 import static org.junit.Assert.*;
 
+import org.junit.Test;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.junit.Test;
 
 /** 快照与线程池作用域测试，不依赖业务图层名、Spring容器或控制库。 */
 public class TileEncodingSnapshotTest {

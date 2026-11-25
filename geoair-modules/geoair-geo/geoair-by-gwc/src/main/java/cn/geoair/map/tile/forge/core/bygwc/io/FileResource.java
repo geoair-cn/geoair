@@ -14,8 +14,6 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.io;
 
-
-
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -30,12 +28,16 @@ public class FileResource implements cn.geoair.map.tile.forge.core.bygwc.io.Reso
         this.file = file;
     }
 
-    /** @see Resource#getLastModified() */
+    /**
+     * @see Resource#getLastModified()
+     */
     public long getLastModified() {
         return file.lastModified();
     }
 
-    /** @see Resource#getSize() */
+    /**
+     * @see Resource#getSize()
+     */
     public long getSize() {
         // avoid a (relatively expensive) call to File.exists(), file.length() returns 0 if the file
         // doesn't exist anyway
@@ -50,7 +52,8 @@ public class FileResource implements cn.geoair.map.tile.forge.core.bygwc.io.Reso
                 FileChannel in = fis.getChannel(); ) {
             final long size = in.size();
             long written = 0;
-            while ((written += in.transferTo(written, size, target)) < size) {;
+            while ((written += in.transferTo(written, size, target)) < size) {
+                ;
             }
             return size;
         }
@@ -93,7 +96,7 @@ public class FileResource implements cn.geoair.map.tile.forge.core.bygwc.io.Reso
 
         byte[] data = new byte[(int) fileSize];
         try (FileInputStream fis = new FileInputStream(file);
-             BufferedInputStream bis = new BufferedInputStream(fis)) {
+                BufferedInputStream bis = new BufferedInputStream(fis)) {
 
             int offset = 0;
             int remaining = data.length;

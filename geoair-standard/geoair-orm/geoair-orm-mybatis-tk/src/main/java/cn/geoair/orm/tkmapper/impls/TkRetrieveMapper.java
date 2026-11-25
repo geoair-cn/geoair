@@ -6,15 +6,17 @@ import cn.geoair.base.util.GutilBean;
 import cn.geoair.base.util.GutilObject;
 import cn.geoair.base.util.GutilReflection;
 import cn.geoair.orm.mybatis.impls.MyBatisMapper;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+
 import tk.mybatis.mapper.common.base.BaseSelectMapper;
 import tk.mybatis.mapper.common.example.SelectByExampleMapper;
 import tk.mybatis.mapper.common.example.SelectCountByExampleMapper;
 import tk.mybatis.mapper.entity.EntityColumn;
 import tk.mybatis.mapper.mapperhelper.EntityHelper;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public interface TkRetrieveMapper<T extends GiEntityQueryable<PK>, PK extends Serializable>
         extends MyBatisMapper<T, PK>, /* SelectByIdsMapper<T>, */

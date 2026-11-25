@@ -3,9 +3,7 @@ package cn.geoair.spi.test;
 import cn.geoair.base.json.GirJSON;
 import cn.geoair.spi.json.GirJacksonJson;
 
-/**
- * GirJacksonJson 入口示例
- */
+/** GirJacksonJson 入口示例 */
 public class GirJacksonJsonExample {
 
     public static void main(String[] args) {

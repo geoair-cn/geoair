@@ -6,9 +6,8 @@ import org.locationtech.jts.geom.Point;
 /**
  * 坐标转换核心接口，定义 WGS84、GCJ02、BD09 与 Web Mercator 的互转。
  *
- * <p>所有坐标数组均按 {@code [x, y]} 排列；地理坐标即 {@code [longitude, latitude]}。
- * WGS84 与 GCJ02 的转换仅在内置中国范围经验框内施加偏移，范围外坐标保持不变。
- * Web Mercator 方法使用球形 Web Mercator 公式，而非通用的任意墨卡托投影。</p>
+ * <p>所有坐标数组均按 {@code [x, y]} 排列；地理坐标即 {@code [longitude, latitude]}。 WGS84 与 GCJ02
+ * 的转换仅在内置中国范围经验框内施加偏移，范围外坐标保持不变。 Web Mercator 方法使用球形 Web Mercator 公式，而非通用的任意墨卡托投影。
  *
  * @author 张逢吉
  * @date 2024/12/05
@@ -306,7 +305,4 @@ public interface GirCoordinateConvertOpt {
      * @return 转换后的Geometry对象或null
      */
     Geometry gcj02ToWgs84Geometry(Geometry geometry, boolean ifExceptionReturnNull);
-
-
-
 }

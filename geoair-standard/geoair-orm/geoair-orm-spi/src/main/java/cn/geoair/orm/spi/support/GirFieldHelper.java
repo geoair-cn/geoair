@@ -1,13 +1,15 @@
 package cn.geoair.orm.spi.support;
 
 import cn.geoair.orm.spi.entity.GirEntityField;
+
+import jakarta.persistence.Entity;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
 import java.util.*;
-import jakarta.persistence.Entity;
 
 /** 类字段工具类 */
 public class GirFieldHelper {

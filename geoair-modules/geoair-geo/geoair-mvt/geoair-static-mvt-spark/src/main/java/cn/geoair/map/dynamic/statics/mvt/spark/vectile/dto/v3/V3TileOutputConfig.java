@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3;
 
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -10,8 +11,8 @@ import java.io.Serializable;
 /**
  * V3 静态 MVT 的输出配置。
  *
- * <p>该配置仅由 V3 使用，统一承载全部输出介质的参数。目录和对象存储均使用
- * {@code z/x/y.pbf} 结构；PostgreSQL 使用 {@link #postgresqlOutputSource}。</p>
+ * <p>该配置仅由 V3 使用，统一承载全部输出介质的参数。目录和对象存储均使用 {@code z/x/y.pbf} 结构；PostgreSQL 使用 {@link
+ * #postgresqlOutputSource}。
  *
  * @author 张逢吉
  */
@@ -28,8 +29,8 @@ public class V3TileOutputConfig implements Serializable {
     private DataSourceConfig postgresqlOutputSource;
 
     /**
-     * 本地目录输出根路径，仅 {@link V3TileOutputType#LOCAL_DIRECTORY} 使用。
-     * Spark 集群模式下必须是所有 executor 都可访问的共享挂载目录，不能只填写 Driver 本机路径。
+     * 本地目录输出根路径，仅 {@link V3TileOutputType#LOCAL_DIRECTORY} 使用。 Spark 集群模式下必须是所有 executor
+     * 都可访问的共享挂载目录，不能只填写 Driver 本机路径。
      */
     private String localDirectory;
 

@@ -2,8 +2,6 @@ package cn.geoair.comp.dynamic.ds;
 
 import cn.geoair.comp.dynamic.ds.apo.DataSourceApo;
 
-import javax.sql.DataSource;
-
 /**
  * @author ：张逢吉
  * @date ：Created in 2025/10/9 10:32 @description： 由上游进行实现
@@ -17,6 +15,4 @@ public interface IAdvDataSourceHelper {
      * @return 数据源描述对象
      */
     DataSourceApo getDataSourceApoById(String dataSourceId);
-
-
 }

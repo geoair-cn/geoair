@@ -1,11 +1,17 @@
 package cn.geoair.map.dynamic.statics.mvt.v4.stats;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json.AttributeStat;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json.LayerStat;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json.TileStats;
 import cn.geoair.map.dynamic.statics.mvt.v4.group.V4OrderedRow;
+
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -19,28 +25,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * {@link V4TileStats} 的口径测试。
  *
- * <p>锁住三件容易在一次"顺手优化"里被改坏的事：</p>
+ * <p>锁住三件容易在一次"顺手优化"里被改坏的事：
+ *
  * <ol>
- *   <li><b>一个源要素只计一次</b>：同一序号在多块瓦片里重复出现（这是切片的常态，
- *       不是异常），统计不能跟着放大；</li>
- *   <li><b>取值上限只挡新值</b>：已达上限后已知值的次数还要继续累计，
- *       否则"出现最多的值"会因为上限而失真；</li>
- *   <li><b>统计的字段 = 实际写进 PBF 的字段</b>：判据必须与多图层编码器一致。</li>
+ *   <li><b>一个源要素只计一次</b>：同一序号在多块瓦片里重复出现（这是切片的常态， 不是异常），统计不能跟着放大；
+ *   <li><b>取值上限只挡新值</b>：已达上限后已知值的次数还要继续累计， 否则"出现最多的值"会因为上限而失真；
+ *   <li><b>统计的字段 = 实际写进 PBF 的字段</b>：判据必须与多图层编码器一致。
  * </ol>
  *
  * @author 张逢吉
  */
 public class V4TileStatsTest {
 
-    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(), 4326);
+    private static final GeometryFactory GEOMETRY_FACTORY =
+            new GeometryFactory(new PrecisionModel(), 4326);
 
     private static MvtLayerSliceParameter layer() {
         MvtLayerSliceParameter layer = new MvtLayerSliceParameter();
@@ -85,7 +86,8 @@ public class V4TileStatsTest {
         V4TileStats stats = new V4TileStats(Collections.singletonList(layer()));
 
         // 同一个要素（序号 7）落进三块瓦片，每块里还是两行（一个要素被切成了两行）
-        stats.onRows("poi", Arrays.asList(row(7, point(1, 1), "gid", 1), row(7, point(1, 1), "gid", 1)));
+        stats.onRows(
+                "poi", Arrays.asList(row(7, point(1, 1), "gid", 1), row(7, point(1, 1), "gid", 1)));
         stats.onRows("poi", Collections.singletonList(row(7, point(1, 1), "gid", 1)));
         stats.onRows("poi", Collections.singletonList(row(8, point(2, 2), "gid", 2)));
 
@@ -118,10 +120,12 @@ public class V4TileStatsTest {
     @Test
     public void reportsTypeAndNumericRange() {
         V4TileStats stats = new V4TileStats(Collections.singletonList(layer()));
-        stats.onRows("poi", Arrays.asList(
-                row(0, null, "height", 12.5, "name", "a"),
-                row(1, null, "height", 3, "name", "b"),
-                row(2, null, "height", 40.25, "name", "a")));
+        stats.onRows(
+                "poi",
+                Arrays.asList(
+                        row(0, null, "height", 12.5, "name", "a"),
+                        row(1, null, "height", 3, "name", "b"),
+                        row(2, null, "height", 40.25, "name", "a")));
 
         LayerStat stat = onlyLayer(stats.toTileStats());
         AttributeStat height = attribute(stat, "height");
@@ -138,7 +142,8 @@ public class V4TileStatsTest {
     @Test
     public void reportsGeometryTypeOnce() {
         V4TileStats stats = new V4TileStats(Collections.singletonList(layer()));
-        stats.onRows("poi", Arrays.asList(row(0, point(1, 1), "gid", 1), row(1, point(2, 2), "gid", 2)));
+        stats.onRows(
+                "poi", Arrays.asList(row(0, point(1, 1), "gid", 1), row(1, point(2, 2), "gid", 2)));
         assertEquals("Point", onlyLayer(stats.toTileStats()).getGeometry());
 
         // 几何整列缺失时如实退回 Unknown，而不是假装成 Point
@@ -153,8 +158,10 @@ public class V4TileStatsTest {
         filtered.setExcludeFields(new ArrayList<>(Collections.singletonList("secret")));
 
         V4TileStats stats = new V4TileStats(Collections.singletonList(filtered));
-        stats.onRows("poi", Collections.singletonList(
-                row(0, point(1, 1), "gid", 1, "secret", "x", "name", "a")));
+        stats.onRows(
+                "poi",
+                Collections.singletonList(
+                        row(0, point(1, 1), "gid", 1, "secret", "x", "name", "a")));
 
         LayerStat stat = onlyLayer(stats.toTileStats());
         List<String> fields = new ArrayList<>();
@@ -168,11 +175,26 @@ public class V4TileStatsTest {
         // 白名单模式：只报 includeFields 与 sysIncludeFields 里的字段，id 字段强制保留
         MvtLayerSliceParameter whitelist = layer();
         whitelist.setIncludeFields(new ArrayList<>(Collections.singletonList("name")));
-        whitelist.setSysIncludeFields(new java.util.LinkedHashSet<>(Collections.singletonList("sys")));
+        whitelist.setSysIncludeFields(
+                new java.util.LinkedHashSet<>(Collections.singletonList("sys")));
         whitelist.setIdFieldName("code");
         V4TileStats limited = new V4TileStats(Collections.singletonList(whitelist));
-        limited.onRows("poi", Collections.singletonList(
-                row(0, point(1, 1), "gid", 1, "name", "a", "sys", "s", "code", "c", "other", "o")));
+        limited.onRows(
+                "poi",
+                Collections.singletonList(
+                        row(
+                                0,
+                                point(1, 1),
+                                "gid",
+                                1,
+                                "name",
+                                "a",
+                                "sys",
+                                "s",
+                                "code",
+                                "c",
+                                "other",
+                                "o")));
 
         List<String> limitedFields = new ArrayList<>();
         for (AttributeStat attribute : onlyLayer(limited.toTileStats()).getAttributes()) {

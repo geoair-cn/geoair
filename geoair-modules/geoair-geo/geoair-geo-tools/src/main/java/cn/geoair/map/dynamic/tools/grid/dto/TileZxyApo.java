@@ -1,19 +1,20 @@
 package cn.geoair.map.dynamic.tools.grid.dto;
 
-
-import java.util.Objects;
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Geometry;
+
+import java.util.Objects;
 
 /**
  * 瓦片坐标值对象，按 {@code z/x/y} 保存层级、列号和行号。
  *
- * <p>该对象本身不携带 Y 轴原点约定；使用 TMS 行号时，需在调用转换 API 时显式传入
- * {@link TileYAxis}。无 Y 轴参数的本类边界方法固定按 Google/XYZ 顶部原点解释。</p>
+ * <p>该对象本身不携带 Y 轴原点约定；使用 TMS 行号时，需在调用转换 API 时显式传入 {@link TileYAxis}。无 Y 轴参数的本类边界方法固定按 Google/XYZ
+ * 顶部原点解释。
  *
  * @author 张逢吉
  */
@@ -40,8 +41,7 @@ public class TileZxyApo {
     }
 
     /** 创建空的瓦片坐标对象。 */
-    public TileZxyApo() {
-    }
+    public TileZxyApo() {}
 
     /**
      * 使用数值坐标创建对象，不校验层级和行列号范围。
@@ -67,13 +67,12 @@ public class TileZxyApo {
             this.x = Integer.parseInt(x);
             this.y = Integer.parseInt(y);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid tile coordinates: z=" + z + ", x=" + x + ", y=" + y, e);
+            throw new IllegalArgumentException(
+                    "Invalid tile coordinates: z=" + z + ", x=" + x + ", y=" + y, e);
         }
     }
 
-    /**
-     * Long类型构造函数（支持从Long类型转换）
-     */
+    /** Long类型构造函数（支持从Long类型转换） */
     public TileZxyApo(Long z, Long x, Long y) {
         if (z == null || x == null || y == null) {
             throw new IllegalArgumentException("Tile coordinates cannot be null");
@@ -95,14 +94,16 @@ public class TileZxyApo {
         }
         String[] parts = zxyString.split("/");
         if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid ZXY format, expected 'z/x/y', got: " + zxyString);
+            throw new IllegalArgumentException(
+                    "Invalid ZXY format, expected 'z/x/y', got: " + zxyString);
         }
         try {
             this.z = Integer.parseInt(parts[0]);
             this.x = Integer.parseInt(parts[1]);
             this.y = Integer.parseInt(parts[2]);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid numeric format in ZXY string: " + zxyString, e);
+            throw new IllegalArgumentException(
+                    "Invalid numeric format in ZXY string: " + zxyString, e);
         }
     }
 
@@ -120,7 +121,6 @@ public class TileZxyApo {
         this.x = zxyArray[1];
         this.y = zxyArray[2];
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -156,8 +156,13 @@ public class TileZxyApo {
      */
     public String toBox4326WktString() {
         ReferencedEnvelope referencedEnvelope =
-                GirGeoTools.defaultInstance().getTileGrid4326Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
-        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(referencedEnvelope, 4326, 4326);
+                GirGeoTools.defaultInstance()
+                        .getTileGrid4326Opt()
+                        .xyzToTileBox(z, x, y, TileYAxis.XYZ, 4326);
+        Geometry geometry =
+                GirGeoTools.defaultInstance()
+                        .getSridOpt()
+                        .convertToGeom(referencedEnvelope, 4326, 4326);
         return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 
@@ -168,8 +173,13 @@ public class TileZxyApo {
      */
     public String toBox3857WktString() {
         ReferencedEnvelope referencedEnvelope =
-                GirGeoTools.defaultInstance().getTileGrid3857Opt().xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857);
-        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(referencedEnvelope, 3857, 3857);
+                GirGeoTools.defaultInstance()
+                        .getTileGrid3857Opt()
+                        .xyzToTileBox(z, x, y, TileYAxis.XYZ, 3857);
+        Geometry geometry =
+                GirGeoTools.defaultInstance()
+                        .getSridOpt()
+                        .convertToGeom(referencedEnvelope, 3857, 3857);
         return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 }

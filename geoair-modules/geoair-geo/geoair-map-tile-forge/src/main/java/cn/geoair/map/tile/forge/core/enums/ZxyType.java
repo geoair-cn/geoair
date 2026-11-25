@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.core.enums;
 
 import cn.geoair.base.data.GiVisualValuable;
+
 import lombok.Getter;
 
 /**
@@ -19,9 +20,9 @@ public enum ZxyType implements GiVisualValuable<String> {
         this.mode = mode;
     }
 
-
     /**
      * 根据 mode 值获取对应的枚举
+     *
      * @param mode 模式字符串（不区分大小写）
      * @return 对应的枚举，未找到时返回 ZXY
      */
@@ -37,22 +38,19 @@ public enum ZxyType implements GiVisualValuable<String> {
         return ZXY;
     }
 
-    /**
-     * 判断是否为 ZXY 模式（坐标顺序为 Z/X/Y）
-     */
+    /** 判断是否为 ZXY 模式（坐标顺序为 Z/X/Y） */
     public boolean isZxy() {
         return this == ZXY;
     }
 
-    /**
-     * 判断是否为 ZYX 模式（坐标顺序为 Z/Y/X）
-     */
+    /** 判断是否为 ZYX 模式（坐标顺序为 Z/Y/X） */
     public boolean isZyx() {
         return this == ZYX;
     }
 
     /**
      * 获取对应的瓦片请求格式
+     *
      * @return 格式字符串
      */
     public String getFormat() {

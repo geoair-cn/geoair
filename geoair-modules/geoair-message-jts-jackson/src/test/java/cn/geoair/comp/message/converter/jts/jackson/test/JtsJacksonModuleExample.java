@@ -1,12 +1,12 @@
 package cn.geoair.comp.message.converter.jts.jackson.test;
 
 import cn.geoair.comp.message.converter.jts.jackson.serializer.jts.JtsExtModule;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.locationtech.jts.geom.Envelope;
 
-/**
- * JtsExtModule 示例
- */
+/** JtsExtModule 示例 */
 public class JtsJacksonModuleExample {
 
     public static void main(String[] args) throws Exception {

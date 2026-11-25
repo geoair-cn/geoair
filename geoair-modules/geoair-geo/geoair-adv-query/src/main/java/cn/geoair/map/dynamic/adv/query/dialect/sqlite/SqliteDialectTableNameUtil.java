@@ -7,8 +7,7 @@ import cn.hutool.core.util.StrUtil;
 /** SQLite 标识符及分页语法处理器。 */
 public final class SqliteDialectTableNameUtil extends AbstractExecDialectTableUtil {
 
-    private static final SqliteDialectTableNameUtil INSTANCE =
-            new SqliteDialectTableNameUtil();
+    private static final SqliteDialectTableNameUtil INSTANCE = new SqliteDialectTableNameUtil();
 
     private SqliteDialectTableNameUtil() {}
 
@@ -32,8 +31,7 @@ public final class SqliteDialectTableNameUtil extends AbstractExecDialectTableUt
             return fieldName;
         }
         String identifier = fieldName;
-        if (identifier.startsWith("\"") && identifier.endsWith("\"")
-                && identifier.length() >= 2) {
+        if (identifier.startsWith("\"") && identifier.endsWith("\"") && identifier.length() >= 2) {
             identifier = identifier.substring(1, identifier.length() - 1).replace("\"\"", "\"");
         }
         return "\"" + identifier.replace("\"", "\"\"") + "\"";

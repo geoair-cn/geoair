@@ -22,9 +22,8 @@ import java.util.zip.GZIPOutputStream;
 /**
  * PMTiles V3 归档工具。
  *
- * <p>工具从 {@code z/x/y.pbf} 本地目录生成符合 PMTiles V3 规范的单文件归档，
- * 包含 Header、根/叶目录、GZIP JSON 元数据和 MVT 数据。瓦片数据是否 gzip 由调用参数决定。归档必须在
- * Spark Driver 单进程执行，不能由多个 executor 并发写入同一个 PMTiles 文件。</p>
+ * <p>工具从 {@code z/x/y.pbf} 本地目录生成符合 PMTiles V3 规范的单文件归档， 包含 Header、根/叶目录、GZIP JSON 元数据和 MVT
+ * 数据。瓦片数据是否 gzip 由调用参数决定。归档必须在 Spark Driver 单进程执行，不能由多个 executor 并发写入同一个 PMTiles 文件。
  *
  * @author 张逢吉
  */
@@ -32,16 +31,17 @@ public final class PmtilesUtils {
 
     /** PMTiles V3 固定 Header 字节数。 */
     public static final int HEADER_LENGTH = 127;
+
     /** Header 加根目录必须不超过 16 KiB。 */
     public static final int MAX_ROOT_DIRECTORY_LENGTH = 16 * 1024 - HEADER_LENGTH;
+
     private static final byte[] MAGIC = "PMTiles".getBytes(StandardCharsets.UTF_8);
     private static final int VERSION = 3;
     private static final int NO_COMPRESSION = 1;
     private static final int GZIP_COMPRESSION = 2;
     private static final int MVT_TILE_TYPE = 1;
 
-    private PmtilesUtils() {
-    }
+    private PmtilesUtils() {}
 
     /**
      * 将 V3 中间目录归档为 PMTiles V3。
@@ -54,19 +54,26 @@ public final class PmtilesUtils {
      * @param jsonMetadata PMTiles JSON 元数据；MVT 必须包含 {@code vector_layers}
      */
     public static void archive(
-            Path stagingDirectory, Path targetFile, TileYAxis stagingYAxis,
-            boolean overwrite, boolean gzipPbf, String jsonMetadata) throws IOException {
+            Path stagingDirectory,
+            Path targetFile,
+            TileYAxis stagingYAxis,
+            boolean overwrite,
+            boolean gzipPbf,
+            String jsonMetadata)
+            throws IOException {
         if (targetFile == null) {
             throw new IllegalArgumentException("PMTiles 输出文件不能为空");
         }
         Path archiveFile = targetFile.toAbsolutePath().normalize();
-        List<V3TileArchiveFiles.TileFile> files = V3TileArchiveFiles.listTiles(stagingDirectory, stagingYAxis);
+        List<V3TileArchiveFiles.TileFile> files =
+                V3TileArchiveFiles.listTiles(stagingDirectory, stagingYAxis);
         V3TileArchiveFiles.sortByPmtilesId(files);
         List<DirectoryEntry> tileEntries = buildTileEntries(files);
         DirectoryLayout directories = buildDirectories(tileEntries);
         byte[] metadata = gzip(validJson(jsonMetadata).getBytes(StandardCharsets.UTF_8));
         prepareTarget(archiveFile, overwrite);
-        Path temporaryFile = archiveFile.resolveSibling(archiveFile.getFileName() + ".tmp-" + UUID.randomUUID());
+        Path temporaryFile =
+                archiveFile.resolveSibling(archiveFile.getFileName() + ".tmp-" + UUID.randomUUID());
         try {
             writeArchive(temporaryFile, files, tileEntries, directories, metadata, gzipPbf);
             moveCompletedArchive(temporaryFile, archiveFile, overwrite);
@@ -116,16 +123,31 @@ public final class PmtilesUtils {
         }
         ByteBuffer header = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
         header.position(8);
-        PmtilesHeader result = new PmtilesHeader(
-                header.getLong(), header.getLong(), header.getLong(), header.getLong(),
-                header.getLong(), header.getLong(), header.getLong(), header.getLong(),
-                header.getLong(), header.getLong(), header.getLong());
+        PmtilesHeader result =
+                new PmtilesHeader(
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong(),
+                        header.getLong());
         long fileSize = Files.size(file);
-        validateSection("rootDirectory", result.rootDirectoryOffset, result.rootDirectoryLength, fileSize);
-        validateSection("jsonMetadata", result.jsonMetadataOffset, result.jsonMetadataLength, fileSize);
+        validateSection(
+                "rootDirectory", result.rootDirectoryOffset, result.rootDirectoryLength, fileSize);
+        validateSection(
+                "jsonMetadata", result.jsonMetadataOffset, result.jsonMetadataLength, fileSize);
         validateSection("tileData", result.tileDataOffset, result.tileDataLength, fileSize);
         if (result.leafDirectoryLength > 0) {
-            validateSection("leafDirectory", result.leafDirectoryOffset, result.leafDirectoryLength, fileSize);
+            validateSection(
+                    "leafDirectory",
+                    result.leafDirectoryOffset,
+                    result.leafDirectoryLength,
+                    fileSize);
         }
         if (result.rootDirectoryOffset != HEADER_LENGTH
                 || result.rootDirectoryLength > MAX_ROOT_DIRECTORY_LENGTH) {
@@ -134,10 +156,7 @@ public final class PmtilesUtils {
         return result;
     }
 
-    /**
-     * 将 XYZ 坐标转换为 PMTiles V3 TileID。
-     * TileID 为跨越所有层级 Hilbert 曲线位置的累计编号。
-     */
+    /** 将 XYZ 坐标转换为 PMTiles V3 TileID。 TileID 为跨越所有层级 Hilbert 曲线位置的累计编号。 */
     public static long tileId(int z, int x, int y) {
         if (z < 0 || z > 29) {
             throw new IllegalArgumentException("PMTiles 仅支持 0-29 级: " + z);
@@ -186,7 +205,8 @@ public final class PmtilesUtils {
         return entries;
     }
 
-    private static DirectoryLayout buildDirectories(List<DirectoryEntry> tileEntries) throws IOException {
+    private static DirectoryLayout buildDirectories(List<DirectoryEntry> tileEntries)
+            throws IOException {
         byte[] root = encodeDirectory(tileEntries);
         if (root.length <= MAX_ROOT_DIRECTORY_LENGTH) {
             return new DirectoryLayout(root, new byte[0]);
@@ -200,7 +220,9 @@ public final class PmtilesUtils {
                 int end = Math.min(tileEntries.size(), start + leafSize);
                 byte[] leaf = encodeDirectory(tileEntries.subList(start, end));
                 leaves.add(leaf);
-                rootEntries.add(new DirectoryEntry(tileEntries.get(start).tileId, leafOffset, leaf.length, 0));
+                rootEntries.add(
+                        new DirectoryEntry(
+                                tileEntries.get(start).tileId, leafOffset, leaf.length, 0));
                 leafOffset += leaf.length;
             }
             root = encodeDirectory(rootEntries);
@@ -249,8 +271,13 @@ public final class PmtilesUtils {
     }
 
     private static void writeArchive(
-            Path output, List<V3TileArchiveFiles.TileFile> files, List<DirectoryEntry> entries,
-            DirectoryLayout directories, byte[] metadata, boolean gzipPbf) throws IOException {
+            Path output,
+            List<V3TileArchiveFiles.TileFile> files,
+            List<DirectoryEntry> entries,
+            DirectoryLayout directories,
+            byte[] metadata,
+            boolean gzipPbf)
+            throws IOException {
         long rootOffset = HEADER_LENGTH;
         long metadataOffset = rootOffset + directories.root.length;
         long leafOffset = metadataOffset + metadata.length;
@@ -259,8 +286,19 @@ public final class PmtilesUtils {
         for (DirectoryEntry entry : entries) {
             tileDataLength += entry.length;
         }
-        byte[] header = createHeader(rootOffset, directories.root.length, metadataOffset, metadata.length,
-                leafOffset, directories.leaves.length, tileDataOffset, tileDataLength, files, entries.size(), gzipPbf);
+        byte[] header =
+                createHeader(
+                        rootOffset,
+                        directories.root.length,
+                        metadataOffset,
+                        metadata.length,
+                        leafOffset,
+                        directories.leaves.length,
+                        tileDataOffset,
+                        tileDataLength,
+                        files,
+                        entries.size(),
+                        gzipPbf);
         try (OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(output))) {
             outputStream.write(header);
             outputStream.write(directories.root);
@@ -279,9 +317,17 @@ public final class PmtilesUtils {
     }
 
     private static byte[] createHeader(
-            long rootOffset, long rootLength, long metadataOffset, long metadataLength,
-            long leafOffset, long leafLength, long tileDataOffset, long tileDataLength,
-            List<V3TileArchiveFiles.TileFile> files, int tileEntries, boolean gzipPbf) {
+            long rootOffset,
+            long rootLength,
+            long metadataOffset,
+            long metadataLength,
+            long leafOffset,
+            long leafLength,
+            long tileDataOffset,
+            long tileDataLength,
+            List<V3TileArchiveFiles.TileFile> files,
+            int tileEntries,
+            boolean gzipPbf) {
         Bounds bounds = bounds(files);
         ByteBuffer header = ByteBuffer.allocate(HEADER_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
         header.put(MAGIC);
@@ -306,7 +352,8 @@ public final class PmtilesUtils {
         putPosition(header, bounds.minLon, bounds.minLat);
         putPosition(header, bounds.maxLon, bounds.maxLat);
         header.put((byte) ((bounds.minZoom + bounds.maxZoom) / 2));
-        putPosition(header, (bounds.minLon + bounds.maxLon) / 2D, (bounds.minLat + bounds.maxLat) / 2D);
+        putPosition(
+                header, (bounds.minLon + bounds.maxLon) / 2D, (bounds.minLat + bounds.maxLat) / 2D);
         return header.array();
     }
 
@@ -360,8 +407,12 @@ public final class PmtilesUtils {
         return json == null || json.trim().isEmpty() ? "{}" : json;
     }
 
-    private static void validateSection(String name, long offset, long length, long fileSize) throws IOException {
-        if (offset < HEADER_LENGTH || length < 0 || offset > fileSize || length > fileSize - offset) {
+    private static void validateSection(String name, long offset, long length, long fileSize)
+            throws IOException {
+        if (offset < HEADER_LENGTH
+                || length < 0
+                || offset > fileSize
+                || length > fileSize - offset) {
             throw new IOException("PMTiles " + name + " 分段范围非法");
         }
     }
@@ -376,7 +427,8 @@ public final class PmtilesUtils {
         }
     }
 
-    private static void moveCompletedArchive(Path temporaryFile, Path targetFile, boolean overwrite) throws IOException {
+    private static void moveCompletedArchive(Path temporaryFile, Path targetFile, boolean overwrite)
+            throws IOException {
         if (overwrite) {
             Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
         } else {
@@ -432,9 +484,17 @@ public final class PmtilesUtils {
         private final long tileContents;
 
         private PmtilesHeader(
-                long rootDirectoryOffset, long rootDirectoryLength, long jsonMetadataOffset, long jsonMetadataLength,
-                long leafDirectoryOffset, long leafDirectoryLength, long tileDataOffset, long tileDataLength,
-                long addressedTiles, long tileEntries, long tileContents) {
+                long rootDirectoryOffset,
+                long rootDirectoryLength,
+                long jsonMetadataOffset,
+                long jsonMetadataLength,
+                long leafDirectoryOffset,
+                long leafDirectoryLength,
+                long tileDataOffset,
+                long tileDataLength,
+                long addressedTiles,
+                long tileEntries,
+                long tileContents) {
             this.rootDirectoryOffset = rootDirectoryOffset;
             this.rootDirectoryLength = rootDirectoryLength;
             this.jsonMetadataOffset = jsonMetadataOffset;

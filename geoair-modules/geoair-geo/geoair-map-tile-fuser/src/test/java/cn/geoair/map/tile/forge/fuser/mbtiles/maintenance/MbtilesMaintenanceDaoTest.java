@@ -4,6 +4,12 @@ import static org.junit.Assert.*;
 
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessCoordinator;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessLease;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -11,10 +17,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 /** 对真实SQLite验证CAS、事务恢复点、WAL和完整回收，不使用模拟SQL成功。 */
 public class MbtilesMaintenanceDaoTest {

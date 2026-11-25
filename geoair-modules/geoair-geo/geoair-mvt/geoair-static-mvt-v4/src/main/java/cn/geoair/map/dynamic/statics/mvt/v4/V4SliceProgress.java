@@ -7,10 +7,10 @@ import cn.geoair.base.percent.GiProgressReporter;
 /**
  * V4 的执行进度与计数。
  *
- * <p>上报口径与 V3 一致：{@link GiProgressReporter#report(Long, Long)} 的
- * {@code total} 是总阶段数、{@code current} 是已完成阶段数，这样管理端换引擎时不用改前端。</p>
+ * <p>上报口径与 V3 一致：{@link GiProgressReporter#report(Long, Long)} 的 {@code total} 是总阶段数、{@code
+ * current} 是已完成阶段数，这样管理端换引擎时不用改前端。
  *
- * <p>V3 的阶段进度靠 Spark Stage 监听器，V4 没有 Spark，所以由驱动自己在每一步结束时上报。</p>
+ * <p>V3 的阶段进度靠 Spark Stage 监听器，V4 没有 Spark，所以由驱动自己在每一步结束时上报。
  *
  * @author 张逢吉
  */

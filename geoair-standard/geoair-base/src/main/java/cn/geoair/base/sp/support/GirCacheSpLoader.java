@@ -2,8 +2,8 @@ package cn.geoair.base.sp.support;
 
 import cn.geoair.base.sp.GkSpLoader;
 import cn.geoair.base.tool.GkConcurrentReferenceHashMap;
+
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

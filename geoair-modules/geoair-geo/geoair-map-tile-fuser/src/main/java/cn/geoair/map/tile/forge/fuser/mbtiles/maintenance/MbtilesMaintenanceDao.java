@@ -6,6 +6,11 @@ import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessLease;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesWriteCoordinator;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesWriteLease;
 import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
+
+import org.sqlite.ProgressHandler;
+import org.sqlite.SQLiteConnection;
+import org.sqlite.core.DB;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,9 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
-import org.sqlite.ProgressHandler;
-import org.sqlite.SQLiteConnection;
-import org.sqlite.core.DB;
 
 /** 外部缓存库的专用 DAO；SQL 仅使用固定表列、受控 PRAGMA 和绑定参数。 */
 public class MbtilesMaintenanceDao {
@@ -119,6 +121,7 @@ public class MbtilesMaintenanceDao {
             return info;
         }
     }
+
     /** 要求可写的标准 tiles 表，唯一坐标索引用于有界游标；禁止在无索引大库上排序全表。 */
     public void validateTranscode(Path file) throws Exception {
         try (MbtilesAccessLease lease = MbtilesAccessCoordinator.operation(file);
@@ -242,6 +245,7 @@ public class MbtilesMaintenanceDao {
             }
         }
     }
+
     /** 瓦片更新和恢复点同库同事务提交；管理库进度晚写不会导致重启重复有损编码。 */
     public void commit(
             Path file,
@@ -296,6 +300,7 @@ public class MbtilesMaintenanceDao {
             sql.executeUpdate();
         }
     }
+
     /** 私有标记说明逐片识别；保留历史format值，避免把混合库谎报为全JPEG。 */
     public void markPerTileEncoding(Path file) throws Exception {
         try (MbtilesWriteLease lease = MbtilesWriteCoordinator.write(file);
@@ -329,6 +334,7 @@ public class MbtilesMaintenanceDao {
             return Math.max(0, before - number(db, "freelist_count"));
         }
     }
+
     /** 调用方必须持有独占维护租约，并在执行前重新检查空间。 */
     public void vacuum(Path file, BooleanSupplier cancelled) throws Exception {
         MbtilesAccessCoordinator.requireMaintenance(file);

@@ -12,10 +12,8 @@ import java.util.Locale;
 /**
  * 静态切片任务约定的数据库连接协议解析器和值对象。
  *
- * <p>协议格式由外部约定，必须保持为：
- * {@code #jdbc:{subprotocol}://用户名#密码/主机:端口/数据库名[/模式名[/表名]]}。
- * 本类只负责该任务协议中的用户名、密码、schema 和表名；标准 JDBC URL 的构建委托给
- * {@link JdbcUrlCodec}，避免在此重复维护各数据库的 URL 方言。</p>
+ * <p>协议格式由外部约定，必须保持为： {@code #jdbc:{subprotocol}://用户名#密码/主机:端口/数据库名[/模式名[/表名]]}。
+ * 本类只负责该任务协议中的用户名、密码、schema 和表名；标准 JDBC URL 的构建委托给 {@link JdbcUrlCodec}，避免在此重复维护各数据库的 URL 方言。
  *
  * @author refactored from PgUrl / PgConnectInfoWithTable
  */
@@ -26,20 +24,28 @@ public final class ProtocolUrl implements Serializable {
 
     /** 第三方协议中声明的子协议，保留原始值以便无损输出。 */
     private final String subProtocol;
+
     /** 数据库用户名。 */
     private final String username;
+
     /** 数据库密码。 */
     private final String password;
+
     /** 主机名或方括号包裹的 IPv6 地址。 */
     private final String host;
+
     /** 端口号。 */
     private final int port;
+
     /** 数据库名称。 */
     private final String database;
+
     /** 标准 JDBC URL 中数据库名后的原始参数，例如 {@code ?sslmode=require}。 */
     private final String jdbcProperties;
+
     /** 协议中的可选 schema 段。 */
     private final String schema;
+
     /** 协议中的可选表名段。 */
     private final String tableName;
 
@@ -56,14 +62,16 @@ public final class ProtocolUrl implements Serializable {
         String afterPrefix = url.substring(PROTOCOL_PREFIX.length());
         int schemeEnd = afterPrefix.indexOf("://");
         if (schemeEnd <= 0) {
-            throw new IllegalArgumentException("缺少子协议或 '://' 分隔符，格式示例: "
-                    + "#jdbc:postgresql://user#password/host:port/database");
+            throw new IllegalArgumentException(
+                    "缺少子协议或 '://' 分隔符，格式示例: "
+                            + "#jdbc:postgresql://user#password/host:port/database");
         }
         this.subProtocol = afterPrefix.substring(0, schemeEnd);
 
         String[] parts = afterPrefix.substring(schemeEnd + 3).split("/", -1);
         if (parts.length < 3 || parts.length > 5) {
-            throw new IllegalArgumentException("路径应为 user#password/host:port/database[/schema[/table]]，实际: " + url);
+            throw new IllegalArgumentException(
+                    "路径应为 user#password/host:port/database[/schema[/table]]，实际: " + url);
         }
 
         String auth = parts[0];
@@ -215,8 +223,8 @@ public final class ProtocolUrl implements Serializable {
     /**
      * 将第三方协议的连接部分转换为标准 JDBC URL，不输出用户名、密码和任务表名。
      *
-     * <p>{@code postgis} 是任务协议允许的 PostgreSQL 别名，输出时会归一化为 JDBC 驱动实际使用的
-     * {@code postgresql}。其它 URL 细节由 {@code geoair-jdbc-url} 的方言实现负责。</p>
+     * <p>{@code postgis} 是任务协议允许的 PostgreSQL 别名，输出时会归一化为 JDBC 驱动实际使用的 {@code postgresql}。其它 URL 细节由
+     * {@code geoair-jdbc-url} 的方言实现负责。
      */
     public String toJdbcUrl() {
         JdbcUrlCodec codec = GirJdbcUrlCodecs.defaultCodec();
@@ -232,10 +240,20 @@ public final class ProtocolUrl implements Serializable {
     /** 按约定还原协议字符串；空 schema 段会保留，确保 {@code //table} 不丢失表名语义。 */
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(PROTOCOL_PREFIX).append(subProtocol)
-                .append("://").append(username).append('#').append(password)
-                .append('/').append(host).append(':').append(port)
-                .append('/').append(database).append(jdbcProperties);
+        StringBuilder result =
+                new StringBuilder(PROTOCOL_PREFIX)
+                        .append(subProtocol)
+                        .append("://")
+                        .append(username)
+                        .append('#')
+                        .append(password)
+                        .append('/')
+                        .append(host)
+                        .append(':')
+                        .append(port)
+                        .append('/')
+                        .append(database)
+                        .append(jdbcProperties);
         if (schema != null) {
             result.append('/').append(schema);
         } else if (tableName != null) {
@@ -265,8 +283,10 @@ public final class ProtocolUrl implements Serializable {
     }
 
     private DatabaseType resolveDatabaseType() {
-        String jdbcDriverName = "postgis".equalsIgnoreCase(subProtocol) ? "postgresql" : subProtocol;
-        DatabaseType databaseType = DatabaseType.fromJdbcDriverName(jdbcDriverName.toLowerCase(Locale.ROOT));
+        String jdbcDriverName =
+                "postgis".equalsIgnoreCase(subProtocol) ? "postgresql" : subProtocol;
+        DatabaseType databaseType =
+                DatabaseType.fromJdbcDriverName(jdbcDriverName.toLowerCase(Locale.ROOT));
         if (databaseType == DatabaseType.UNKNOWN) {
             throw new IllegalArgumentException("不支持生成 JDBC URL 的子协议: " + subProtocol);
         }
@@ -274,8 +294,10 @@ public final class ProtocolUrl implements Serializable {
     }
 
     private static boolean supportsSchemaRewrite(DatabaseType databaseType) {
-        return databaseType == DatabaseType.POSTGRESQL || databaseType == DatabaseType.ORACLE
-                || databaseType == DatabaseType.SQLSERVER || databaseType == DatabaseType.H2;
+        return databaseType == DatabaseType.POSTGRESQL
+                || databaseType == DatabaseType.ORACLE
+                || databaseType == DatabaseType.SQLSERVER
+                || databaseType == DatabaseType.H2;
     }
 
     private static HostPort parseHostPort(String value) {
@@ -300,7 +322,8 @@ public final class ProtocolUrl implements Serializable {
         if (queryIndex < 0) {
             return new DatabaseAndProperties(value, "");
         }
-        return new DatabaseAndProperties(value.substring(0, queryIndex), value.substring(queryIndex));
+        return new DatabaseAndProperties(
+                value.substring(0, queryIndex), value.substring(queryIndex));
     }
 
     private static void validateHost(String host) {

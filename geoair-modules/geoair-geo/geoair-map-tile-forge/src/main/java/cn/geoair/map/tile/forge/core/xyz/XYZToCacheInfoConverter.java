@@ -5,9 +5,7 @@ import cn.geoair.map.tile.forge.core.bygwc.config.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 从XYZ图层参数生成ArcGIS CacheInfo对象的工具类
- */
+/** 从XYZ图层参数生成ArcGIS CacheInfo对象的工具类 */
 public class XYZToCacheInfoConverter {
 
     static XYZToCacheInfoConverter instance;
@@ -15,7 +13,6 @@ public class XYZToCacheInfoConverter {
     public static XYZToCacheInfoConverter getInstance() {
         return instance == null ? instance = new XYZToCacheInfoConverter() : instance;
     }
-
 
     // Web Mercator（EPSG:3857）的基本参数
     private static final double WMTS_ORIGIN_X = -20037508.342789244;
@@ -29,8 +26,8 @@ public class XYZToCacheInfoConverter {
     /**
      * 生成Web Mercator投影的XYZ图层对应的CacheInfo对象
      *
-     * @param minZoom  最小缩放级别（如0）
-     * @param maxZoom  最大缩放级别（如18）
+     * @param minZoom 最小缩放级别（如0）
+     * @param maxZoom 最大缩放级别（如18）
      * @param tileSize 瓦片像素尺寸（默认256）
      * @return 完整的CacheInfo对象
      */
@@ -84,41 +81,38 @@ public class XYZToCacheInfoConverter {
         return cacheInfo;
     }
 
-    /**
-     * 创建Web Mercator（EPSG:3857）的空间参考对象
-     */
+    /** 创建Web Mercator（EPSG:3857）的空间参考对象 */
     private static SpatialReference createWebMercatorSpatialReference() {
         SpatialReference spatialRef = new SpatialReference();
         spatialRef.setWKID(3857); // EPSG:3857的Wkid
         spatialRef.setLatestWKID(3857);
         spatialRef.setWKT(
-                "PROJCS[\"WGS_1984_Web_Mercator_Auxiliary_Sphere\"," +
-                        "GEOGCS[\"GCS_WGS_1984\"," +
-                        "DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]]," +
-                        "PRIMEM[\"Greenwich\",0.0]," +
-                        "UNIT[\"Degree\",0.0174532925199433]]," +
-                        "PROJECTION[\"Mercator_Auxiliary_Sphere\"]," +
-                        "PARAMETER[\"False_Easting\",0.0]," +
-                        "PARAMETER[\"False_Northing\",0.0]," +
-                        "PARAMETER[\"Central_Meridian\",0.0]," +
-                        "PARAMETER[\"Standard_Parallel_1\",0.0]," +
-                        "PARAMETER[\"Auxiliary_Sphere_Type\",0.0]," +
-                        "UNIT[\"Meter\",1.0]]"
-        );
+                "PROJCS[\"WGS_1984_Web_Mercator_Auxiliary_Sphere\","
+                        + "GEOGCS[\"GCS_WGS_1984\","
+                        + "DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],"
+                        + "PRIMEM[\"Greenwich\",0.0],"
+                        + "UNIT[\"Degree\",0.0174532925199433]],"
+                        + "PROJECTION[\"Mercator_Auxiliary_Sphere\"],"
+                        + "PARAMETER[\"False_Easting\",0.0],"
+                        + "PARAMETER[\"False_Northing\",0.0],"
+                        + "PARAMETER[\"Central_Meridian\",0.0],"
+                        + "PARAMETER[\"Standard_Parallel_1\",0.0],"
+                        + "PARAMETER[\"Auxiliary_Sphere_Type\",0.0],"
+                        + "UNIT[\"Meter\",1.0]]");
         return spatialRef;
     }
 
     /**
      * 生成各缩放级别的LODInfo列表
      *
-     * @param minZoom  最小级别
-     * @param maxZoom  最大级别
+     * @param minZoom 最小级别
+     * @param maxZoom 最大级别
      * @param tileSize 瓦片尺寸
      * @return LODInfo列表
      */
     private static List<LODInfo> createLODInfos(int minZoom, int maxZoom, int tileSize) {
         List<LODInfo> lodInfos = new ArrayList<>();
-//        for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
+        //        for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
         for (int zoom = 0; zoom <= 19; zoom++) {
             LODInfo lod = new LODInfo();
             lod.setLevelID(zoom);
@@ -138,9 +132,7 @@ public class XYZToCacheInfoConverter {
         return lodInfos;
     }
 
-    /**
-     * 重载方法：使用默认瓦片尺寸（256）
-     */
+    /** 重载方法：使用默认瓦片尺寸（256） */
     public CacheInfo createCacheInfo(int minZoom, int maxZoom) {
         return createCacheInfo(minZoom, maxZoom, DEFAULT_TILE_SIZE);
     }
@@ -151,12 +143,20 @@ public class XYZToCacheInfoConverter {
         CacheInfo cacheInfo = XYZToCacheInfoConverter.getInstance().createCacheInfo(0, 18);
 
         // 验证结果
-        System.out.println("空间参考Wkid: " + cacheInfo.getTileCacheInfo().getSpatialReference().getWKID());
-        System.out.println("瓦片原点: " + cacheInfo.getTileCacheInfo().getTileOrigin().getX() + ", " +
-                cacheInfo.getTileCacheInfo().getTileOrigin().getY());
-        System.out.println("瓦片尺寸: " + cacheInfo.getTileCacheInfo().getTileCols() + "x" +
-                cacheInfo.getTileCacheInfo().getTileRows());
+        System.out.println(
+                "空间参考Wkid: " + cacheInfo.getTileCacheInfo().getSpatialReference().getWKID());
+        System.out.println(
+                "瓦片原点: "
+                        + cacheInfo.getTileCacheInfo().getTileOrigin().getX()
+                        + ", "
+                        + cacheInfo.getTileCacheInfo().getTileOrigin().getY());
+        System.out.println(
+                "瓦片尺寸: "
+                        + cacheInfo.getTileCacheInfo().getTileCols()
+                        + "x"
+                        + cacheInfo.getTileCacheInfo().getTileRows());
         System.out.println("层级数量: " + cacheInfo.getTileCacheInfo().getLodInfos().size());
-        System.out.println("第0级分辨率: " + cacheInfo.getTileCacheInfo().getLodInfos().get(0).getResolution());
+        System.out.println(
+                "第0级分辨率: " + cacheInfo.getTileCacheInfo().getLodInfos().get(0).getResolution());
     }
 }

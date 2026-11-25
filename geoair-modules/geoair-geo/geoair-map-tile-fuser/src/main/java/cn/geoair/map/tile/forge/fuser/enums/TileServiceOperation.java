@@ -4,9 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 瓦片服务转换操作。
- */
+/** 瓦片服务转换操作。 */
 public enum TileServiceOperation {
 
     /** Google 网格转 4326 网格。 */

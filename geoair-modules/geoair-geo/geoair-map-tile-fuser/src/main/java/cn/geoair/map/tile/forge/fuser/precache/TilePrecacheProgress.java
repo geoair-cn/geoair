@@ -23,13 +23,19 @@ public final class TilePrecacheProgress {
 
     @GaModelField(text = "各处理结果数量")
     private final Map<TileOperationStatus, Long> counts;
+
     @GaModelField(text = "各阶段累计，不重复计入整体进度")
     private final TilePrecacheStages stages;
 
     public TilePrecacheProgress(int zoom, long total, Map<TileOperationStatus, Long> counts) {
         this(zoom, total, counts, TilePrecacheStages.empty());
     }
-    public TilePrecacheProgress(int zoom, long total, Map<TileOperationStatus, Long> counts, TilePrecacheStages stages) {
+
+    public TilePrecacheProgress(
+            int zoom,
+            long total,
+            Map<TileOperationStatus, Long> counts,
+            TilePrecacheStages stages) {
         this.zoom = zoom;
         this.total = total;
         this.counts = Collections.unmodifiableMap(new EnumMap<>(counts));

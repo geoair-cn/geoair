@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.file.jdbc.link;
 
-import cn.hutool.core.collection.ListUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -22,7 +21,8 @@ public abstract class JdbcGeoWriterLinkInfo extends JdbcGeoLinkInfo {
 
     /** 冲突判断字段；为空时由数据库执行普通插入。 */
     protected List<String> conflictKeys = new ArrayList<>();
-//    protected List<String> conflictKeys = ListUtil.of("fid");
+
+    //    protected List<String> conflictKeys = ListUtil.of("fid");
     @Override
     public void checkLinkInfo() {
         validateConnection();

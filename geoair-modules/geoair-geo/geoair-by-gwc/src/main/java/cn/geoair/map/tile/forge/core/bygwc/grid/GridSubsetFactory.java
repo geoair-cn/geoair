@@ -14,8 +14,6 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.grid;
 
-
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 

@@ -1,9 +1,11 @@
 package cn.geoair.map.tile.forge.fuser.mbtiles.maintenance;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
+
+import lombok.Data;
+
 import java.util.Map;
 import java.util.TreeMap;
-import lombok.Data;
 
 /** 真实累计量与阶段结果；总数未知时保持 null。 */
 @Data

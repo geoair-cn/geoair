@@ -3,6 +3,7 @@ package cn.geoair.base.util;
 import cn.geoair.base.bean.GkNullWrapperBean;
 import cn.geoair.base.lang.GkBasicType;
 import cn.geoair.base.tool.GkConcurrentReferenceHashMap;
+
 import java.beans.Introspector;
 import java.io.Closeable;
 import java.io.Externalizable;
@@ -68,30 +69,20 @@ public abstract class GutilClass {
     /** ".class"文件后缀 */
     public static final String CLASS_FILE_SUFFIX = ".class";
 
-    /**
-     * 以包装类型为键、对应原始类型为值的Map，例如：Integer.class -> int.class。
-     */
+    /** 以包装类型为键、对应原始类型为值的Map，例如：Integer.class -> int.class。 */
     private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new IdentityHashMap<>(8);
 
-    /**
-     * 以原始类型为键、对应包装类型为值的Map，例如：int.class -> Integer.class。
-     */
+    /** 以原始类型为键、对应包装类型为值的Map，例如：int.class -> Integer.class。 */
     private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap =
             new IdentityHashMap<>(8);
 
-    /**
-     * 以原始类型名为键、对应原始类型为值的Map，例如："int" -> int.class。
-     */
+    /** 以原始类型名为键、对应原始类型为值的Map，例如："int" -> int.class。 */
     private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
 
-    /**
-     * 以常见Java语言类名为键、对应Class为值的Map，主要用于远程调用的高效反序列化。
-     */
+    /** 以常见Java语言类名为键、对应Class为值的Map，主要用于远程调用的高效反序列化。 */
     private static final Map<String, Class<?>> commonClassCache = new HashMap<>(64);
 
-    /**
-     * 在查找'主'用户级接口时应忽略的常见Java语言接口集合。
-     */
+    /** 在查找'主'用户级接口时应忽略的常见Java语言接口集合。 */
     private static final Set<Class<?>> javaLanguageInterfaces;
 
     /** 声明类实现的接口上的等价方法的缓存。 */
@@ -188,12 +179,10 @@ public abstract class GutilClass {
     }
 
     /**
-     * 返回默认的ClassLoader：通常优先使用线程上下文ClassLoader（如果可用）；
-     * 否则回退到加载ClassUtils类的ClassLoader。
+     * 返回默认的ClassLoader：通常优先使用线程上下文ClassLoader（如果可用）； 否则回退到加载ClassUtils类的ClassLoader。
      *
-     * <p>如果你打算在明确希望得到非null ClassLoader引用的场景中使用线程上下文ClassLoader，
-     * 请调用此方法：例如用于类路径资源加载（但对于{@code Class.forName}则不是必需的，
-     * 因为它也接受{@code null} ClassLoader引用）。
+     * <p>如果你打算在明确希望得到非null ClassLoader引用的场景中使用线程上下文ClassLoader， 请调用此方法：例如用于类路径资源加载（但对于{@code
+     * Class.forName}则不是必需的， 因为它也接受{@code null} ClassLoader引用）。
      *
      * @return 默认ClassLoader（仅当系统ClassLoader也不可访问时返回{@code null}）
      * @see Thread#getContextClassLoader()
@@ -222,8 +211,7 @@ public abstract class GutilClass {
     }
 
     /**
-     * 必要时用环境的bean ClassLoader覆盖线程上下文ClassLoader，
-     * 即当bean ClassLoader与当前线程上下文ClassLoader不等价时。
+     * 必要时用环境的bean ClassLoader覆盖线程上下文ClassLoader， 即当bean ClassLoader与当前线程上下文ClassLoader不等价时。
      *
      * @param classLoaderToUse 用于线程上下文的实际ClassLoader
      * @return 原始的线程上下文ClassLoader，如果未覆盖则返回{@code null}
@@ -241,8 +229,7 @@ public abstract class GutilClass {
 
     /**
      * 是{@code Class.forName()}的替代方法，同样支持原始类型（如"int"）和数组类名（如"String[]"）。
-     * 此外，它还支持以Java源码风格解析内部类名（如用"java.lang.Thread.State"代替
-     * "java.lang.Thread$State"）。
+     * 此外，它还支持以Java源码风格解析内部类名（如用"java.lang.Thread.State"代替 "java.lang.Thread$State"）。
      *
      * @param name 类的名称
      * @param classLoader 要使用的类加载器（可以为{@code null}，表示使用默认类加载器）
@@ -336,8 +323,7 @@ public abstract class GutilClass {
     }
 
     /**
-     * 判断由给定名称标识的{@link Class}是否存在且可加载。
-     * 如果类或其某个依赖不存在或无法加载，返回{@code false}。
+     * 判断由给定名称标识的{@link Class}是否存在且可加载。 如果类或其某个依赖不存在或无法加载，返回{@code false}。
      *
      * @param className 要检查的类名
      * @param classLoader 要使用的类加载器（可以为{@code null}，表示使用默认类加载器）
@@ -436,8 +422,7 @@ public abstract class GutilClass {
     /**
      * 根据JVM对原始类名的命名规则，将给定的类名解析为原始类（如果合适）。
      *
-     * <p>也支持原始数组的JVM内部类名。但<i>不</i>支持原始数组的"[]"后缀记法；
-     * 该记法仅由{@link #forName(String, ClassLoader)}支持。
+     * <p>也支持原始数组的JVM内部类名。但<i>不</i>支持原始数组的"[]"后缀记法； 该记法仅由{@link #forName(String, ClassLoader)}支持。
      *
      * @param name 可能是原始类的类名
      * @return 原始类，如果该名称不表示原始类或原始数组类则返回{@code null}
@@ -512,8 +497,7 @@ public abstract class GutilClass {
     }
 
     /**
-     * 检查右侧类型是否可以赋给左侧类型，假设是通过反射进行设置。
-     * 将原始类型包装类视为可赋给对应的原始类型。
+     * 检查右侧类型是否可以赋给左侧类型，假设是通过反射进行设置。 将原始类型包装类视为可赋给对应的原始类型。
      *
      * @param lhsType 目标类型
      * @param rhsType 要赋给目标类型的值类型
@@ -541,8 +525,7 @@ public abstract class GutilClass {
     }
 
     /**
-     * 判断给定类型是否可以由给定值赋值，假设是通过反射进行设置。
-     * 将原始类型包装类视为可赋给对应的原始类型。
+     * 判断给定类型是否可以由给定值赋值，假设是通过反射进行设置。 将原始类型包装类视为可赋给对应的原始类型。
      *
      * @param type 目标类型
      * @param value 要赋给该类型的值
@@ -577,11 +560,9 @@ public abstract class GutilClass {
 
     /**
      * 返回适合与{@code ClassLoader.getResource}一起使用的路径（也适合与{@code Class.getResource}
-     * 一起使用，只需在返回值前加斜杠'/'）。构建方式：取指定类文件的包名，将所有点（'.'）转换为
-     * 斜杠（'/'），必要时添加尾斜杠，并将指定资源名拼接到其后。
-     * <br>
-     * 因此，此方法可用于构建加载与类文件位于同一包中的资源文件的路径，
-     * 不过通常使用{@link org.springframework.core.io.ClassPathResource}更方便。
+     * 一起使用，只需在返回值前加斜杠'/'）。构建方式：取指定类文件的包名，将所有点（'.'）转换为 斜杠（'/'），必要时添加尾斜杠，并将指定资源名拼接到其后。 <br>
+     * 因此，此方法可用于构建加载与类文件位于同一包中的资源文件的路径， 不过通常使用{@link
+     * org.springframework.core.io.ClassPathResource}更方便。
      *
      * @param clazz 用作基础的类
      * @param resourceName 要追加的资源名。前导斜杠可选。
@@ -598,9 +579,8 @@ public abstract class GutilClass {
     }
 
     /**
-     * 给定一个输入类对象，返回由该类包名组成的路径字符串，即所有点（'.'）替换为斜杠（'/'）。
-     * 不添加前导或尾随斜杠。结果可以拼上斜杠和资源名直接用于{@code ClassLoader.getResource()}；
-     * 如果要用于{@code Class.getResource}，则还需要在返回值前加前导斜杠。
+     * 给定一个输入类对象，返回由该类包名组成的路径字符串，即所有点（'.'）替换为斜杠（'/'）。 不添加前导或尾随斜杠。结果可以拼上斜杠和资源名直接用于{@code
+     * ClassLoader.getResource()}； 如果要用于{@code Class.getResource}，则还需要在返回值前加前导斜杠。
      *
      * @param clazz 输入类。{@code null}值或默认（空）包将返回空字符串（""）。
      * @return 表示包名的路径
@@ -623,8 +603,7 @@ public abstract class GutilClass {
     /**
      * 构建由给定数组中类的名称组成的字符串。
      *
-     * <p>基本上类似于{@code AbstractCollection.toString()}，但会在每个类名前去掉
-     * "class "/"interface "前缀。
+     * <p>基本上类似于{@code AbstractCollection.toString()}，但会在每个类名前去掉 "class "/"interface "前缀。
      *
      * @param classes Class对象数组
      * @return 形如"[com.foo.Bar, com.foo.Baz]"的字符串
@@ -637,8 +616,7 @@ public abstract class GutilClass {
     /**
      * 构建由给定集合中类的名称组成的字符串。
      *
-     * <p>基本上类似于{@code AbstractCollection.toString()}，但会在每个类名前去掉
-     * "class "/"interface "前缀。
+     * <p>基本上类似于{@code AbstractCollection.toString()}，但会在每个类名前去掉 "class "/"interface "前缀。
      *
      * @param classes Class对象集合（可以为{@code null}）
      * @return 形如"[com.foo.Bar, com.foo.Baz]"的字符串
@@ -660,7 +638,7 @@ public abstract class GutilClass {
         return sb.toString();
     }
 
-/**
+    /**
      * 将给定的{@code Collection}复制为{@code Class}数组。
      *
      * <p>{@code Collection}中只能包含{@code Class}元素。
@@ -789,8 +767,7 @@ public abstract class GutilClass {
      *
      * @param clazz1 要内省的类
      * @param clazz2 要内省的另一个类
-     * @return 公共祖先（即公共父类，或一个接口继承另一个接口），如果未找到返回{@code null}。
-     *     如果任一给定类为{@code null}，则返回另一个类。
+     * @return 公共祖先（即公共父类，或一个接口继承另一个接口），如果未找到返回{@code null}。 如果任一给定类为{@code null}，则返回另一个类。
      * @since 3.2.6
      */
     public static Class<?> determineCommonAncestor(Class<?> clazz1, Class<?> clazz2) {
@@ -817,8 +794,8 @@ public abstract class GutilClass {
     }
 
     /**
-     * 判断给定接口是否为常见的Java语言接口：{@link Serializable}、{@link Externalizable}、
-     * {@link Closeable}、{@link AutoCloseable}、{@link Cloneable}、{@link Comparable}——
+     * 判断给定接口是否为常见的Java语言接口：{@link Serializable}、{@link Externalizable}、 {@link Closeable}、{@link
+     * AutoCloseable}、{@link Cloneable}、{@link Comparable}——
      * 在查找'主'用户级接口时可以忽略这些接口。共同特征：无服务级操作、无bean属性方法、无默认方法。
      *
      * @param ifc 要检查的接口
@@ -897,8 +874,7 @@ public abstract class GutilClass {
     }
 
     /**
-     * 返回给定对象类型的描述性名称：通常就是类名，但对于数组是组件类型类名加"[]"，
-     * 对于JDK代理则是追加其实现接口列表。
+     * 返回给定对象类型的描述性名称：通常就是类名，但对于数组是组件类型类名加"[]"， 对于JDK代理则是追加其实现接口列表。
      *
      * @param value 要内省的值
      * @return 类的限定名
@@ -1103,8 +1079,7 @@ public abstract class GutilClass {
     /**
      * 判断给定类是否具有给定签名的公共方法，如果有则返回（否则抛出{@code IllegalStateException}）。
      *
-     * <p>如果指定了任意签名，则仅在存在唯一候选时才返回该方法，
-     * 即具有指定名称的唯一公共方法。
+     * <p>如果指定了任意签名，则仅在存在唯一候选时才返回该方法， 即具有指定名称的唯一公共方法。
      *
      * <p>本质上将{@code NoSuchMethodException}转换为{@code IllegalStateException}。
      *
@@ -1147,8 +1122,7 @@ public abstract class GutilClass {
     /**
      * 判断给定类是否具有给定签名的公共方法，如果有则返回（否则返回{@code null}）。
      *
-     * <p>如果指定了任意签名，则仅在存在唯一候选时才返回该方法，
-     * 即具有指定名称的唯一公共方法。
+     * <p>如果指定了任意签名，则仅在存在唯一候选时才返回该方法， 即具有指定名称的唯一公共方法。
      *
      * <p>本质上将{@code NoSuchMethodException}转换为{@code null}。
      *
@@ -1237,17 +1211,15 @@ public abstract class GutilClass {
     }
 
     /**
-     * 给定一个可能来自接口的方法，以及当前反射调用中使用的目标类，找到对应的目标方法（如果存在）。
-     * 例如方法可能是{@code IFoo.bar()}，目标类可能是{@code DefaultFoo}。在这种情况下，
-     * 方法可能是{@code DefaultFoo.bar()}。这样可以找到该方法上的属性。
+     * 给定一个可能来自接口的方法，以及当前反射调用中使用的目标类，找到对应的目标方法（如果存在）。 例如方法可能是{@code IFoo.bar()}，目标类可能是{@code
+     * DefaultFoo}。在这种情况下， 方法可能是{@code DefaultFoo.bar()}。这样可以找到该方法上的属性。
      *
      * <p><b>注意：</b>与{@link org.springframework.aop.support.AopUtils#getMostSpecificMethod}
-     * 相反，此方法<i>不</i>自动解析Java 5桥接方法。如果需要桥接方法解析
-     * （例如获取原始方法定义的元数据），请调用{@link
+     * 相反，此方法<i>不</i>自动解析Java 5桥接方法。如果需要桥接方法解析 （例如获取原始方法定义的元数据），请调用{@link
      * org.springframework.core.BridgeMethodResolver#findBridgedMethod}。
      *
-     * <p><b>注意：</b>自Spring 3.1.1起，如果Java安全设置不允许反射访问
-     * （例如调用{@code Class#getDeclaredMethods}等），此实现将回退到返回原始方法。
+     * <p><b>注意：</b>自Spring 3.1.1起，如果Java安全设置不允许反射访问 （例如调用{@code
+     * Class#getDeclaredMethods}等），此实现将回退到返回原始方法。
      *
      * @param method 要调用的方法，可能来自接口
      * @param targetClass 当前调用的目标类（可以为{@code null}，或者甚至不实现该方法）
@@ -1313,9 +1285,8 @@ public abstract class GutilClass {
     /**
      * 判断给定方法是由用户声明的，或者至少指向用户声明的方法。
      *
-     * <p>检查{@link Method#isSynthetic()}（针对实现方法）以及{@code GroovyObject}接口
-     * （针对接口方法；在实现类上，{@code GroovyObject}方法的实现无论如何都会被标记为合成方法）。
-     * 注意，尽管是合成的，桥接方法（{@link Method#isBridge()}）仍被视为用户级方法，
+     * <p>检查{@link Method#isSynthetic()}（针对实现方法）以及{@code GroovyObject}接口 （针对接口方法；在实现类上，{@code
+     * GroovyObject}方法的实现无论如何都会被标记为合成方法）。 注意，尽管是合成的，桥接方法（{@link Method#isBridge()}）仍被视为用户级方法，
      * 因为它们最终指向用户声明的泛型方法。
      *
      * @param method 要检查的方法
@@ -1532,7 +1503,9 @@ public abstract class GutilClass {
     // -----------------------------------------------------------------------------------------
     // Classpath
 
-    /** @return 获得Java ClassPath路径，不包括 jre */
+    /**
+     * @return 获得Java ClassPath路径，不包括 jre
+     */
     public static String[] getJavaClassPaths() {
         return System.getProperty("java.class.path").split(System.getProperty("path.separator"));
     }

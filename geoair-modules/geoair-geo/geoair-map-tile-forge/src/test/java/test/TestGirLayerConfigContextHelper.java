@@ -13,14 +13,15 @@ import java.util.Optional;
  * @date ：Created in 2026/7/3 16:20
  * @description： TODO
  */
-public class TestGirLayerConfigContextHelper  implements GirLayerConfigContextHelper {
+public class TestGirLayerConfigContextHelper implements GirLayerConfigContextHelper {
     @Override
     public Optional<GirLayerConfigContext> getByLayerName(String layerName) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<GirLayerConfigContext> getGirLayerConfigContext(GirMapTileType mapTileType, String layerName, String dataId, String fileName) {
+    public Optional<GirLayerConfigContext> getGirLayerConfigContext(
+            GirMapTileType mapTileType, String layerName, String dataId, String fileName) {
         return Optional.empty();
     }
 

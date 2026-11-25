@@ -4,12 +4,12 @@ import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.convert.GirFormatUtils;
 import cn.hutool.core.util.ObjectUtil;
 
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.locationtech.jts.geom.*;
-import org.locationtech.jts.operation.union.UnaryUnionOp;
 
 /**
  * 几何对象合并工具类（单例模式） 基于JTS实现线/面的多格式合并，支持拓扑合并和简单拼接
@@ -22,8 +22,7 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
     // 单例实例
     private static volatile GirGeoMergeUtils INSTANCE;
 
-
-    private final GirFormatUtils formatOpt ;
+    private final GirFormatUtils formatOpt;
 
     ToolsConfig advToolsConfig;
 
@@ -35,7 +34,6 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
     public static GirGeoMergeUtils getInstance(ToolsConfig advToolsConfig) {
         return new GirGeoMergeUtils(advToolsConfig);
     }
-
 
     @Deprecated
     public static GirGeoMergeUtils getInstance() {
@@ -165,7 +163,9 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
                         Arrays.asList(Arrays.copyOfRange(currCoords, 1, currCoords.length)));
             }
 
-            return advToolsConfig.getGeometryFactory().createLineString(allCoords.toArray(new Coordinate[0]));
+            return advToolsConfig
+                    .getGeometryFactory()
+                    .createLineString(allCoords.toArray(new Coordinate[0]));
         } finally {
 
         }
@@ -347,11 +347,11 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
                 return geometrie;
             }
             if (geomClass == LineString.class) {
-                return mergeToMultiLineString(new LineString[]{(LineString) geometrie});
+                return mergeToMultiLineString(new LineString[] {(LineString) geometrie});
             } else if (geomClass == Polygon.class) {
-                return mergeToMultiPolygon(new Polygon[]{(Polygon) geometrie});
+                return mergeToMultiPolygon(new Polygon[] {(Polygon) geometrie});
             } else if (geomClass == Point.class) {
-                return mergeToMultiPoint(new Point[]{(Point) geometrie});
+                return mergeToMultiPoint(new Point[] {(Point) geometrie});
             } else {
                 throw new IllegalArgumentException("不支持的几何类型：" + geomClass.getSimpleName());
             }
@@ -359,11 +359,10 @@ public class GirGeoMergeUtils implements GirGeoMergeOpt {
 
         }
     }
+
     // ====================== 私有工具方法 ======================
 
-    /**
-     * 校验Geometry数组
-     */
+    /** 校验Geometry数组 */
     private <T extends Geometry> void validateGeometryArray(T[] geometries, Class<T> clazz) {
         if (ObjectUtil.isEmpty(geometries)) {
             throw new IllegalArgumentException(clazz.getSimpleName() + "数组不能为空");

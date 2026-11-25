@@ -20,9 +20,7 @@ public class SpiMimeLoader {
 
     private static volatile List<IMimeTypeGetter> iMimeGetters;
 
-    /**
-     * 获取完整的只读 MIME 解析器快照；初始化后的读取不需要加锁。
-     */
+    /** 获取完整的只读 MIME 解析器快照；初始化后的读取不需要加锁。 */
     public static List<IMimeTypeGetter> getMimeTypeGetters() {
         List<IMimeTypeGetter> snapshot = iMimeGetters;
         if (snapshot == null) {
@@ -37,9 +35,7 @@ public class SpiMimeLoader {
         return snapshot;
     }
 
-    /**
-     * 串行重载 MIME 解析器；成功后原子替换快照，失败时保留上一次可用结果。
-     */
+    /** 串行重载 MIME 解析器；成功后原子替换快照，失败时保留上一次可用结果。 */
     public static synchronized void loadMimes() {
         // 加载过程中只修改局部列表，读者不会看见半初始化状态，已有快照也不会被原地修改。
         List<IMimeTypeGetter> loaded = new ArrayList<>();
@@ -53,9 +49,7 @@ public class SpiMimeLoader {
         iMimeGetters = Collections.unmodifiableList(loaded);
     }
 
-    /**
-     * 从Java SPI加载IMimeTypeGetter
-     */
+    /** 从Java SPI加载IMimeTypeGetter */
     private static List<IMimeTypeGetter> loadFromSpi() {
         List<IMimeTypeGetter> result = new ArrayList<>();
         try {

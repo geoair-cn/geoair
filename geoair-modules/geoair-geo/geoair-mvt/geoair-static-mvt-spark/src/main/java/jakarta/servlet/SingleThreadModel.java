@@ -6,5 +6,4 @@ package jakarta.servlet;
  * @description 不能删除，删除了是spark就用不了了
  */
 @Deprecated
-public class SingleThreadModel {
-}
+public class SingleThreadModel {}

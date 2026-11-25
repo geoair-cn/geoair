@@ -2,9 +2,7 @@ package cn.geoair.map.tile.forge.core.zip.model;
 
 import lombok.Data;
 
-/**
- * ZIP文件中央目录结束记录（EOCD）封装
- */
+/** ZIP文件中央目录结束记录（EOCD）封装 */
 @Data
 public class EocdInfo {
     // 当前磁盘号
@@ -25,8 +23,14 @@ public class EocdInfo {
     private long fileSize;
 
     // 构造方法（对应解析逻辑）
-    public EocdInfo(long diskNumber, long startDisk, long diskEntries, long totalEntries,
-                    long centralDirSize, long centralDirOffset, long commentLength) {
+    public EocdInfo(
+            long diskNumber,
+            long startDisk,
+            long diskEntries,
+            long totalEntries,
+            long centralDirSize,
+            long centralDirOffset,
+            long commentLength) {
         this.diskNumber = diskNumber;
         this.startDisk = startDisk;
         this.diskEntries = diskEntries;

@@ -1,10 +1,10 @@
 package cn.geoair.spi.cache;
 
-import java.lang.ref.WeakReference;
+import cn.geoair.base.Gir;
 
 import org.springframework.cache.CacheManager;
 
-import cn.geoair.base.Gir;
+import java.lang.ref.WeakReference;
 
 final class SpringCacheManagerProvider {
 

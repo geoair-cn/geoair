@@ -3,13 +3,15 @@ package cn.geoair.orm.springjpa.impls;
 import cn.geoair.base.gpa.dao.GiPagerDao;
 import cn.geoair.base.gpa.dao.GiRetrieveDao;
 import cn.geoair.base.gpa.entity.GiEntityQueryable;
+
+import org.springframework.data.domain.Example;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.springframework.data.domain.Example;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface RetrieveRepository<T extends GiEntityQueryable<PK>, PK extends Serializable>
         extends JpaRepository<T, PK>,

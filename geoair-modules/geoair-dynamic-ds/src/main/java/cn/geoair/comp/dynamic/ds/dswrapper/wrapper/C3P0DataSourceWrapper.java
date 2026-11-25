@@ -1,6 +1,7 @@
 package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+
 import javax.sql.DataSource;
 
 /** C3P0 数据源包装器 */
@@ -38,7 +39,7 @@ public class C3P0DataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     @Override
     public String getSimpleDataSourceName() {
-        ComboPooledDataSource c3p0DataSource = getC3P0DataSource() ;
+        ComboPooledDataSource c3p0DataSource = getC3P0DataSource();
         // C3P0的标识优先用dataSourceName，兜底返回c3p0
         return c3p0DataSource.getDataSourceName() != null
                 ? c3p0DataSource.getDataSourceName()
@@ -47,7 +48,7 @@ public class C3P0DataSourceWrapper extends GirAbstractDataSourceWrapper {
 
     @Override
     public String getJdbcUrl() {
-        ComboPooledDataSource c3p0DataSource =getC3P0DataSource() ;
+        ComboPooledDataSource c3p0DataSource = getC3P0DataSource();
         try {
             return c3p0DataSource.getJdbcUrl();
         } catch (Exception e) {
@@ -65,8 +66,8 @@ public class C3P0DataSourceWrapper extends GirAbstractDataSourceWrapper {
         try {
             // C3P0 获取活跃连接数的正确方式：
             // 总连接数 - 空闲连接数 = 活跃连接数
-            int totalConnections = c3p0.getNumConnectionsAllUsers();  // 总连接数
-            int idleConnections = c3p0.getNumIdleConnectionsAllUsers();  // 空闲连接数
+            int totalConnections = c3p0.getNumConnectionsAllUsers(); // 总连接数
+            int idleConnections = c3p0.getNumIdleConnectionsAllUsers(); // 空闲连接数
             int activeCount = totalConnections - idleConnections;
 
             return Math.max(0, activeCount);

@@ -20,20 +20,13 @@ import java.io.OutputStream;
 
 public interface Resource {
 
-    /**
-     * The size of the resource in bytes.
-     */
+    /** The size of the resource in bytes. */
     long getSize();
 
-
-    /**
-     * An InputStream backed by the resource.
-     */
+    /** An InputStream backed by the resource. */
     InputStream getInputStream() throws IOException;
 
-    /**
-     * An OutputStream backed by the resource. Writes are appended to the resource.
-     */
+    /** An OutputStream backed by the resource. Writes are appended to the resource. */
     OutputStream getOutputStream() throws IOException;
 
     byte[] getByteData() throws IOException;

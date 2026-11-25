@@ -1,4 +1,5 @@
 package cn.geoair.map.tile.forge.fuser.mbtiles.maintenance;
+
 /** 只开放已核对的 SQLite 检查点模式。 */
 public enum MbtilesCheckpointMode {
     PASSIVE,

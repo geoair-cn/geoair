@@ -2,14 +2,14 @@ package cn.geoair.map.dynamic.file.csv;
 
 import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta;
 import cn.hutool.core.util.StrUtil;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import org.geotools.api.feature.simple.SimpleFeatureType;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 final class CsvSchemaSupport {
 
@@ -31,7 +31,10 @@ final class CsvSchemaSupport {
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.setName("csv_feature");
         if (linkInfo.getSrid() > 0) {
-            builder.setCRS(cn.geoair.map.dynamic.tools.GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid()));
+            builder.setCRS(
+                    cn.geoair.map.dynamic.tools.GirGeoTools.defaultInstance()
+                            .getSridOpt()
+                            .getCRS(linkInfo.getSrid()));
         }
         for (String header : headers) {
             builder.add(header, String.class);
@@ -62,7 +65,8 @@ final class CsvSchemaSupport {
             if (normalized.equals(normalize(header))) {
                 return i;
             }
-            String resolved = AdvBeanMappingMeta.of(HeaderHolder.class).resolveColumnName(header, false);
+            String resolved =
+                    AdvBeanMappingMeta.of(HeaderHolder.class).resolveColumnName(header, false);
             if (normalized.equals(normalize(resolved))) {
                 return i;
             }

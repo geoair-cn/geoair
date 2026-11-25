@@ -10,5 +10,4 @@ import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 public interface IAdvConfigOpt {
 
     AdvQueryGlobalConfig getConfig();
-
 }

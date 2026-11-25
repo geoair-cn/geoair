@@ -1,8 +1,10 @@
 package cn.geoair.comp.code.generator.multi.domian;
 
 import cn.geoair.base.util.GutilStr;
-import java.util.Map;
+
 import lombok.Data;
+
+import java.util.Map;
 
 /**
  * 代码生成业务字段表 gen_table_column

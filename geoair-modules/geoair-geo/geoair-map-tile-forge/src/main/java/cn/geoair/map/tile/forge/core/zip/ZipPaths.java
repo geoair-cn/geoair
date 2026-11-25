@@ -1,17 +1,21 @@
 package cn.geoair.map.tile.forge.core.zip;
 
-import java.nio.file.Path;
-import java.nio.file.InvalidPathException;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.util.Locale;
 
 /** 请求路径已由 Servlet 解码，此处不重复 URLDecode，保留加号与字面百分号。 */
 public final class ZipPaths {
-    private ZipPaths() { }
+    private ZipPaths() {}
 
     public static String relative(String value) {
-        if (value == null || value.isEmpty() || value.startsWith("/") || value.indexOf('\\') >= 0
-                || value.indexOf(':') >= 0 || value.indexOf('\0') >= 0)
+        if (value == null
+                || value.isEmpty()
+                || value.startsWith("/")
+                || value.indexOf('\\') >= 0
+                || value.indexOf(':') >= 0
+                || value.indexOf('\0') >= 0)
             throw new ZipReadException(ZipReadFailure.INVALID_PATH, "ZIP资源路径无效", null);
         for (String part : value.split("/", -1)) {
             if (part.isEmpty() || part.equals(".") || part.equals(".."))
@@ -26,8 +30,12 @@ public final class ZipPaths {
     }
 
     public static boolean safe(String value) {
-        try { relative(value); return true; }
-        catch (ZipReadException e) { return false; }
+        try {
+            relative(value);
+            return true;
+        } catch (ZipReadException e) {
+            return false;
+        }
     }
 
     public static String format(String value) {

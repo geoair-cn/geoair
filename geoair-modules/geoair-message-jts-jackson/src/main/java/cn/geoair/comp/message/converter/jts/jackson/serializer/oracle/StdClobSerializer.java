@@ -11,7 +11,8 @@ import java.sql.SQLException;
 
 public class StdClobSerializer extends JsonSerializer<Clob> {
     @Override
-    public void serialize(Clob clob, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(Clob clob, JsonGenerator gen, SerializerProvider serializers)
+            throws IOException {
         if (clob == null) {
             gen.writeNull();
             return;

@@ -1,8 +1,7 @@
 package cn.geoair.map.dynamic.tools.grid.converter;
 
-
-import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.convert.GirGeoFormatOpt;
 import cn.geoair.map.dynamic.tools.grid.GirTileConverterOpt;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
@@ -13,20 +12,18 @@ import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertOpt;
 import cn.hutool.core.util.StrUtil;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * 瓦片转换器的公共基础实现。
  *
- * <p>负责通用的几何范围处理、SRID 转换、闭区间 {@link RangeApo} 遍历及 XYZ/TMS 适配。
- * 子类只需实现本坐标系的范围与坐标计算。所有不带 {@link TileYAxis} 参数的方法均采用
- * Google/XYZ 顶部原点。</p>
+ * <p>负责通用的几何范围处理、SRID 转换、闭区间 {@link RangeApo} 遍历及 XYZ/TMS 适配。 子类只需实现本坐标系的范围与坐标计算。所有不带 {@link
+ * TileYAxis} 参数的方法均采用 Google/XYZ 顶部原点。
  *
  * @author 张逢吉
  */
@@ -37,6 +34,7 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
 
     /** 坐标参考系转换工具。 */
     protected GirSridConvertOpt sridConvertOpt;
+
     /** 空间格式转换工具。 */
     protected GirGeoFormatOpt formatOpt;
 
@@ -54,7 +52,6 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
         sridConvertOpt = geoTools.getSridOpt();
         formatOpt = geoTools.getFormatOpt();
     }
-
 
     protected abstract Geometry transform(Geometry geometry, int srcSrid);
 
@@ -74,10 +71,8 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
      * @param x 瓦片X索引（非负）
      * @param y 瓦片Y索引（非负）
      * @throws IllegalArgumentException 层级超出支持范围或行列号为负时抛出
-     *
-     * <p>本方法有意不校验 {@code x/y < 2^z}：边界计算会使用 {@code x + 1} 或
-     * {@code y + 1} 表示瓦片的右/下边界。需要验证实际瓦片行列号时，应由调用方按当前
-     * 网格的列数和 {@link #getTileRowCount(int)} 校验。</p>
+     *     <p>本方法有意不校验 {@code x/y < 2^z}：边界计算会使用 {@code x + 1} 或 {@code y + 1}
+     *     表示瓦片的右/下边界。需要验证实际瓦片行列号时，应由调用方按当前 网格的列数和 {@link #getTileRowCount(int)} 校验。
      */
     protected void validateXyz(int z, int x, int y) {
         if (z < 0 || z > 22) {
@@ -255,10 +250,11 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
             maxY = Math.max(maxY, tile.getY());
         }
 
-        return boundsFromTileRange(TileRange.closed(
-                zoom, (int) minX, (int) maxX, (int) minY, (int) maxY, TileYAxis.XYZ), targetSrid);
+        return boundsFromTileRange(
+                TileRange.closed(
+                        zoom, (int) minX, (int) maxX, (int) minY, (int) maxY, TileYAxis.XYZ),
+                targetSrid);
     }
-
 
     @Override
     public BoxReferencedEnvelope boundsFromRangeApo(RangeApo rangeApo, int targetSrid) {
@@ -279,8 +275,8 @@ public abstract class TileConverterCommon implements GirTileConverterOpt {
         return boundsFromTileRange(minTileX, maxTileX, minTileY, maxTileY, zoom, targetSrid);
     }
 
-    public abstract BoxReferencedEnvelope boundsFromTileRange(long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid);
-
+    public abstract BoxReferencedEnvelope boundsFromTileRange(
+            long minTileX, long maxTileX, long minTileY, long maxTileY, int zoom, int targetSrid);
 
     @Override
     public Set<TileZxyApo> zxyListByBox(

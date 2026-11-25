@@ -3,9 +3,7 @@ package cn.geoair.base.test;
 import cn.geoair.base.env.property.GiPropertier;
 import cn.geoair.base.env.property.GirPropertyHelper;
 
-/**
- * GirPropertyHelper 入口示例
- */
+/** GirPropertyHelper 入口示例 */
 public class GirPropertyHelperExample {
 
     public static void main(String[] args) {

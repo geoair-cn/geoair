@@ -1,8 +1,9 @@
 package cn.geoair.map.dynamic.adv.query.enums;
 
-import java.io.Serializable;
 import org.geotools.geometry.jts.Geometries;
 import org.locationtech.jts.geom.*;
+
+import java.io.Serializable;
 
 /**
  * 空间类型枚举
@@ -29,6 +30,7 @@ public enum AdvEnumsTypeGeom implements Serializable {
         }
         return unknown;
     }
+
     public static AdvEnumsTypeGeom findByGeoToolsValue(Geometries value) {
         for (AdvEnumsTypeGeom type : AdvEnumsTypeGeom.values()) {
             if (type.getGeotoolsType() == (value)) {
@@ -37,11 +39,12 @@ public enum AdvEnumsTypeGeom implements Serializable {
         }
         return unknown;
     }
+
     public static AdvEnumsTypeGeom findByGeoToolsClassValue(Class<?> jtsGeomClass) {
         for (AdvEnumsTypeGeom type : AdvEnumsTypeGeom.values()) {
             // 判断 type 的 GeoTools 类型是否与传入的类型兼容
-            if (type.getGeotoolsType() != null &&
-                type.getGeotoolsType().getBinding().isAssignableFrom(jtsGeomClass)) {
+            if (type.getGeotoolsType() != null
+                    && type.getGeotoolsType().getBinding().isAssignableFrom(jtsGeomClass)) {
                 return type;
             }
         }

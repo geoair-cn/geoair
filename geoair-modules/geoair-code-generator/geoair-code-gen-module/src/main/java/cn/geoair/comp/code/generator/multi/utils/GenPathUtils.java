@@ -15,14 +15,10 @@ import java.io.File;
  */
 public class GenPathUtils {
 
-    /**
-     * 项目空间路径
-     */
+    /** 项目空间路径 */
     private static final String PROJECT_PATH = "main/java";
 
-    /**
-     * 获取枚举生成地址
-     */
+    /** 获取枚举生成地址 */
     public static String getEnumGenPath(
             GenTable table, GenTableColumn column, String template, Boolean mutiIs) {
         String genPath = table.getGenPath();
@@ -36,9 +32,7 @@ public class GenPathUtils {
                 + GenPathUtils.getEnumFileName(template, table, column, mutiIs);
     }
 
-    /**
-     * 获取文件名
-     */
+    /** 获取文件名 */
     public static String getEnumFileName(
             String template, GenTable genTable, GenTableColumn column, Boolean mutiIs) {
         // 文件名称
@@ -72,9 +66,7 @@ public class GenPathUtils {
         return genPath + File.separator + getFileName(template, table, globalConfig);
     }
 
-    /**
-     * 获取文件名
-     */
+    /** 获取文件名 */
     private static String getFileName(
             String template, GenTable genTable, GirGeneratorConfig globalConfig) {
         // 文件名称
@@ -107,10 +99,10 @@ public class GenPathUtils {
     /**
      * 获取普通文件生成路径（KLF规范）
      *
-     * @param template    模板路径
-     * @param moduleName  模块名
-     * @param className   大驼峰类名
-     * @param classname   小驼峰/拼接类名
+     * @param template 模板路径
+     * @param moduleName 模块名
+     * @param className 大驼峰类名
+     * @param classname 小驼峰/拼接类名
      * @param packageName 包名
      * @return 完整文件路径（null表示未匹配到模板）
      */
@@ -351,8 +343,7 @@ public class GenPathUtils {
                                 moduleName,
                                 classname + "/" + className);
             }
-        }
-        else {
+        } else {
             if (template.contains("rx-po.java.vm")) {
                 fileName =
                         StringUtils.format(
@@ -500,9 +491,9 @@ public class GenPathUtils {
     /**
      * 获取枚举文件生成路径（KLF规范）
      *
-     * @param template    模板路径
-     * @param moduleName  模块名
-     * @param enumsName   枚举类名
+     * @param template 模板路径
+     * @param moduleName 模块名
+     * @param enumsName 枚举类名
      * @param packageName 包名
      * @return 完整文件路径
      */

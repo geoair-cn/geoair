@@ -1,23 +1,23 @@
-//package cn.geoair.map.dynamic.adv.query.wherequery.queryr;
+// package cn.geoair.map.dynamic.adv.query.wherequery.queryr;
 //
-//import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
-//import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
-//import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
-//import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
-//import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
-//import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
-//import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
+// import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
+// import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
+// import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
+// import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
+// import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
+// import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
+// import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 //
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.List;
+// import java.util.ArrayList;
+// import java.util.Arrays;
+// import java.util.List;
 //
-///**
+/// **
 // * @author ：张俊
 // * @date ：Created in 2026/5/18 19:27
 // * @description： QueryRequest 的bulider对象
 // */
-//public class QueryRequestBuilderBack {
+// public class QueryRequestBuilderBack {
 //
 //    // ==================== 模式一参数 ====================
 //
@@ -420,4 +420,4 @@
 //
 //        return new GirAdvQueryRequest(this);
 //    }
-//}
+// }

@@ -2,6 +2,7 @@ package cn.geoair.base.data.support;
 
 import cn.geoair.base.data.GiGroupType;
 import cn.geoair.base.data.GiType;
+
 import java.util.HashMap;
 import java.util.Map;
 

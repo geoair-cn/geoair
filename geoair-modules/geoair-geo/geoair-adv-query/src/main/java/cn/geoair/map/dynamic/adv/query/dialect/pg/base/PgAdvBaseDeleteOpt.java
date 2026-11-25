@@ -10,7 +10,8 @@ import java.util.function.Supplier;
 /** PostgreSQL删除操作实现类 */
 public class PgAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
 
-    public PgAdvBaseDeleteOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+    public PgAdvBaseDeleteOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         super(configAdvQueryGetter, registry);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();

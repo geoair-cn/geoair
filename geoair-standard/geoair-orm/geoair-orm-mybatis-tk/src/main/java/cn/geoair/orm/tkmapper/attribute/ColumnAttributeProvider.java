@@ -1,6 +1,7 @@
 package cn.geoair.orm.tkmapper.attribute;
 
 import org.apache.ibatis.mapping.MappedStatement;
+
 import tk.mybatis.mapper.mapperhelper.MapperHelper;
 import tk.mybatis.mapper.mapperhelper.MapperTemplate;
 

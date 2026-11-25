@@ -2,6 +2,7 @@ package cn.geoair.base.lang;
 
 import cn.geoair.base.util.GutilArray;
 import cn.geoair.base.util.GutilStr;
+
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

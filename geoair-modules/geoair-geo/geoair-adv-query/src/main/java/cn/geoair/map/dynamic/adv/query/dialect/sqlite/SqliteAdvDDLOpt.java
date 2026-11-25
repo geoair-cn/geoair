@@ -68,15 +68,15 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
     @Override
     public boolean dIsTableExists(String tableName) {
-        if (StrUtil.isBlank(tableName)
-                || dialectTableNameProcessor.tbTableIsSqlView(tableName)) {
+        if (StrUtil.isBlank(tableName) || dialectTableNameProcessor.tbTableIsSqlView(tableName)) {
             return false;
         }
         String schema = resolveSchema(tableName);
         String pureTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String sql = StrUtil.format(
-                "SELECT COUNT(*) AS cnt FROM {} WHERE type = 'table' AND name = ?",
-                schemaCatalog(schema));
+        String sql =
+                StrUtil.format(
+                        "SELECT COUNT(*) AS cnt FROM {} WHERE type = 'table' AND name = ?",
+                        schemaCatalog(schema));
         GirAdvOneRow row = getAdvBaseOpt().bSelectOne(sql, SqlParamList.of(pureTableName));
         return row != null && row.getInt("cnt") > 0;
     }
@@ -88,10 +88,11 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
         }
         String schema = resolveSchema(tableName);
         String pureTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        String sql = "SELECT cid, name, type, \"notnull\" AS not_null, dflt_value, pk, hidden "
-                + "FROM pragma_table_xinfo(?, ?) ORDER BY cid";
-        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(
-                sql, SqlParamList.of(pureTableName, schema));
+        String sql =
+                "SELECT cid, name, type, \"notnull\" AS not_null, dflt_value, pk, hidden "
+                        + "FROM pragma_table_xinfo(?, ?) ORDER BY cid";
+        List<GirAdvOneRow> rows =
+                getAdvBaseOpt().bSelectList(sql, SqlParamList.of(pureTableName, schema));
         List<FieldBySchemaApo> fields = new ArrayList<>();
         for (GirAdvOneRow row : rows) {
             FieldBySchemaApo field = new FieldBySchemaApo();
@@ -116,8 +117,7 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
     }
 
     @Override
-    public void dAlterColumn(
-            String tableName, String oldColumnName, FieldBySchemaApo newField) {
+    public void dAlterColumn(String tableName, String oldColumnName, FieldBySchemaApo newField) {
         throw new UnsupportedOperationException(ALTER_COLUMN_MESSAGE);
     }
 
@@ -140,8 +140,8 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
         String schema = resolveSchema(tableName);
         String pureTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
         String sql = "SELECT name FROM pragma_table_xinfo(?, ?) WHERE pk > 0 ORDER BY pk";
-        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(
-                sql, SqlParamList.of(pureTableName, schema));
+        List<GirAdvOneRow> rows =
+                getAdvBaseOpt().bSelectList(sql, SqlParamList.of(pureTableName, schema));
         List<String> primaryKeys = new ArrayList<>();
         for (GirAdvOneRow row : rows) {
             primaryKeys.add(row.getStr("name"));
@@ -157,8 +157,7 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
     }
 
     @Override
-    public void dAddPrimaryKey(
-            String tableName, List<String> columnNames, String constraintName) {
+    public void dAddPrimaryKey(String tableName, List<String> columnNames, String constraintName) {
         throw new UnsupportedOperationException(ALTER_COLUMN_MESSAGE);
     }
 
@@ -185,24 +184,22 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
     }
 
     @Override
-    protected String buildDropPrimaryKeySql(
-            String qualifiedTableName, String constraintName) {
+    protected String buildDropPrimaryKeySql(String qualifiedTableName, String constraintName) {
         throw new UnsupportedOperationException(ALTER_COLUMN_MESSAGE);
     }
 
     @Override
     protected String buildCreateIndexSql(
-            String qualifiedTableName,
-            String indexName,
-            String columns,
-            boolean isUnique) {
+            String qualifiedTableName, String indexName, String columns, boolean isUnique) {
         String schema = dialectTableNameProcessor.tbExtractSchemaName(qualifiedTableName);
         if (StrUtil.isBlank(schema)) {
             schema = DEFAULT_SCHEMA;
         }
         String table = dialectTableNameProcessor.tbGetTableNameNotSchema(qualifiedTableName);
-        String qualifiedIndex = dialectTableNameProcessor.tbQuoteSchemaName(schema)
-                + "." + dialectTableNameProcessor.tbQuoteFieldName(indexName);
+        String qualifiedIndex =
+                dialectTableNameProcessor.tbQuoteSchemaName(schema)
+                        + "."
+                        + dialectTableNameProcessor.tbQuoteFieldName(indexName);
         return StrUtil.format(
                 "CREATE {}INDEX {} ON {} ({})",
                 isUnique ? "UNIQUE " : "",
@@ -227,17 +224,20 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
         }
         String schema = resolveSchema(tableName);
         String pureTableName = dialectTableNameProcessor.tbGetTableNameNotSchema(tableName);
-        List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(
-                "SELECT name FROM pragma_index_list(?, ?) ORDER BY seq",
-                SqlParamList.of(pureTableName, schema));
+        List<GirAdvOneRow> rows =
+                getAdvBaseOpt()
+                        .bSelectList(
+                                "SELECT name FROM pragma_index_list(?, ?) ORDER BY seq",
+                                SqlParamList.of(pureTableName, schema));
         List<IndexApo> result = new ArrayList<>();
         for (GirAdvOneRow row : rows) {
             String indexName = row.getStr("name");
-            String definitionSql = StrUtil.format(
-                    "SELECT sql FROM {} WHERE type = 'index' AND name = ?",
-                    schemaCatalog(schema));
-            GirAdvOneRow definition = getAdvBaseOpt().bSelectOne(
-                    definitionSql, SqlParamList.of(indexName));
+            String definitionSql =
+                    StrUtil.format(
+                            "SELECT sql FROM {} WHERE type = 'index' AND name = ?",
+                            schemaCatalog(schema));
+            GirAdvOneRow definition =
+                    getAdvBaseOpt().bSelectOne(definitionSql, SqlParamList.of(indexName));
             IndexApo index = new IndexApo();
             index.setSchemaname(schema);
             index.setTablename(pureTableName);
@@ -309,10 +309,11 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     public List<String> dGetTablesBySchema(String schemaName) {
         String schema = StrUtil.isBlank(schemaName) ? DEFAULT_SCHEMA : schemaName;
-        String sql = StrUtil.format(
-                "SELECT name FROM {} WHERE type = 'table' "
-                        + "AND name NOT LIKE 'sqlite_%' ORDER BY name",
-                schemaCatalog(schema));
+        String sql =
+                StrUtil.format(
+                        "SELECT name FROM {} WHERE type = 'table' "
+                                + "AND name NOT LIKE 'sqlite_%' ORDER BY name",
+                        schemaCatalog(schema));
         List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<String> tables = new ArrayList<>();
         for (GirAdvOneRow row : rows) {
@@ -329,22 +330,25 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
     @Override
     public List<SchemaTableApo> dGetTableAndViewBySchema(String schemaName) {
         String schema = StrUtil.isBlank(schemaName) ? DEFAULT_SCHEMA : schemaName;
-        String sql = StrUtil.format(
-                "SELECT name, type FROM {} WHERE type IN ('table', 'view') "
-                        + "AND name NOT LIKE 'sqlite_%' ORDER BY name",
-                schemaCatalog(schema));
+        String sql =
+                StrUtil.format(
+                        "SELECT name, type FROM {} WHERE type IN ('table', 'view') "
+                                + "AND name NOT LIKE 'sqlite_%' ORDER BY name",
+                        schemaCatalog(schema));
         List<GirAdvOneRow> rows = getAdvBaseOpt().bSelectList(sql);
         List<SchemaTableApo> result = new ArrayList<>();
         String databaseName = dGetCurrentDataBase();
         for (GirAdvOneRow row : rows) {
             String type = row.getStr("type");
-            result.add(new SchemaTableApo()
-                    .setDatabaseName(databaseName)
-                    .setSchema(schema)
-                    .setName(row.getStr("name"))
-                    .setType("table".equalsIgnoreCase(type)
-                            ? AdvSchemaTableTypeOpt.表
-                            : AdvSchemaTableTypeOpt.视图));
+            result.add(
+                    new SchemaTableApo()
+                            .setDatabaseName(databaseName)
+                            .setSchema(schema)
+                            .setName(row.getStr("name"))
+                            .setType(
+                                    "table".equalsIgnoreCase(type)
+                                            ? AdvSchemaTableTypeOpt.表
+                                            : AdvSchemaTableTypeOpt.视图));
         }
         return result;
     }
@@ -417,7 +421,8 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
             return;
         }
         String normalized = typeName.toUpperCase(Locale.ROOT);
-        if (normalized.contains("CHAR") || normalized.contains("CLOB")
+        if (normalized.contains("CHAR")
+                || normalized.contains("CLOB")
                 || normalized.contains("TEXT")) {
             int displaySize = metaData.getColumnDisplaySize(columnIndex);
             if (displaySize > 0) {
@@ -439,9 +444,11 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
             return false;
         }
         String pureName = dialectTableNameProcessor.tbGetTableNameNotSchema(functionName);
-        GirAdvOneRow row = getAdvBaseOpt().bSelectOne(
-                "SELECT COUNT(*) AS cnt FROM pragma_function_list WHERE lower(name) = lower(?)",
-                SqlParamList.of(pureName));
+        GirAdvOneRow row =
+                getAdvBaseOpt()
+                        .bSelectOne(
+                                "SELECT COUNT(*) AS cnt FROM pragma_function_list WHERE lower(name) = lower(?)",
+                                SqlParamList.of(pureName));
         return row != null && row.getInt("cnt") > 0;
     }
 
@@ -452,7 +459,8 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
 
     @Override
     protected String buildCreateTableLikeSql(String dstTableName, String srcTableName) {
-        return StrUtil.format("CREATE TABLE {} AS SELECT * FROM {} WHERE 0", dstTableName, srcTableName);
+        return StrUtil.format(
+                "CREATE TABLE {} AS SELECT * FROM {} WHERE 0", dstTableName, srcTableName);
     }
 
     @Override
@@ -464,7 +472,8 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
     protected String buildCreateTableFromSqlWithNoDataSql(String dstTableName, String sql) {
         return StrUtil.format(
                 "CREATE TABLE {} AS SELECT * FROM ({}) AS \"_geoair_src\" WHERE 0",
-                dstTableName, sql);
+                dstTableName,
+                sql);
     }
 
     private String resolveSchema(String tableName) {
@@ -490,7 +499,8 @@ public class SqliteAdvDDLOpt extends AbstractExecAdvDDLOpt {
         }
         String normalized = declaredType.toUpperCase(Locale.ROOT);
         int first = Integer.parseInt(matcher.group(1));
-        if (normalized.contains("CHAR") || normalized.contains("CLOB")
+        if (normalized.contains("CHAR")
+                || normalized.contains("CLOB")
                 || normalized.contains("TEXT")) {
             field.setCharacterMaximumLength(first);
             return;

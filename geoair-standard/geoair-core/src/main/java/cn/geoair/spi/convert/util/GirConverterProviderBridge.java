@@ -21,10 +21,9 @@ public class GirConverterProviderBridge {
     }
 
     @GaMethodHandImpl(
-        implClass = GirConverterProviderBridge.class,
-        implMethod = "getProvider",
-        type = ImplType.comity
-    )
+            implClass = GirConverterProviderBridge.class,
+            implMethod = "getProvider",
+            type = ImplType.comity)
     private static GiConverterProvider _getProvider() {
         return new GirConverterImpl();
     }
@@ -33,7 +32,8 @@ public class GirConverterProviderBridge {
 
         Class<S> sc = (Class<S>) source.getClass();
 
-        GiConverter<S, T> converter = GirConverterProviderBridge.getProvider().getConverter(sc, targetClass);
+        GiConverter<S, T> converter =
+                GirConverterProviderBridge.getProvider().getConverter(sc, targetClass);
         return converter.convert(source);
     }
 }

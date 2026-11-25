@@ -6,6 +6,7 @@ import cn.geoair.map.tile.forge.fuser.image.TileImageProcessingContext;
 import cn.geoair.map.tile.forge.fuser.image.TileImageProcessingOutcome;
 import cn.geoair.map.tile.forge.fuser.image.TileImageProcessor;
 import cn.geoair.map.tile.forge.fuser.image.TileImageResultWriter;
+
 import java.util.function.Consumer;
 
 /** 显式启用的下载后处理组合；不自带算法、线程池、业务任务表或重试调度。 */

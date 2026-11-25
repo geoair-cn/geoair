@@ -1,6 +1,7 @@
 package cn.geoair.base.text;
 
 import cn.geoair.base.util.GutilAssert;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.text.DateFormat;

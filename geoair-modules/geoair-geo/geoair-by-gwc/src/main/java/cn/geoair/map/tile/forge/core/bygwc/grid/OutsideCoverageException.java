@@ -14,14 +14,10 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.grid;
 
-
-
 import java.util.Arrays;
 
 public class OutsideCoverageException extends RuntimeException {
-    /**
-     *
-     */
+    /** */
     private static final long serialVersionUID = -2465389680194367974L;
 
     public OutsideCoverageException(long[] index, long firstLevel, long lastLevel) {

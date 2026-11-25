@@ -25,17 +25,24 @@ public class ForgeExecutorUtils {
             int MAX_POOL_SIZE = 200;
             long KEEP_ALIVE_TIME = 60L;
             BlockingQueue<Runnable> WORK_QUEUE = new LinkedBlockingQueue<>(10000);
-            executor = new ThreadPoolExecutor(
-                    CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-                    WORK_QUEUE, new ThreadFactory() {
-                private final AtomicLong count = new AtomicLong(0);
+            executor =
+                    new ThreadPoolExecutor(
+                            CORE_POOL_SIZE,
+                            MAX_POOL_SIZE,
+                            KEEP_ALIVE_TIME,
+                            TimeUnit.SECONDS,
+                            WORK_QUEUE,
+                            new ThreadFactory() {
+                                private final AtomicLong count = new AtomicLong(0);
 
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "tile-precache-" + count.incrementAndGet());
-                }
-            }, new ThreadPoolExecutor.CallerRunsPolicy() // 拒绝策略：由调用线程执行
-            );
+                                @Override
+                                public Thread newThread(Runnable r) {
+                                    return new Thread(
+                                            r, "tile-precache-" + count.incrementAndGet());
+                                }
+                            },
+                            new ThreadPoolExecutor.CallerRunsPolicy() // 拒绝策略：由调用线程执行
+                            );
         }
 
         return executor;

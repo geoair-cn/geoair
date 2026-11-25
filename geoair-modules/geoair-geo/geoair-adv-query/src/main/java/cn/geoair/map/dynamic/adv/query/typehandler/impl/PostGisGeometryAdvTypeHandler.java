@@ -5,6 +5,7 @@ import cn.geoair.map.dynamic.tools.convert.GirPostGisJdbcTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
+
 import org.locationtech.jts.geom.Geometry;
 import org.postgresql.util.PGobject;
 
@@ -23,7 +24,7 @@ public class PostGisGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
             return GirPostGisNetTran.getGeometry(value);
         }
         // PostGIS org 驱动几何对象
-        if (GirPostGisTran.isOrgConvert() &&GirPostGisOrgTran.isGeometry(value)) {
+        if (GirPostGisTran.isOrgConvert() && GirPostGisOrgTran.isGeometry(value)) {
             return GirPostGisOrgTran.getGeometry(value);
         }
         // PostgreSQL JDBC 驱动返回 PGobject
@@ -38,7 +39,8 @@ public class PostGisGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
 
     @Override
     protected Object writeGeometry(Geometry value) {
-        String wkt = GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
+        String wkt =
+                GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(value, true);
         if (wkt == null) {
             return null;
         }

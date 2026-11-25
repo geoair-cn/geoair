@@ -3,6 +3,7 @@ package cn.geoair.base.data.tuples;
 import cn.geoair.base.data.tuples.valueintf.GkiValue0;
 import cn.geoair.base.data.tuples.valueintf.GkiValue1;
 import cn.geoair.base.data.tuples.valueintf.GkiValue2;
+
 import java.util.Collection;
 import java.util.Iterator;
 

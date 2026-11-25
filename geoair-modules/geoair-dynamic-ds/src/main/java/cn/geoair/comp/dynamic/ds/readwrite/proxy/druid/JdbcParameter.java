@@ -24,25 +24,17 @@ public interface JdbcParameter {
         public static final int URL = 10005;
         public static final int UnicodeStream = 10006;
         public static final int BYTES = 10007;
-
     }
-    /**
-     * 获取参数值
-     */
+
+    /** 获取参数值 */
     Object getValue();
 
-    /**
-     * 获取长度（用于流类型）
-     */
+    /** 获取长度（用于流类型） */
     long getLength();
 
-    /**
-     * 获取日历（用于日期类型）
-     */
+    /** 获取日历（用于日期类型） */
     Calendar getCalendar();
 
-    /**
-     * 获取 SQL 类型
-     */
+    /** 获取 SQL 类型 */
     int getSqlType();
 }

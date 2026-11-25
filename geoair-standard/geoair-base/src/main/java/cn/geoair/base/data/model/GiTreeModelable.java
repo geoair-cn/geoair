@@ -3,6 +3,7 @@ package cn.geoair.base.data.model;
 import cn.geoair.base.Gir;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.util.GutilReflection;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.LinkedList;

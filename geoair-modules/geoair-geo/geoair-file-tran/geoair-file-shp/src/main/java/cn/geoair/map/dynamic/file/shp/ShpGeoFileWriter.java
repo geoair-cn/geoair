@@ -9,24 +9,24 @@ import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+
+import org.geotools.api.data.Transaction;
+import org.geotools.api.feature.Property;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.api.feature.simple.SimpleFeatureType;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import org.geotools.data.DefaultTransaction;
-import org.geotools.api.data.Transaction;
-
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.api.feature.Property;
-import org.geotools.api.feature.simple.SimpleFeature;
-import org.geotools.api.feature.simple.SimpleFeatureType;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 
 public class ShpGeoFileWriter implements GeoFileWriter {
 
@@ -65,7 +65,9 @@ public class ShpGeoFileWriter implements GeoFileWriter {
 
             if (writeConfig != null && writeConfig.getOutPutSrid() > 0) {
                 CoordinateReferenceSystem targetCrs =
-                        GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid());
+                        GirGeoTools.defaultInstance()
+                                .getSridOpt()
+                                .getCRS(writeConfig.getOutPutSrid());
                 org.geotools.feature.simple.SimpleFeatureTypeBuilder tb =
                         new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
                 tb.init(featureType);
@@ -114,14 +116,16 @@ public class ShpGeoFileWriter implements GeoFileWriter {
         File shpFile = new File(linkInfo.getShpFilePath());
         Map<String, Object> params = new HashMap<>();
         params.put(ShapefileDataStoreFactory.URLP.key, shpFile.toURI().toURL());
-        params.put(ShapefileDataStoreFactory.DBFCHARSET.key, Charset.forName(linkInfo.getCharset()));
+        params.put(
+                ShapefileDataStoreFactory.DBFCHARSET.key, Charset.forName(linkInfo.getCharset()));
         params.put(ShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, Boolean.TRUE);
 
         ShapefileDataStore dataStore = null;
         Transaction transaction = null;
 
         try {
-            dataStore = (ShapefileDataStore) new ShapefileDataStoreFactory().createNewDataStore(params);
+            dataStore =
+                    (ShapefileDataStore) new ShapefileDataStoreFactory().createNewDataStore(params);
             if (dataStore == null) {
                 throw new GeoFileWriteException("初始化 ShapefileDataStore 失败");
             }
@@ -132,7 +136,7 @@ public class ShpGeoFileWriter implements GeoFileWriter {
             String typeName = dataStore.getTypeNames()[0];
 
             try (org.geotools.api.data.FeatureWriter<SimpleFeatureType, SimpleFeature> writer =
-                         dataStore.getFeatureWriterAppend(typeName, transaction)) {
+                    dataStore.getFeatureWriterAppend(typeName, transaction)) {
                 for (SimpleFeature source : (Iterable<SimpleFeature>) featureCollection) {
                     SimpleFeature target = writer.next();
                     for (Property prop : source.getProperties()) {
@@ -145,7 +149,10 @@ public class ShpGeoFileWriter implements GeoFileWriter {
             }
 
             transaction.commit();
-            log.info("Shapefile 写入完成，共 {} 条，路径：{}", featureCollection.size(), shpFile.getAbsolutePath());
+            log.info(
+                    "Shapefile 写入完成，共 {} 条，路径：{}",
+                    featureCollection.size(),
+                    shpFile.getAbsolutePath());
         } catch (Exception e) {
             if (transaction != null) {
                 try {

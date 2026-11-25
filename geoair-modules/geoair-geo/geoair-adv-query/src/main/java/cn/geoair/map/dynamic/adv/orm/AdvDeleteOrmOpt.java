@@ -6,7 +6,6 @@ import cn.geoair.map.dynamic.adv.query.utils.GirAdvSqlUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.spring.GirSpringAdvExecutor;
 
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;

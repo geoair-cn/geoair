@@ -1,6 +1,7 @@
 package cn.geoair.base.tool;
 
 import cn.geoair.base.util.GutilStr;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;

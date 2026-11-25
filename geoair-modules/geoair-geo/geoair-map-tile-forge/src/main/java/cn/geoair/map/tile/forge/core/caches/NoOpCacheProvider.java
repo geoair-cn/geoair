@@ -10,14 +10,10 @@ public class NoOpCacheProvider implements CacheProvider {
     }
 
     @Override
-    public void put(Object key, Object value) {
-
-    }
+    public void put(Object key, Object value) {}
 
     @Override
-    public void put(Object key, Object value, long milliseconds) {
-
-    }
+    public void put(Object key, Object value, long milliseconds) {}
 
     @Override
     public Object getObject(Object key) {
@@ -55,17 +51,11 @@ public class NoOpCacheProvider implements CacheProvider {
     }
 
     @Override
-    public void evict(Object key) {
-
-    }
+    public void evict(Object key) {}
 
     @Override
-    public void evictByPreFix(Object prefix) {
-
-    }
+    public void evictByPreFix(Object prefix) {}
 
     @Override
-    public void clear() {
-
-    }
+    public void clear() {}
 }

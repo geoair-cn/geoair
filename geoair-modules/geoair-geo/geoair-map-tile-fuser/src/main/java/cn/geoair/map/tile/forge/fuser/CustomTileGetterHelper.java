@@ -16,11 +16,10 @@ public interface CustomTileGetterHelper {
     }
 
     /**
-     *  通过图层对象获取TileGetter的具体实现
+     * 通过图层对象获取TileGetter的具体实现
+     *
      * @param layerInfo 图层对象
      * @return TileGetter具体自定义实现
      */
     LayerTileGetter getTileGetterByPxyLayerInfo(PxyLayerInfo layerInfo);
-
-
 }

@@ -16,6 +16,7 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.base.tool.GkConsole;
 import cn.geoair.base.tool.GkConsoleTable;
+
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -130,42 +131,49 @@ public abstract class Gir {
 
                 @Override
                 public boolean isFatalEnabled() {
-                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isFatalEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .isFatalEnabled();
                 }
 
                 @Override
                 public boolean isErrorEnabled() {
 
-                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isErrorEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .isErrorEnabled();
                 }
 
                 @Override
                 public boolean isWarnEnabled() {
 
-                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isWarnEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .isWarnEnabled();
                 }
 
                 @Override
                 public boolean isInfoEnabled() {
 
-                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isInfoEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .isInfoEnabled();
                 }
 
                 @Override
                 public boolean isDebugEnabled() {
 
-                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isDebugEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .isDebugEnabled();
                 }
 
                 @Override
                 public boolean isTraceEnabled() {
 
-                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).isTraceEnabled();
+                    return GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .isTraceEnabled();
                 }
 
                 @Override
                 public void fatal(String format, Object... arguments) {
-                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).fatal(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .fatal(format, arguments);
                 }
 
                 @Override
@@ -181,7 +189,8 @@ public abstract class Gir {
 
                 @Override
                 public void error(String format, Object... arguments) {
-                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).error(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .error(format, arguments);
                 }
 
                 @Override
@@ -197,7 +206,8 @@ public abstract class Gir {
 
                 @Override
                 public void warn(String format, Object... arguments) {
-                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).warn(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .warn(format, arguments);
                 }
 
                 @Override
@@ -213,7 +223,8 @@ public abstract class Gir {
 
                 @Override
                 public void info(String format, Object... arguments) {
-                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).info(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .info(format, arguments);
                 }
 
                 @Override
@@ -229,7 +240,8 @@ public abstract class Gir {
 
                 @Override
                 public void debug(String format, Object... arguments) {
-                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).debug(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .debug(format, arguments);
                 }
 
                 @Override
@@ -245,7 +257,8 @@ public abstract class Gir {
 
                 @Override
                 public void trace(String format, Object... arguments) {
-                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName()).trace(format, arguments);
+                    GirLoggerFactory.getLogger(GkCallerUtil.getCallerCallerName())
+                            .trace(format, arguments);
                 }
 
                 @Override

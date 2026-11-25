@@ -43,7 +43,8 @@ final class TileBoundaryMask {
         double west = tile.getMinX(), right = tile.getMaxX();
         double scale = size / tile.getWidth();
         // 从选区右侧沿每行向左扫描，跨过外环或孔洞的边都翻转一次。
-        Envelope rayRange = new Envelope(west, Math.max(right, east), tile.getMinY(), tile.getMaxY());
+        Envelope rayRange =
+                new Envelope(west, Math.max(right, east), tile.getMinY(), tile.getMaxY());
         for (Object item : edges.query(rayRange)) {
             LineSegment edge = (LineSegment) item;
             Coordinate a = edge.p0, b = edge.p1;

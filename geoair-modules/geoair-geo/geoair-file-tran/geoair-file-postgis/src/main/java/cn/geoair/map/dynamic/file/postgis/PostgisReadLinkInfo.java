@@ -1,20 +1,19 @@
 package cn.geoair.map.dynamic.file.postgis;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
- 
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /** PostGIS 链接信息类 包含数据库连接、排序字段、几何字段等核心配置 */
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
- 
 public class PostgisReadLinkInfo extends PostgisLinkInfo {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private String querySqlByOutPut; // 导出的sql

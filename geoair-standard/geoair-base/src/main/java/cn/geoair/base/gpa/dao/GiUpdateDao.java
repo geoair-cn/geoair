@@ -1,6 +1,7 @@
 package cn.geoair.base.gpa.dao;
 
 import cn.geoair.base.gpa.entity.GiEntityAlterable;
+
 import java.io.Serializable;
 import java.util.List;
 

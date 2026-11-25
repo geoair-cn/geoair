@@ -2,6 +2,7 @@ package cn.geoair.base.data.common;
 
 import cn.geoair.base.data.GiVisualValuable;
 import cn.geoair.base.data.support.GirVisualValueKid;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

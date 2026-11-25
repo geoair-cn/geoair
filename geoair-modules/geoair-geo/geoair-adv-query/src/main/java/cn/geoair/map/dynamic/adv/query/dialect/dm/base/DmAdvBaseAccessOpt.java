@@ -5,6 +5,7 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.DmDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
+
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -15,13 +16,15 @@ import java.util.function.Supplier;
  */
 public class DmAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
-    public DmAdvBaseAccessOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+    public DmAdvBaseAccessOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         super(configAdvQueryGetter, registry);
         this.dialectTableNameProcessor = DmDialectTableNameUtil.getInstance();
     }
 
     @Override
-    protected String buildInsertIgnoreSql(String tableName, String fields, String placeholders, List<String> conflictKeys) {
+    protected String buildInsertIgnoreSql(
+            String tableName, String fields, String placeholders, List<String> conflictKeys) {
         String[] fieldArray = fields.split(",");
         StringBuilder sourceSelectBuilder = new StringBuilder("SELECT ");
         for (int i = 0; i < fieldArray.length; i++) {
@@ -37,14 +40,21 @@ public class DmAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
         if (effectiveConflictKeys == null || effectiveConflictKeys.isEmpty()) {
             effectiveConflictKeys = java.util.Collections.singletonList(fieldArray[0].trim());
         }
-        String conflictCondition = effectiveConflictKeys.stream()
-                .map(field -> {
-                    String trimmedField = field.trim();
-                    return StrUtil.format("target.{} = source.{}", trimmedField, trimmedField);
-                })
-                .collect(java.util.stream.Collectors.joining(" AND "));
+        String conflictCondition =
+                effectiveConflictKeys.stream()
+                        .map(
+                                field -> {
+                                    String trimmedField = field.trim();
+                                    return StrUtil.format(
+                                            "target.{} = source.{}", trimmedField, trimmedField);
+                                })
+                        .collect(java.util.stream.Collectors.joining(" AND "));
         return StrUtil.format(
                 "INSERT INTO {} ({}) SELECT * FROM ({}) source WHERE NOT EXISTS (SELECT 1 FROM {} target WHERE {})",
-                tableName, fields, sourceSelectBuilder, tableName, conflictCondition);
+                tableName,
+                fields,
+                sourceSelectBuilder,
+                tableName,
+                conflictCondition);
     }
 }

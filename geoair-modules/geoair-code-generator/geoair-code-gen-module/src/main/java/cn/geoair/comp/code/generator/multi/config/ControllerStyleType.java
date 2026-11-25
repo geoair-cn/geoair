@@ -5,7 +5,6 @@ package cn.geoair.comp.code.generator.multi.config;
  * @date ：Created in 10:05 @description： TODO
  */
 public enum ControllerStyleType {
-
     rest("1", "接口命名为rest风格  简洁为 add ,update,list,del"),
     hasType("2", "接口命名为功能加上类型  例如 addXXX ,updateXXX,listXXX,delXXX");
 

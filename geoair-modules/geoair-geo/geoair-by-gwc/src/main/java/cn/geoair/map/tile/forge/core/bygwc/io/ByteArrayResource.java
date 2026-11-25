@@ -1,6 +1,5 @@
 package cn.geoair.map.tile.forge.core.bygwc.io;
 
-
 import cn.hutool.core.lang.Assert;
 
 import java.io.ByteArrayInputStream;
@@ -14,7 +13,8 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io.Resource, Serializable {
+public class ByteArrayResource
+        implements cn.geoair.map.tile.forge.core.bygwc.io.Resource, Serializable {
 
     private byte[] data;
 
@@ -24,9 +24,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
 
     private long lastModified = System.currentTimeMillis();
 
-    /**
-     * Create a new empty ByteArrayResource
-     */
+    /** Create a new empty ByteArrayResource */
     public ByteArrayResource() {
         this((byte[]) null);
     }
@@ -56,7 +54,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
     /**
      * Create a new ByteArrayResource from the given byte array.
      *
-     * @param data   the array of bytes. It will be retained by the Resource for storage.
+     * @param data the array of bytes. It will be retained by the Resource for storage.
      * @param offset the beginning of the portion of the array to use as content
      * @param length the length of the portion of the array to use as content
      */
@@ -76,9 +74,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
         }
     }
 
-    /**
-     * Create a new empty ByteArrayResource with a particular initial capacity.
-     */
+    /** Create a new empty ByteArrayResource with a particular initial capacity. */
     public ByteArrayResource(final int initialCapacity) {
         this(new byte[initialCapacity], 0, 0);
     }
@@ -158,9 +154,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
         return new SeekableInputStream(this);
     }
 
-    /**
-     * Get the contents of the resource.
-     */
+    /** Get the contents of the resource. */
     public byte[] getContents() {
         if (data == null || length == 0) {
             return null;
@@ -173,9 +167,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
         return buff;
     }
 
-    /**
-     * Discard the contents.
-     */
+    /** Discard the contents. */
     public void truncate() {
         offset = 0;
         length = 0;

@@ -1,8 +1,9 @@
 package cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.module;
 
 import cn.geoair.comp.message.converter.jts.jackson.serializer.oracle.StdOracleJsonObjectSerializer;
-import cn.geoair.map.dynamic.tools.convert.GirOracleTran;
+
 import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import oracle.sql.json.OracleJsonObject;
 
 /**

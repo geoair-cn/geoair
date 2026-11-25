@@ -12,7 +12,6 @@ import java.sql.Statement;
  */
 public interface IDsConnectionOpt {
 
-
     /**
      * 获取数据库连接
      *
@@ -21,7 +20,6 @@ public interface IDsConnectionOpt {
      * @return 数据库连接对象
      */
     Connection getConnection();
-
 
     /**
      * 关闭数据库连接
@@ -37,7 +35,7 @@ public interface IDsConnectionOpt {
      *
      * <p>关闭结果集、语句和连接等数据库资源，释放系统资源。
      *
-     * @param rs   结果集对象
+     * @param rs 结果集对象
      * @param stmt 语句对象
      * @param conn 连接对象
      */

@@ -32,5 +32,4 @@ public class FormattingTuple {
     public Throwable getThrowable() {
         return throwable;
     }
-
 }

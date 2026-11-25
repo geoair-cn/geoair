@@ -4,6 +4,11 @@ import static org.junit.Assert.*;
 
 import cn.geoair.map.tile.forge.fuser.encoding.TileImageCodec;
 import cn.geoair.map.tile.forge.fuser.support.RasterTestImages;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -12,9 +17,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class MbtilesInPlaceTranscoderTest {
     @Rule public TemporaryFolder folder = new TemporaryFolder();

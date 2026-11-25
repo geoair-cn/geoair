@@ -16,12 +16,17 @@ import java.util.function.Consumer;
 public interface LayerPerFileDao extends Closeable {
 
     /** 没有源版本的旧索引仅可由旧调用链使用，按需读取会安全回退到源归档。 */
-    default String getArchiveVersion() throws SQLException { return null; }
+    default String getArchiveVersion() throws SQLException {
+        return null;
+    }
 
-    default void setArchiveVersion(String version) throws SQLException { }
+    default void setArchiveVersion(String version) throws SQLException {}
 
     /** 请求路径只读取已完整发布且版本匹配的索引；未实现时由调用方回到归档。 */
-    default TileCentralDirectoryModel findReadyByFileName(String version, String fileName) throws SQLException { return null; }
+    default TileCentralDirectoryModel findReadyByFileName(String version, String fileName)
+            throws SQLException {
+        return null;
+    }
 
     void init() throws SQLException;
 
@@ -50,7 +55,7 @@ public interface LayerPerFileDao extends Closeable {
     void doPreCacheStart();
 
     /** 构建失败时保留可重试状态，旧驱动可继续沿用默认实现。 */
-    default void doPreCacheFailed() { }
+    default void doPreCacheFailed() {}
 
     void delCache();
 

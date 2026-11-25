@@ -3,32 +3,33 @@ package cn.geoair.map.tile.forge.core.service;
 import cn.geoair.base.bean.GirBeanHelper;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.cache.TileCacheRegistry;
+import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
-import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
 import cn.geoair.map.tile.forge.core.support.arcgis.ArcgisConfigXmlGetter;
-import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.utils.ForgeExecutorUtils;
+
 import lombok.Getter;
+
 import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 public class GirMapTileService {
     public static GiLogger log = GirLoggerFactory.getLogger();
     static GirMapTileService self = null;
     private static final Set<String> PRECACHING_LAYERS = ConcurrentHashMap.newKeySet();
-    @Getter
-    GirLayerConfigContextHelper contextHelper;
-    @Getter
-    TileStorageSupportAdapter tileStorageSupportAdapter;
+    @Getter GirLayerConfigContextHelper contextHelper;
+    @Getter TileStorageSupportAdapter tileStorageSupportAdapter;
 
-    public GirMapTileService(GirLayerConfigContextHelper contextHelper, TileStorageSupportAdapter tileStorageSupportAdapter) {
+    public GirMapTileService(
+            GirLayerConfigContextHelper contextHelper,
+            TileStorageSupportAdapter tileStorageSupportAdapter) {
         this.contextHelper = contextHelper;
         this.tileStorageSupportAdapter = tileStorageSupportAdapter;
         self = this;
@@ -41,7 +42,6 @@ public class GirMapTileService {
         return self;
     }
 
-
     /**
      * 获取图层的瓦片数据
      *
@@ -49,14 +49,18 @@ public class GirMapTileService {
      * @return 瓦片数据
      * @throws Exception 获取过程中可能出现的异常，如网络错误、文件读取错误等
      */
-    public TileRequest getLayerTile(String layerName, String z, String y, String x) throws Exception {
+    public TileRequest getLayerTile(String layerName, String z, String y, String x)
+            throws Exception {
         // 1. 查询图层配置
-        GirLayerConfigContext config = contextHelper.getByLayerName(layerName)
-                .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
+        GirLayerConfigContext config =
+                contextHelper
+                        .getByLayerName(layerName)
+                        .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
         return getLayerTile(config, z, y, x);
     }
 
-    public TileRequest getLayerTile(GirLayerConfigContext config, String z, String y, String x) throws Exception {
+    public TileRequest getLayerTile(GirLayerConfigContext config, String z, String y, String x)
+            throws Exception {
         // 2. 通过适配器获取对应的TileStorageSupport实例
         ITileStorageSupport storageSupport = tileStorageSupportAdapter.getSupport(config);
 
@@ -64,13 +68,13 @@ public class GirMapTileService {
         return storageSupport.getTileData(config, z, x, y);
     }
 
-    /**
-     * 获取图层的瓦片数据
-     */
+    /** 获取图层的瓦片数据 */
     public TileRequest getCapabilities(String layerName) throws Exception {
         // 1. 查询图层配置
-        GirLayerConfigContext config = contextHelper.getByLayerName(layerName)
-                .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
+        GirLayerConfigContext config =
+                contextHelper
+                        .getByLayerName(layerName)
+                        .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
 
         // 2. 通过适配器获取对应的TileStorageSupport实例
         ITileStorageSupport storageSupport = tileStorageSupportAdapter.getSupport(config);
@@ -103,11 +107,12 @@ public class GirMapTileService {
         return tileRequest;
     }
 
-
     public void preCacheTiles(String layerName) {
 
-        GirLayerConfigContext config = contextHelper.getByLayerName(layerName)
-                .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
+        GirLayerConfigContext config =
+                contextHelper
+                        .getByLayerName(layerName)
+                        .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
 
         ITileStorageSupport storageSupport = tileStorageSupportAdapter.getSupport(config);
         if (!PRECACHING_LAYERS.add(layerName)) {
@@ -117,21 +122,23 @@ public class GirMapTileService {
         log.info("开始预缓存图层：{}, 执行器 {}", layerName, storageSupport.getClass().getName());
         // 使用共享且有界的执行器，避免每次请求都创建一个原生线程。
         try {
-            ForgeExecutorUtils.getExecutor().execute(() -> {
-                try {
-                    log.info("异步线程开始预缓存图层：{}", layerName);
-                    storageSupport.preCacheTiles(config, TileCacheRegistry.getDefaultTileCache());
-                    log.info("异步线程预缓存图层完成：{}", layerName);
-                } catch (Exception e) {
-                    log.error("图层预缓存失败：{}", layerName, e);
-                } finally {
-                    PRECACHING_LAYERS.remove(layerName);
-                }
-            });
+            ForgeExecutorUtils.getExecutor()
+                    .execute(
+                            () -> {
+                                try {
+                                    log.info("异步线程开始预缓存图层：{}", layerName);
+                                    storageSupport.preCacheTiles(
+                                            config, TileCacheRegistry.getDefaultTileCache());
+                                    log.info("异步线程预缓存图层完成：{}", layerName);
+                                } catch (Exception e) {
+                                    log.error("图层预缓存失败：{}", layerName, e);
+                                } finally {
+                                    PRECACHING_LAYERS.remove(layerName);
+                                }
+                            });
         } catch (RuntimeException e) {
             PRECACHING_LAYERS.remove(layerName);
             throw e;
         }
     }
-
 }

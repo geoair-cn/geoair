@@ -1,6 +1,7 @@
 package cn.geoair.spi.util;
 
 import cn.geoair.base.util.GutilAop;
+
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Component;
 

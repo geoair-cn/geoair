@@ -1,8 +1,5 @@
 package cn.geoair.orm.mybatis.plugins;
 
-import java.sql.Statement;
-import java.util.List;
-import java.util.Properties;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
@@ -11,15 +8,17 @@ import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.springframework.stereotype.Component;
 
+import java.sql.Statement;
+import java.util.List;
+import java.util.Properties;
+
 @Intercepts(
-    value = {
-        @Signature(
-            args = {Statement.class},
-            method = "handleResultSets",
-            type = ResultSetHandler.class
-        )
-    }
-)
+        value = {
+            @Signature(
+                    args = {Statement.class},
+                    method = "handleResultSets",
+                    type = ResultSetHandler.class)
+        })
 @Component
 public class HandleResultPlugin implements Interceptor {
 

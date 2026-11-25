@@ -6,7 +6,7 @@ import java.io.IOException;
 /**
  * V3 瓦片二进制存储会话。
  *
- * <p>一个 Spark 分区独占一个会话实例，避免在 executor 之间共享文件句柄或 S3 客户端状态。</p>
+ * <p>一个 Spark 分区独占一个会话实例，避免在 executor 之间共享文件句柄或 S3 客户端状态。
  *
  * @author 张逢吉
  */

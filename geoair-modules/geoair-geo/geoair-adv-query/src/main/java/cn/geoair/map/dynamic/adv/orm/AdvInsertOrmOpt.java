@@ -4,7 +4,6 @@ import cn.geoair.base.gpa.dao.GiCreateDao;
 import cn.geoair.base.gpa.entity.GiEntitySaveable;
 import cn.geoair.map.dynamic.adv.spring.GirSpringAdvExecutor;
 
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;

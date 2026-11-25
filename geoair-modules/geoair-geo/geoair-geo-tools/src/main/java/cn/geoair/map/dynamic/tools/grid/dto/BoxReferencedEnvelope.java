@@ -1,14 +1,14 @@
 package cn.geoair.map.dynamic.tools.grid.dto;
 
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+
 import lombok.Getter;
+
+import org.geotools.api.geometry.BoundingBox;
+import org.geotools.api.geometry.MismatchedDimensionException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.api.geometry.BoundingBox;
-
-import org.geotools.api.geometry.MismatchedDimensionException;
 
 /**
  * @author ：张逢吉
@@ -17,9 +17,7 @@ import org.geotools.api.geometry.MismatchedDimensionException;
 @Getter
 public class BoxReferencedEnvelope extends ReferencedEnvelope {
 
-    /**
-     * 当前的范围框的坐标系
-     */
+    /** 当前的范围框的坐标系 */
     int thisSrid;
 
     public BoxReferencedEnvelope(Envelope envelope, int thisSrid)
@@ -29,7 +27,10 @@ public class BoxReferencedEnvelope extends ReferencedEnvelope {
     }
 
     public String getWktString(int targetSrid) {
-        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(this, thisSrid, targetSrid);
+        Geometry geometry =
+                GirGeoTools.defaultInstance()
+                        .getSridOpt()
+                        .convertToGeom(this, thisSrid, targetSrid);
         return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 
@@ -50,6 +51,8 @@ public class BoxReferencedEnvelope extends ReferencedEnvelope {
         Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(this);
         return this.getThisSrid()
                 + ";"
-                + GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
+                + GirGeoTools.defaultInstance()
+                        .getFormatOpt()
+                        .jtsGeometryToWktString(geometry, true);
     }
 }

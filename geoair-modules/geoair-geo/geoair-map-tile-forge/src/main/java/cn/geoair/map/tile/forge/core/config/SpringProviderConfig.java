@@ -2,9 +2,10 @@ package cn.geoair.map.tile.forge.core.config;
 
 import cn.geoair.map.tile.forge.core.bygwc.ProviderConfig;
 import cn.hutool.extra.spring.SpringUtil;
+
 import lombok.Data;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * @author ：张俊
@@ -19,9 +20,7 @@ public class SpringProviderConfig extends ProviderConfig {
         instance = this;
     }
 
-    /**
-     * 配置实例对象
-     */
+    /** 配置实例对象 */
     static SpringProviderConfig instance = null;
 
     /**
@@ -30,8 +29,7 @@ public class SpringProviderConfig extends ProviderConfig {
      * @return 返回ProviderConfig实例
      */
     public static SpringProviderConfig getInstance() {
-        return instance = instance == null ? SpringUtil.getBean(SpringProviderConfig.class) : instance;
+        return instance =
+                instance == null ? SpringUtil.getBean(SpringProviderConfig.class) : instance;
     }
-
-
 }

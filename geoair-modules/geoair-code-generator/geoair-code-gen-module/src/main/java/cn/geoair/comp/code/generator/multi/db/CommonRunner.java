@@ -12,10 +12,11 @@ import cn.geoair.map.dynamic.adv.query.apo.SchemaTableApo;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-import java.util.ArrayList;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.sql.DataSource;
 
 /**
@@ -59,10 +60,14 @@ public class CommonRunner implements ICommonRunner {
             }
             genTableColumn.setColumnComment(columnComment);
             genTableColumn.setColumnType(fieldBySchemaApo.getUdtName());
-            genTableColumn.setNumericPrecision(fieldBySchemaApo.getNumericPrecision() != null
-                    ? String.valueOf(fieldBySchemaApo.getNumericPrecision()) : null);
-            genTableColumn.setNumericScale(fieldBySchemaApo.getNumericScale() != null
-                    ? String.valueOf(fieldBySchemaApo.getNumericScale()) : null);
+            genTableColumn.setNumericPrecision(
+                    fieldBySchemaApo.getNumericPrecision() != null
+                            ? String.valueOf(fieldBySchemaApo.getNumericPrecision())
+                            : null);
+            genTableColumn.setNumericScale(
+                    fieldBySchemaApo.getNumericScale() != null
+                            ? String.valueOf(fieldBySchemaApo.getNumericScale())
+                            : null);
             genTableColumn.setIsPk(fieldBySchemaApo.isPrimaryKeyIs() ? "1" : "0");
             genTableColumn.setIsIncrement("0");
             genTableColumn.setIsRequired("NO".equals(fieldBySchemaApo.getIsNullable()) ? "1" : "0");
@@ -121,6 +126,8 @@ public class CommonRunner implements ICommonRunner {
             return "";
         }
         String normalized = StrUtil.subAfter(tableName, ".", true);
-        return StrUtil.isEmpty(normalized) ? tableName.trim().toLowerCase() : normalized.trim().toLowerCase();
+        return StrUtil.isEmpty(normalized)
+                ? tableName.trim().toLowerCase()
+                : normalized.trim().toLowerCase();
     }
 }

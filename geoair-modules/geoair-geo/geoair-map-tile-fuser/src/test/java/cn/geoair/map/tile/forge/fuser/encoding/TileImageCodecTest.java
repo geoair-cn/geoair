@@ -3,11 +3,14 @@ package cn.geoair.map.tile.forge.fuser.encoding;
 import static org.junit.Assert.*;
 
 import cn.geoair.map.tile.forge.fuser.utils.TileImageUtils;
+
+import org.junit.Test;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
+
 import javax.imageio.ImageIO;
-import org.junit.Test;
 
 /** 真实编码图片验证内容识别、透明保护和任务参数隔离。 */
 public class TileImageCodecTest {

@@ -39,7 +39,8 @@ public class MysqlDialectTableNameUtil extends AbstractExecDialectTableUtil {
             return fieldName;
         }
         String identifier = fieldName;
-        if (identifier.startsWith(FIELD_QUOTE_PREFIX) && identifier.endsWith(FIELD_QUOTE_SUFFIX)
+        if (identifier.startsWith(FIELD_QUOTE_PREFIX)
+                && identifier.endsWith(FIELD_QUOTE_SUFFIX)
                 && identifier.length() >= 2) {
             identifier = identifier.substring(1, identifier.length() - 1).replace("``", "`");
         }
@@ -50,7 +51,6 @@ public class MysqlDialectTableNameUtil extends AbstractExecDialectTableUtil {
     public String tbBuildPageSql(String noPageSql, int pageSize, long offset) {
         return StrUtil.format("{} LIMIT {}, {}", noPageSql, offset, pageSize);
     }
-
 
     @Override
     public String tbBuildPageSql(String noPageSql) {

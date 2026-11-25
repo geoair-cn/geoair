@@ -16,8 +16,6 @@ public class DefaultDataSourceGetterFunction implements DataSourceGetterFunction
     @Override
     public DataSource apply(DataSourceConfig config) {
         return new DriverManagerDataSource(
-                config.getJdbcUrl(),
-                config.getUsername(),
-                config.getPassword());
+                config.getJdbcUrl(), config.getUsername(), config.getPassword());
     }
 }

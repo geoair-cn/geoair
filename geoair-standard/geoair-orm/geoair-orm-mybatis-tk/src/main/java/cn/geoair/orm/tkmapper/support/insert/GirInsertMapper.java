@@ -1,6 +1,7 @@
 package cn.geoair.orm.tkmapper.support.insert;
 
 import org.apache.ibatis.annotations.InsertProvider;
+
 import tk.mybatis.mapper.annotation.RegisterMapper;
 
 /**

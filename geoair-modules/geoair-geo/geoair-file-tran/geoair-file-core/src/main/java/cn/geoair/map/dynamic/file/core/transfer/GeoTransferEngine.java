@@ -14,9 +14,8 @@ import java.util.List;
 
 /**
  * Core V2 的无状态空间数据传输引擎。
- * <p>
- * 引擎只负责读取、批处理、错误策略、进度和资源关闭；数据库方言、文件格式和建表细节
- * 均由 Reader / Writer 实现承担。每次调用使用独立请求对象，因此同一个引擎实例可安全复用。
+ *
+ * <p>引擎只负责读取、批处理、错误策略、进度和资源关闭；数据库方言、文件格式和建表细节 均由 Reader / Writer 实现承担。每次调用使用独立请求对象，因此同一个引擎实例可安全复用。
  *
  * @author 张逢吉
  */
@@ -27,8 +26,7 @@ public final class GeoTransferEngine {
         return new GeoTransferEngine();
     }
 
-    private GeoTransferEngine() {
-    }
+    private GeoTransferEngine() {}
 
     /** 执行一次空间数据传输。 */
     public GeoTransferResult execute(GeoTransferRequest request) {
@@ -44,9 +42,17 @@ public final class GeoTransferEngine {
             writer.writeHeader(reader.readHeader(null), null);
             long count = reader.getFeatureCount();
             if (count > 0) {
-                transferByPage(reader, writer, count, options, request.getProgressListener(), result, start);
+                transferByPage(
+                        reader,
+                        writer,
+                        count,
+                        options,
+                        request.getProgressListener(),
+                        result,
+                        start);
             } else {
-                transferByCursor(reader, writer, options, request.getProgressListener(), result, start);
+                transferByCursor(
+                        reader, writer, options, request.getProgressListener(), result, start);
             }
             result.setStatus(TranStatus.SUCCESS);
         } catch (Exception e) {
@@ -65,8 +71,13 @@ public final class GeoTransferEngine {
     }
 
     private void transferByPage(
-            GeoFileReader reader, GeoFileWriter writer, long expectedCount, GeoTransferOptions options,
-            GeoTransferProgressListener listener, GeoTransferResult result, long start) {
+            GeoFileReader reader,
+            GeoFileWriter writer,
+            long expectedCount,
+            GeoTransferOptions options,
+            GeoTransferProgressListener listener,
+            GeoTransferResult result,
+            long start) {
         int pageNum = 1;
         while (result.getTotalCount() < expectedCount) {
             checkTimeout(options, start);
@@ -84,8 +95,12 @@ public final class GeoTransferEngine {
     }
 
     private void transferByCursor(
-            GeoFileReader reader, GeoFileWriter writer, GeoTransferOptions options,
-            GeoTransferProgressListener listener, GeoTransferResult result, long start) {
+            GeoFileReader reader,
+            GeoFileWriter writer,
+            GeoTransferOptions options,
+            GeoTransferProgressListener listener,
+            GeoTransferResult result,
+            long start) {
         Iterator<GirAdvOneRow> iterator = reader.readRowIterator(null);
         List<GirAdvOneRow> batch = new ArrayList<>(options.getBatchSize());
         while (iterator != null && iterator.hasNext()) {
@@ -99,8 +114,12 @@ public final class GeoTransferEngine {
     }
 
     private void flushCursorBatch(
-            GeoFileWriter writer, List<GirAdvOneRow> batch, GeoTransferOptions options,
-            GeoTransferProgressListener listener, GeoTransferResult result, long start) {
+            GeoFileWriter writer,
+            List<GirAdvOneRow> batch,
+            GeoTransferOptions options,
+            GeoTransferProgressListener listener,
+            GeoTransferResult result,
+            long start) {
         if (batch.isEmpty()) {
             return;
         }
@@ -111,7 +130,10 @@ public final class GeoTransferEngine {
     }
 
     private void writeBatch(
-            GeoFileWriter writer, List<GirAdvOneRow> rows, GeoTransferOptions options, GeoTransferResult result) {
+            GeoFileWriter writer,
+            List<GirAdvOneRow> rows,
+            GeoTransferOptions options,
+            GeoTransferResult result) {
         try {
             writer.writeRows(rows, null);
             result.setSuccessCount(result.getSuccessCount() + rows.size());
@@ -137,23 +159,28 @@ public final class GeoTransferEngine {
     }
 
     private void notifyProgress(
-            GeoTransferProgressListener listener, GeoTransferResult result, long expectedCount, long start) {
+            GeoTransferProgressListener listener,
+            GeoTransferResult result,
+            long expectedCount,
+            long start) {
         if (listener == null) {
             return;
         }
-        TranProgress progress = new TranProgress()
-                .setTotalFeatureCount(expectedCount)
-                .setBatchTotalCount(result.getTotalCount())
-                .setBatchSuccessCount(result.getSuccessCount())
-                .setBatchFailCount(result.getFailCount())
-                .setElapsedTime(System.currentTimeMillis() - start)
-                .setStatus(TranStatus.RUNNING)
-                .calculateSuccessRate();
+        TranProgress progress =
+                new TranProgress()
+                        .setTotalFeatureCount(expectedCount)
+                        .setBatchTotalCount(result.getTotalCount())
+                        .setBatchSuccessCount(result.getSuccessCount())
+                        .setBatchFailCount(result.getFailCount())
+                        .setElapsedTime(System.currentTimeMillis() - start)
+                        .setStatus(TranStatus.RUNNING)
+                        .calculateSuccessRate();
         listener.onProgress(progress);
     }
 
     private void checkTimeout(GeoTransferOptions options, long start) {
-        if (options.getTimeoutMillis() > 0 && System.currentTimeMillis() - start > options.getTimeoutMillis()) {
+        if (options.getTimeoutMillis() > 0
+                && System.currentTimeMillis() - start > options.getTimeoutMillis()) {
             throw new IllegalStateException("空间数据传输超时：" + options.getTimeoutMillis() + "ms");
         }
     }

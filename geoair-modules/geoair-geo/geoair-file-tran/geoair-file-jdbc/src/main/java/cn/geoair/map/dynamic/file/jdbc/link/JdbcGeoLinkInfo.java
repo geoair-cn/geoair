@@ -1,6 +1,7 @@
 package cn.geoair.map.dynamic.file.jdbc.link;
 
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;

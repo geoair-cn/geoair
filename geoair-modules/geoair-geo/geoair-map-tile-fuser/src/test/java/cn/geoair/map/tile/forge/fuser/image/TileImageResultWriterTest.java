@@ -15,10 +15,12 @@ import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationScope;
 import cn.geoair.map.tile.forge.fuser.support.ConstantTileImageProcessor;
 import cn.geoair.map.tile.forge.fuser.support.RasterTestImages;
-import java.io.IOException;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.IOException;
 
 public class TileImageResultWriterTest {
     @Rule public TemporaryFolder folder = new TemporaryFolder();

@@ -1,19 +1,24 @@
 package cn.geoair.map.dynamic.file.jdbc;
 
+import static org.junit.Assert.assertEquals;
+
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoLinkInfo;
+
 import org.junit.Test;
 
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 /** JDBC URL 到 GeoTools 连接参数的无数据库契约测试。 */
 public class JdbcGeoDataStoreParamsTest {
 
     @Test
     public void shouldCreateMysqlDataStoreParamsFromJdbcUrl() {
-        Map<String, Object> params = JdbcGeoDataStoreParams.create("mysql", linkInfo(
-                "jdbc:mysql://10.0.0.8:3307/source_db?useSSL=false", "source_schema"));
+        Map<String, Object> params =
+                JdbcGeoDataStoreParams.create(
+                        "mysql",
+                        linkInfo(
+                                "jdbc:mysql://10.0.0.8:3307/source_db?useSSL=false",
+                                "source_schema"));
 
         assertEquals("mysql", params.get("dbtype"));
         assertEquals("10.0.0.8", params.get("host"));
@@ -24,8 +29,9 @@ public class JdbcGeoDataStoreParamsTest {
 
     @Test
     public void shouldCreateOracleDataStoreParamsFromServiceNameUrl() {
-        Map<String, Object> params = JdbcGeoDataStoreParams.create("oracle", linkInfo(
-                "jdbc:oracle:thin:@//10.0.0.9:1521/ORCLPDB1", "GIS"));
+        Map<String, Object> params =
+                JdbcGeoDataStoreParams.create(
+                        "oracle", linkInfo("jdbc:oracle:thin:@//10.0.0.9:1521/ORCLPDB1", "GIS"));
 
         assertEquals("oracle", params.get("dbtype"));
         assertEquals("10.0.0.9", params.get("host"));

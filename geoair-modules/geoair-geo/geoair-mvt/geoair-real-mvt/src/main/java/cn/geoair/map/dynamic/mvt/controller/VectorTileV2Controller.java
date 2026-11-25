@@ -1,37 +1,37 @@
-//package cn.geoair.map.dynamic.mvt.controller;
+// package cn.geoair.map.dynamic.mvt.controller;
 //
-//import cn.geoair.base.api.annotation.GaApi;
-//import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
-//import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
-//import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
+// import cn.geoair.base.api.annotation.GaApi;
+// import cn.geoair.map.dynamic.mvt.GirRealMvtHelper;
+// import cn.geoair.map.dynamic.mvt.dto.ParamCheckResult;
+// import cn.geoair.map.dynamic.mvt.dto.TileRequestParams;
 //
-//import cn.geoair.map.dynamic.tools.GirGeoTools;
-//import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
-//import cn.hutool.core.util.ObjectUtil;
-//import com.alibaba.fastjson2.JSON;
-//import com.alibaba.fastjson2.JSONObject;
-//import com.alibaba.fastjson2.JSONWriter;
+// import cn.geoair.map.dynamic.tools.GirGeoTools;
+// import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
+// import cn.hutool.core.util.ObjectUtil;
+// import com.alibaba.fastjson2.JSON;
+// import com.alibaba.fastjson2.JSONObject;
+// import com.alibaba.fastjson2.JSONWriter;
 //
-//import java.nio.charset.StandardCharsets;
-//import javax.servlet.http.HttpServletRequest;
-//import javax.servlet.http.HttpServletResponse;
-//import javax.servlet.http.HttpSession;
+// import java.nio.charset.StandardCharsets;
+// import javax.servlet.http.HttpServletRequest;
+// import javax.servlet.http.HttpServletResponse;
+// import javax.servlet.http.HttpSession;
 //
-//import lombok.RequiredArgsConstructor;
-// 
-//import org.locationtech.jts.geom.Geometry;
-//import org.springframework.web.bind.annotation.*;
+// import lombok.RequiredArgsConstructor;
 //
-//@Slf4j
+// import org.locationtech.jts.geom.Geometry;
+// import org.springframework.web.bind.annotation.*;
+//
+// @Slf4j
 //// @Controller
 //
-//@CrossOrigin
-//@GaApi(
+// @CrossOrigin
+// @GaApi(
 //        text = "矢量瓦片服务",
 //        tags = {"矢量瓦片服务"}
-//)
-//@RequestMapping("/vectorTileService")
-//public class VectorTileV2Controller extends TileCommon {
+// )
+// @RequestMapping("/vectorTileService")
+// public class VectorTileV2Controller extends TileCommon {
 //
 //
 //    public VectorTileV2Controller() {
@@ -105,7 +105,8 @@
 //                boxReferencedEnvelope =
 //                        GirGeoTools.me().getTileGrid4326Opt().xyzToTileBox(z, x, y, 4326);
 //            }
-//            Geometry geometry = GirGeoTools.me().getSridOpt().convertToGeom(boxReferencedEnvelope);
+//            Geometry geometry =
+// GirGeoTools.me().getSridOpt().convertToGeom(boxReferencedEnvelope);
 //            re.put("bbox", geometry.toText());
 //            Geometry convert = GirGeoTools.me().getSridOpt().convert(geometry, gridSrid, 4326);
 //            re.put("bbox4326", convert.toText());
@@ -117,4 +118,4 @@
 //                jsonString.getBytes(StandardCharsets.UTF_8),
 //                "application/json; charset=utf-8");
 //    }
-//}
+// }

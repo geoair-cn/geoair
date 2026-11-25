@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.tools.grid.bing;
 
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,7 +18,8 @@ public class BingMapQuadKeyUtilsTest {
         Assert.assertEquals(0, root.getZ());
         Assert.assertEquals(0, root.getX());
         Assert.assertEquals(0, root.getY());
-        Assert.assertArrayEquals(new String[]{"0", "1", "2", "3"}, quadKeyUtils.getChildQuadKeys(""));
+        Assert.assertArrayEquals(
+                new String[] {"0", "1", "2", "3"}, quadKeyUtils.getChildQuadKeys(""));
     }
 
     @Test

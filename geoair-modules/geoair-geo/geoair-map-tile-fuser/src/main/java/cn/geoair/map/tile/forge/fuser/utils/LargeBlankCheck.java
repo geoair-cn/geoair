@@ -21,5 +21,4 @@ public class LargeBlankCheck {
     Boolean blankIs;
 
     BufferedImage image = null;
-
 }

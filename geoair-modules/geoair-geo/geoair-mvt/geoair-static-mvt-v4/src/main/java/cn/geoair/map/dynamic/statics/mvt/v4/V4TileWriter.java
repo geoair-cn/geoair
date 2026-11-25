@@ -23,11 +23,11 @@ import java.sql.PreparedStatement;
 /**
  * V4 的瓦片写出器：把聚合单元编码成 PBF 并落到目标介质。
  *
- * <p>编码调用的是 <b>V3 的同一个编码器</b>（{@link MultiLayerMvtEncoderV3#encode}），
- * 因此超限降级、属性输出规则、几何简化等行为与 V3 完全一致 —— 这是 V4 与 V3 产物可比的前提。</p>
+ * <p>编码调用的是 <b>V3 的同一个编码器</b>（{@link MultiLayerMvtEncoderV3#encode}）， 因此超限降级、属性输出规则、几何简化等行为与 V3
+ * 完全一致 —— 这是 V4 与 V3 产物可比的前提。
  *
- * <p>与 V3 的差别只在执行方式：V3 在 {@code foreachPartition} 里每个分区开一个存储会话，
- * V4 是单线程顺序写，全程只开一个会话（PostgreSQL 则是一条连接 + 批量提交）。</p>
+ * <p>与 V3 的差别只在执行方式：V3 在 {@code foreachPartition} 里每个分区开一个存储会话， V4 是单线程顺序写，全程只开一个会话（PostgreSQL
+ * 则是一条连接 + 批量提交）。
  *
  * @author 张逢吉
  */
@@ -48,7 +48,8 @@ final class V4TileWriter implements Closeable {
     private int pendingBatch;
     private long pendingBytes;
 
-    V4TileWriter(MultiLayerTileSliceParameter parameter, V4SliceProgress progress) throws Exception {
+    V4TileWriter(MultiLayerTileSliceParameter parameter, V4SliceProgress progress)
+            throws Exception {
         this.parameter = parameter;
         this.progress = progress;
         this.outputConfig = parameter.getOutputConfig();
@@ -76,9 +77,12 @@ final class V4TileWriter implements Closeable {
             }
             return;
         }
-        TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileKey);
-        int outputY = outputConfig.getTileYAxis() == TileYAxis.TMS
-                ? getTmsY(zxy, pbf.getGridSrid()) : zxy.getY();
+        TileZxyApo zxy =
+                GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileKey);
+        int outputY =
+                outputConfig.getTileYAxis() == TileYAxis.TMS
+                        ? getTmsY(zxy, pbf.getGridSrid())
+                        : zxy.getY();
         store.writeTile(zxy.getZ(), zxy.getX(), outputY, pbf.getData(), parameter.isGzipPbf());
         progress.addTile(pbf.getData().length);
     }
@@ -96,16 +100,23 @@ final class V4TileWriter implements Closeable {
         String table = output.getTableNameForSql();
         connection = output.toDataSource().getConnection();
         connection.setAutoCommit(false);
-        deleteStatement = connection.prepareStatement(
-                "DELETE FROM " + table + " WHERE z=? AND x=? AND y=? AND grid_srid=? AND layer_name=?"
-                        + " AND COALESCE(edition, '') = COALESCE(?, '')");
-        insertStatement = connection.prepareStatement(
-                "INSERT INTO " + table + " (id,z,x,tms_y,y,grid_srid,tile_data,layer_name,edition,insert_time)"
-                        + " VALUES (?,?,?,?,?,?,?,?,?,?)");
+        deleteStatement =
+                connection.prepareStatement(
+                        "DELETE FROM "
+                                + table
+                                + " WHERE z=? AND x=? AND y=? AND grid_srid=? AND layer_name=?"
+                                + " AND COALESCE(edition, '') = COALESCE(?, '')");
+        insertStatement =
+                connection.prepareStatement(
+                        "INSERT INTO "
+                                + table
+                                + " (id,z,x,tms_y,y,grid_srid,tile_data,layer_name,edition,insert_time)"
+                                + " VALUES (?,?,?,?,?,?,?,?,?,?)");
     }
 
     private void bindDelete(String tileKey, PbfInfo pbf) throws Exception {
-        TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileKey);
+        TileZxyApo zxy =
+                GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileKey);
         deleteStatement.setInt(1, zxy.getZ());
         deleteStatement.setInt(2, zxy.getX());
         deleteStatement.setInt(3, zxy.getY());
@@ -116,7 +127,8 @@ final class V4TileWriter implements Closeable {
     }
 
     private void bindInsert(String tileKey, PbfInfo pbf) throws Exception {
-        TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileKey);
+        TileZxyApo zxy =
+                GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileKey);
         insertStatement.setString(1, IdUtil.getSnowflakeNextIdStr());
         insertStatement.setInt(2, zxy.getZ());
         insertStatement.setInt(3, zxy.getX());
@@ -146,15 +158,18 @@ final class V4TileWriter implements Closeable {
     /** PostgreSQL 输出恒写 TMS 行号，与 V3 一致。 */
     private static int getTmsY(TileZxyApo zxy, int gridSrid) {
         if (gridSrid == 3857) {
-            return GirGeoTools.defaultInstance().getTileGrid3857Opt()
+            return GirGeoTools.defaultInstance()
+                    .getTileGrid3857Opt()
                     .convertY(zxy.getZ(), zxy.getY(), TileYAxis.XYZ, TileYAxis.TMS);
         }
-        return GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt()
+        return GirGeoTools.defaultInstance()
+                .getTileGrid4326SeparateOpt()
                 .convertY(zxy.getZ(), zxy.getY(), TileYAxis.XYZ, TileYAxis.TMS);
     }
 
     private static V3TileOutputType resolveOutputType(MultiLayerTileSliceParameter parameter) {
-        if (parameter.getOutputConfig() == null || parameter.getOutputConfig().getOutputType() == null) {
+        if (parameter.getOutputConfig() == null
+                || parameter.getOutputConfig().getOutputType() == null) {
             throw new IllegalArgumentException("V4 outputConfig 与 outputType 不能为空");
         }
         return parameter.getOutputConfig().getOutputType();

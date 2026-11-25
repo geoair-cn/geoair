@@ -2,11 +2,12 @@ package cn.geoair.orm.springjpa.util;
 
 import cn.geoair.base.Gir;
 
-import java.lang.ref.WeakReference;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+
 import org.springframework.stereotype.Component;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author ：张俊
@@ -17,9 +18,7 @@ public class EntityManagerProvider {
 
     private static WeakReference<EntityManagerProvider> weakReference = null;
 
-    @PersistenceContext
-    EntityManager entityManager;
-
+    @PersistenceContext EntityManager entityManager;
 
     public EntityManager getEntityManager() {
         return entityManager;

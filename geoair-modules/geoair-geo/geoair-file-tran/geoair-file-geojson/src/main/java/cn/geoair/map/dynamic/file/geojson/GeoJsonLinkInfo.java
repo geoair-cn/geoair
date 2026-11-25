@@ -1,10 +1,12 @@
 package cn.geoair.map.dynamic.file.geojson;
 
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
-import java.io.File;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.File;
 
 /** GeoJSON 文件链接信息 */
 @Data

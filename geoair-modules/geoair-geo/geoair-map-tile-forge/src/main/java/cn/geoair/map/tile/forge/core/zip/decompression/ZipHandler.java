@@ -1,18 +1,13 @@
 package cn.geoair.map.tile.forge.core.zip.decompression;
 
-
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-/**
- * ZIP(DEFLATE算法)解压适配器
- */
+/** ZIP(DEFLATE算法)解压适配器 */
 public class ZipHandler implements DecompressionHandler {
 
-    /**
-     * byte[] 能申请到的最大长度。留 8 个字节的余量，跟 JDK 里 ArrayList 等地方的口径保持一致。
-     */
+    /** byte[] 能申请到的最大长度。留 8 个字节的余量，跟 JDK 里 ArrayList 等地方的口径保持一致。 */
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     @Override
@@ -31,8 +26,10 @@ public class ZipHandler implements DecompressionHandler {
             int inflated = 0;
             byte[] probe = new byte[1];
             while (!inflater.finished()) {
-                int count = inflated < output.length
-                        ? inflater.inflate(output, inflated, output.length - inflated) : inflater.inflate(probe);
+                int count =
+                        inflated < output.length
+                                ? inflater.inflate(output, inflated, output.length - inflated)
+                                : inflater.inflate(probe);
                 if (inflated == output.length && count > 0) throw new IOException("ZIP解压结果超过声明长度");
                 inflated += count;
                 if (count == 0 && !inflater.finished()) throw new IOException("ZIP压缩流不完整或无法继续解压");

@@ -2,6 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile;
 
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.SparkVectorTileGenerator;
+
 import org.apache.spark.sql.SparkSession;
 
 /**
@@ -19,8 +20,7 @@ public class SparkJavaTileApp {
         SparkSession spark = SparkSession.builder().appName("spark-tile-vec-tile").getOrCreate();
 
         try {
-            SparkVectorTileGenerator sparkVectorTileGenerator =
-                    new SparkVectorTileGenerator(spark);
+            SparkVectorTileGenerator sparkVectorTileGenerator = new SparkVectorTileGenerator(spark);
 
             sparkVectorTileGenerator.doGenerate(tileSliceParameter);
         } finally {

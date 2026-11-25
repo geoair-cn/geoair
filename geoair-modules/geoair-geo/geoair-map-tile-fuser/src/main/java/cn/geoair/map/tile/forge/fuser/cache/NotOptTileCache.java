@@ -35,9 +35,7 @@ public class NotOptTileCache implements TileCache {
     }
 
     @Override
-    public void clearAll() {
-
-    }
+    public void clearAll() {}
 
     @Override
     public long getTotalSize() {

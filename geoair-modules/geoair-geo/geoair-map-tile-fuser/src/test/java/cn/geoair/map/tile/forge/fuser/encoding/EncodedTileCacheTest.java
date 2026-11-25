@@ -16,6 +16,11 @@ import cn.geoair.map.tile.forge.fuser.provider.FormattedLayerTileGetter;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
 import cn.geoair.map.tile.forge.fuser.support.RasterTestImages;
 import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,9 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class EncodedTileCacheTest {
     @Rule public TemporaryFolder folder = new TemporaryFolder();

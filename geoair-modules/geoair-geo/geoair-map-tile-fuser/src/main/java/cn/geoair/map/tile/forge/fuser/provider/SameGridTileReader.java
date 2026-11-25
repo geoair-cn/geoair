@@ -1,7 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.provider;
 
-import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
+import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
 import cn.geoair.map.tile.forge.core.bygwc.grid.SRS;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.geoair.map.tile.forge.fuser.fuser.TileFusionResult;
@@ -9,7 +9,7 @@ import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
 
 /** 当前内置网格的 XYZ 请求直读入口；内部 Getter 一律使用 TMS 行号。 */
 public final class SameGridTileReader {
-    private SameGridTileReader() { }
+    private SameGridTileReader() {}
 
     public static boolean equivalentSrid(Integer source, int output) {
         return source != null && normalizeSrid(source) == normalizeSrid(output);
@@ -29,13 +29,22 @@ public final class SameGridTileReader {
         long rows = grid.getGridSet().getGrid(z).getNumTilesHigh();
         if (y < 0 || y >= rows) throw new IllegalArgumentException("瓦片Y坐标超出源网格范围");
         int row = Math.toIntExact(rows - y - 1);
-        if (!grid.covers(new long[]{x, row, z})) throw new IllegalArgumentException("瓦片坐标超出源图层覆盖范围");
+        if (!grid.covers(new long[] {x, row, z}))
+            throw new IllegalArgumentException("瓦片坐标超出源图层覆盖范围");
         return row;
     }
 
-    public static TileFusionResult read(LayerTileGetter getter, int sourceSrid, int outputSrid,
-                                        int z, int x, int xyzY, MissingTileMeaning missingMeaning) throws Exception {
-        if (!equivalentSrid(sourceSrid, outputSrid)) throw new IllegalArgumentException("网格不同，不能直接读取");
+    public static TileFusionResult read(
+            LayerTileGetter getter,
+            int sourceSrid,
+            int outputSrid,
+            int z,
+            int x,
+            int xyzY,
+            MissingTileMeaning missingMeaning)
+            throws Exception {
+        if (!equivalentSrid(sourceSrid, outputSrid))
+            throw new IllegalArgumentException("网格不同，不能直接读取");
         if (getter == null) throw new IllegalArgumentException("源读取器不能为空");
         GridSubset expected;
         if (normalizeSrid(outputSrid) == 3857) expected = GridInitUtils.getWorldGrid3857();
@@ -44,16 +53,19 @@ public final class SameGridTileReader {
         GridSubset actual = getter.getSrcGridSubset();
         int row = tmsY(actual, sourceSrid, z, x, xyzY);
         int expectedRow = tmsY(expected, outputSrid, z, x, xyzY);
-        BoundingBox nativeBox = actual.boundsFromIndex(new long[]{x, row, z});
-        BoundingBox requestedBox = expected.boundsFromIndex(new long[]{x, expectedRow, z});
-        double tolerance = Math.max(1, Math.max(requestedBox.getWidth(), requestedBox.getHeight())) * 1e-9;
-        if (actual.getTileWidth() != expected.getTileWidth() || actual.getTileHeight() != expected.getTileHeight()
+        BoundingBox nativeBox = actual.boundsFromIndex(new long[] {x, row, z});
+        BoundingBox requestedBox = expected.boundsFromIndex(new long[] {x, expectedRow, z});
+        double tolerance =
+                Math.max(1, Math.max(requestedBox.getWidth(), requestedBox.getHeight())) * 1e-9;
+        if (actual.getTileWidth() != expected.getTileWidth()
+                || actual.getTileHeight() != expected.getTileHeight()
                 || Math.abs(nativeBox.getMinX() - requestedBox.getMinX()) > tolerance
                 || Math.abs(nativeBox.getMinY() - requestedBox.getMinY()) > tolerance
                 || Math.abs(nativeBox.getMaxX() - requestedBox.getMaxX()) > tolerance
                 || Math.abs(nativeBox.getMaxY() - requestedBox.getMaxY()) > tolerance)
             throw new IllegalArgumentException("源瓦片矩阵与目标内置矩阵不同，不能仅凭坐标系相同直接读取");
-        CheckedLayerTileGetter checked = new CheckedLayerTileGetter(getter, missingMeaning, TileReadFailurePolicy.FAIL_FAST);
+        CheckedLayerTileGetter checked =
+                new CheckedLayerTileGetter(getter, missingMeaning, TileReadFailurePolicy.FAIL_FAST);
         Resource resource = checked.getTileResource(z, x, row);
         return checked.result(resource == null ? null : resource.getByteData(), null);
     }

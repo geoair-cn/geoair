@@ -19,7 +19,8 @@ public final class TilePrecacheBatchGate {
         this.capacity = capacity;
     }
 
-    synchronized void acquire(String task, TileCancellationToken cancellation) throws InterruptedException {
+    synchronized void acquire(String task, TileCancellationToken cancellation)
+            throws InterruptedException {
         Object request = new Object();
         Deque<Object> queue = waiting.computeIfAbsent(task, ignored -> new ArrayDeque<>());
         queue.addLast(request);

@@ -2,9 +2,7 @@ package cn.geoair.map.dynamic.adv.dbmeta;
 
 import java.util.*;
 
-/**
- * MySQL 数据类型与Java类型映射枚举
- */
+/** MySQL 数据类型与Java类型映射枚举 */
 public enum MysqlType implements DataBaseFieldType {
 
     // 整数类
@@ -18,7 +16,11 @@ public enum MysqlType implements DataBaseFieldType {
     // 浮点/小数类
     FLOAT("float", "FLOAT", DefaultJavaType.JAVA_FLOAT, CategoryEnum.FLOAT),
     DOUBLE("double", "DOUBLE", DefaultJavaType.JAVA_DOUBLE, CategoryEnum.FLOAT),
-    DOUBLE_PRECISION("double precision", "DOUBLE PRECISION", DefaultJavaType.JAVA_DOUBLE, CategoryEnum.FLOAT),
+    DOUBLE_PRECISION(
+            "double precision",
+            "DOUBLE PRECISION",
+            DefaultJavaType.JAVA_DOUBLE,
+            CategoryEnum.FLOAT),
     DECIMAL("decimal", "DECIMAL", DefaultJavaType.JAVA_DECIMAL, CategoryEnum.FLOAT),
     NUMERIC("numeric", "NUMERIC", DefaultJavaType.JAVA_NUMERIC, CategoryEnum.FLOAT),
 
@@ -36,7 +38,8 @@ public enum MysqlType implements DataBaseFieldType {
     DATE("date", "DATE", DefaultJavaType.JAVA_LOCAL_DATE, CategoryEnum.DATE),
     TIME("time", "TIME", DefaultJavaType.JAVA_LOCAL_TIME, CategoryEnum.TIME),
     DATETIME("datetime", "DATETIME", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CategoryEnum.DATETIME),
-    TIMESTAMP("timestamp", "TIMESTAMP", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CategoryEnum.TIMESTAMP),
+    TIMESTAMP(
+            "timestamp", "TIMESTAMP", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CategoryEnum.TIMESTAMP),
     YEAR("year", "YEAR", DefaultJavaType.JAVA_INTEGER, CategoryEnum.INT),
 
     // 二进制类
@@ -51,29 +54,29 @@ public enum MysqlType implements DataBaseFieldType {
     JSON("json", "JSON", DefaultJavaType.JAVA_JSON, CategoryEnum.TEXT),
 
     // 空间类
-    GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "geometry", "GEOMETRY"),
-    POINT(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "point", "POINT"),
-    LINESTRING(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "linestring", "LINESTRING"),
-    POLYGON(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "polygon", "POLYGON"),
-    MULTIPOINT(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "multipoint", "MULTIPOINT"),
-    MULTILINESTRING(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "multilinestring", "MULTILINESTRING"),
-    MULTIPOLYGON(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "multipolygon", "MULTIPOLYGON"),
-    GEOMETRYCOLLECTION(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "geometrycollection", "GEOMETRYCOLLECTION"),
+    GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY, "geometry", "GEOMETRY"),
+    POINT(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY, "point", "POINT"),
+    LINESTRING(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY, "linestring", "LINESTRING"),
+    POLYGON(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY, "polygon", "POLYGON"),
+    MULTIPOINT(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY, "multipoint", "MULTIPOINT"),
+    MULTILINESTRING(
+            DefaultJavaType.JAVA_GEOMETRY,
+            CategoryEnum.GEOMETRY,
+            "multilinestring",
+            "MULTILINESTRING"),
+    MULTIPOLYGON(
+            DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY, "multipolygon", "MULTIPOLYGON"),
+    GEOMETRYCOLLECTION(
+            DefaultJavaType.JAVA_GEOMETRY,
+            CategoryEnum.GEOMETRY,
+            "geometrycollection",
+            "GEOMETRYCOLLECTION"),
 
     // 其他
     BIT("bit", "BIT", DefaultJavaType.JAVA_BYTE, CategoryEnum.INT),
 
     // 布尔（TINYINT(1) 在 MySQL 中经常表示布尔）
-    BOOLEAN(DefaultJavaType.JAVA_BOOLEAN, CategoryEnum.BOOLEAN,
-            "boolean", "BOOL", "tinyint");
+    BOOLEAN(DefaultJavaType.JAVA_BOOLEAN, CategoryEnum.BOOLEAN, "boolean", "BOOL", "tinyint");
 
     private final List<String> udtNames;
     private final String standardName;
@@ -90,19 +93,16 @@ public enum MysqlType implements DataBaseFieldType {
         }
     }
 
-    /**
-     * 单一 udtName 的构造器
-     */
-    MysqlType(String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
+    /** 单一 udtName 的构造器 */
+    MysqlType(
+            String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
         this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
         this.javaType = javaType;
         this.category = category;
     }
 
-    /**
-     * 多个 udtName 变体的构造器
-     */
+    /** 多个 udtName 变体的构造器 */
     MysqlType(DefaultJavaType javaType, CategoryEnum category, String... udtNames) {
         this.udtNames = Arrays.asList(udtNames);
         this.standardName = this.name();

@@ -4,6 +4,7 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3GeoJsonInputConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3GeoJsonMode;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -28,12 +29,11 @@ import java.util.zip.GZIPInputStream;
 /**
  * V4 GeoJSON 要素读取器：顺序读取标准 FeatureCollection / 单个 Feature / Feature 数组 / GeoJSON Lines。
  *
- * <p>与 V3 的差别：V3 把解析挂在 Spark 的 {@code binaryFiles} / {@code textFile} 上（并行按文件块切分），
- * V4 是单机顺序读，因此这里自己做流式解析 —— <b>内存里只保留当前一个 Feature</b>，
- * 与 V3 文档模式的流式特性一致。</p>
+ * <p>与 V3 的差别：V3 把解析挂在 Spark 的 {@code binaryFiles} / {@code textFile} 上（并行按文件块切分）， V4
+ * 是单机顺序读，因此这里自己做流式解析 —— <b>内存里只保留当前一个 Feature</b>， 与 V3 文档模式的流式特性一致。
  *
- * <p>路径支持 {@code file:///} 前缀（管理端存的就是这种形式）与本地绝对/相对路径。
- * {@code .gz} 在两种模式下都能解压（V3 的 Lines 模式依赖 Hadoop 编解码器，V4 不依赖）。</p>
+ * <p>路径支持 {@code file:///} 前缀（管理端存的就是这种形式）与本地绝对/相对路径。 {@code .gz} 在两种模式下都能解压（V3 的 Lines 模式依赖 Hadoop
+ * 编解码器，V4 不依赖）。
  *
  * @author 张逢吉
  */
@@ -69,8 +69,11 @@ public final class V4GeoJsonFeatureReader implements V4FeatureReader {
         }
         for (String path : paths) {
             String lower = path.toLowerCase(Locale.ROOT);
-            if (!(lower.endsWith(".geojsonl") || lower.endsWith(".ndjson") || lower.endsWith(".jsonl")
-                    || lower.endsWith(".geojsonl.gz") || lower.endsWith(".ndjson.gz")
+            if (!(lower.endsWith(".geojsonl")
+                    || lower.endsWith(".ndjson")
+                    || lower.endsWith(".jsonl")
+                    || lower.endsWith(".geojsonl.gz")
+                    || lower.endsWith(".ndjson.gz")
                     || lower.endsWith(".jsonl.gz"))) {
                 return V3GeoJsonMode.FEATURE_COLLECTION;
             }
@@ -90,10 +93,15 @@ public final class V4GeoJsonFeatureReader implements V4FeatureReader {
     }
 
     /** GeoJSON Lines：一行一个 Feature，逐行解析。 */
-    private void readLines(Path path, MvtLayerSliceParameter layer,
-            V3GeoJsonInputConfig config, V4RowConsumer consumer) throws Exception {
+    private void readLines(
+            Path path,
+            MvtLayerSliceParameter layer,
+            V3GeoJsonInputConfig config,
+            V4RowConsumer consumer)
+            throws Exception {
         try (InputStream input = open(path);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
+                BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
             String line;
             long lineNo = 0L;
             while ((line = reader.readLine()) != null) {
@@ -104,9 +112,12 @@ public final class V4GeoJsonFeatureReader implements V4FeatureReader {
                 }
                 try {
                     JsonNode feature = new ObjectMapper().readTree(json);
-                    consumer.accept(V4GeoJsonFeatureMapper.toRow(
-                            feature, layer.getGeomFieldName(), layer.getIdFieldName(),
-                            layer.resolveSourceDataSrid()));
+                    consumer.accept(
+                            V4GeoJsonFeatureMapper.toRow(
+                                    feature,
+                                    layer.getGeomFieldName(),
+                                    layer.getIdFieldName(),
+                                    layer.resolveSourceDataSrid()));
                 } catch (Exception e) {
                     if (!config.isSkipInvalidFeature()) {
                         throw new IllegalArgumentException(
@@ -118,8 +129,12 @@ public final class V4GeoJsonFeatureReader implements V4FeatureReader {
     }
 
     /** 标准文档：FeatureCollection / 单个 Feature / Feature 数组，流式读。 */
-    private void readDocument(Path path, MvtLayerSliceParameter layer,
-            V3GeoJsonInputConfig config, V4RowConsumer consumer) throws Exception {
+    private void readDocument(
+            Path path,
+            MvtLayerSliceParameter layer,
+            V3GeoJsonInputConfig config,
+            V4RowConsumer consumer)
+            throws Exception {
         try (InputStream input = open(path)) {
             JsonParser parser = JSON_FACTORY.createParser(input);
             try {
@@ -169,8 +184,12 @@ public final class V4GeoJsonFeatureReader implements V4FeatureReader {
         private JsonNode singleFeature;
         private GirAdvOneRow next;
 
-        private DocumentWalker(String source, JsonParser parser,
-                MvtLayerSliceParameter layer, V3GeoJsonInputConfig config) throws IOException {
+        private DocumentWalker(
+                String source,
+                JsonParser parser,
+                MvtLayerSliceParameter layer,
+                V3GeoJsonInputConfig config)
+                throws IOException {
             this.source = source;
             this.parser = parser;
             this.layer = layer;
@@ -199,8 +218,10 @@ public final class V4GeoJsonFeatureReader implements V4FeatureReader {
                     inFeatureArray = true;
                     return;
                 }
-                if ("type".equals(fieldName) || "id".equals(fieldName)
-                        || "geometry".equals(fieldName) || "properties".equals(fieldName)) {
+                if ("type".equals(fieldName)
+                        || "id".equals(fieldName)
+                        || "geometry".equals(fieldName)
+                        || "properties".equals(fieldName)) {
                     candidate.set(fieldName, mapper.readTree(parser));
                 } else {
                     parser.skipChildren();
@@ -227,12 +248,17 @@ public final class V4GeoJsonFeatureReader implements V4FeatureReader {
                         return false;
                     }
                     try {
-                        next = V4GeoJsonFeatureMapper.toRow(feature, layer.getGeomFieldName(),
-                                layer.getIdFieldName(), layer.resolveSourceDataSrid());
+                        next =
+                                V4GeoJsonFeatureMapper.toRow(
+                                        feature,
+                                        layer.getGeomFieldName(),
+                                        layer.getIdFieldName(),
+                                        layer.resolveSourceDataSrid());
                         return true;
                     } catch (Exception e) {
                         if (!skipInvalidFeature) {
-                            throw new IllegalArgumentException("解析 GeoJSON Feature 失败，文件: " + source, e);
+                            throw new IllegalArgumentException(
+                                    "解析 GeoJSON Feature 失败，文件: " + source, e);
                         }
                     }
                 }

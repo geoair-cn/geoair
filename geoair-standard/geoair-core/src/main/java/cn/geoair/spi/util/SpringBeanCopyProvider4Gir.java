@@ -2,6 +2,7 @@ package cn.geoair.spi.util;
 
 import cn.geoair.base.bean.GirBeanException;
 import cn.geoair.base.util.GutilBean;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 

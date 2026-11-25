@@ -2,9 +2,7 @@ package cn.geoair.map.tile.forge.fuser.mbtiles.statistics;
 
 import lombok.Getter;
 
-/**
- * 单个缩放级别的缓存统计。
- */
+/** 单个缩放级别的缓存统计。 */
 @Getter
 public class CacheZoomStatistics {
 

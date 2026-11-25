@@ -24,7 +24,12 @@ import cn.geoair.map.tile.forge.fuser.support.ConstantTileImageProcessor;
 import cn.geoair.map.tile.forge.fuser.support.RasterTestImages;
 import cn.geoair.map.tile.forge.fuser.utils.TileImageUtils;
 import cn.geoair.web.mime.GiMimeType;
+
 import com.sun.net.httpserver.HttpServer;
+
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,9 +40,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.imageio.ImageIO;
-import org.junit.*;
-import org.junit.rules.TemporaryFolder;
 
 /** 使用真实HTTP图片、SQLite及缓存驱动，业务任务表和Spring模型不进入库测试。 */
 public class TilePrecachePipelineTest {

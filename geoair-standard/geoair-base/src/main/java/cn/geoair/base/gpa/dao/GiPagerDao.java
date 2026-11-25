@@ -3,6 +3,7 @@ package cn.geoair.base.gpa.dao;
 import cn.geoair.base.data.page.GiPageParam;
 import cn.geoair.base.data.page.GiPager;
 import cn.geoair.base.gpa.entity.GiEntityQueryable;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;

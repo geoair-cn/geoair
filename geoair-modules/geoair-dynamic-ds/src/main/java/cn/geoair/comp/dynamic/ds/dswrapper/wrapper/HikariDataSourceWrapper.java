@@ -3,15 +3,15 @@ package cn.geoair.comp.dynamic.ds.dswrapper.wrapper;
 import cn.geoair.base.Gir;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
+
 import com.zaxxer.hikari.HikariDataSource;
- 
 
 import javax.sql.DataSource;
 
 /** HikariCP数据源包装器 */
- 
 public class HikariDataSourceWrapper extends GirAbstractDataSourceWrapper {
     public static GiLogger log = GirLoggerFactory.getLogger();
+
     public HikariDataSourceWrapper(DataSource targetDataSource) {
         super(targetDataSource);
     }
@@ -73,7 +73,6 @@ public class HikariDataSourceWrapper extends GirAbstractDataSourceWrapper {
             return null;
         }
     }
-
 
     public HikariDataSource getHikariDataSource() {
         if (isSupport()) {

@@ -11,6 +11,7 @@ public interface AdvDataSourceWrapper extends DataSource {
     static AdvDataSourceWrapper wrap(final DataSource dataSource) {
         return DataSourceWrapperRegistry.getWrapper(dataSource).get();
     }
+
     /** 获取包装的原始数据源 */
     DataSource getTargetDataSource();
 

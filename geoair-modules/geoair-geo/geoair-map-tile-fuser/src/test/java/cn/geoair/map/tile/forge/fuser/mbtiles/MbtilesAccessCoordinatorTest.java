@@ -2,14 +2,15 @@ package cn.geoair.map.tile.forge.fuser.mbtiles;
 
 import static org.junit.Assert.*;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** 不使用长休眠推测时序，协调租约必须在真实收尾后归还。 */
 public class MbtilesAccessCoordinatorTest {

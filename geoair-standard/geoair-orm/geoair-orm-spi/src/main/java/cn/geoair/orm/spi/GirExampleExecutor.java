@@ -1,15 +1,15 @@
-//package cn.geoair.orm.spi;
+// package cn.geoair.orm.spi;
 //
-//import cn.geoair.base.data.page.GiPageParam;
-//import cn.geoair.base.data.page.GiPager;
-//import cn.geoair.orm.spi.support.GirExample;
-//import java.util.List;
+// import cn.geoair.base.data.page.GiPageParam;
+// import cn.geoair.base.data.page.GiPager;
+// import cn.geoair.orm.spi.support.GirExample;
+// import java.util.List;
 //
-///**
+/// **
 // * @author ：张俊
 // * @date ：Created in 2022/7/2 15:14 @description： ExampleExecutor Example 执行器
 // */
-//public interface GirExampleExecutor {
+// public interface GirExampleExecutor {
 //
 //    /**
 //     * 根据Example查询总数
@@ -82,4 +82,4 @@
 //     * @return
 //     */
 //    <T> T updateByExample(Object updateEntity, GirExample girExample);
-//}
+// }

@@ -46,5 +46,4 @@ public final class JdbcParameterString implements JdbcParameter {
     public int getSqlType() {
         return Types.VARCHAR;
     }
-
 }

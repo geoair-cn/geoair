@@ -5,6 +5,7 @@ import cn.geoair.base.data.GiVisualValuable;
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.data.model.applyer.GiModelFieldApplyer;
 import cn.geoair.base.def.annotation.GaParameter;
+
 import java.lang.reflect.Field;
 
 public class GirEnumApplyer implements GiModelFieldApplyer {

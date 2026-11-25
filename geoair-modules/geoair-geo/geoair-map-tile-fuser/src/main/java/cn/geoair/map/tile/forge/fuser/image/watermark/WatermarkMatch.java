@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /** 检测到的模板位置及归一化相关系数。 */
-@Getter @AllArgsConstructor
+@Getter
+@AllArgsConstructor
 public class WatermarkMatch {
     private final int x;
     private final int y;

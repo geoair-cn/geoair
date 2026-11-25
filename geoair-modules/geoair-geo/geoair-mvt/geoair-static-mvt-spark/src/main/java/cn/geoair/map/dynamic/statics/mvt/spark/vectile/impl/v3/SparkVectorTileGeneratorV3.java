@@ -19,25 +19,28 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.input.V3FeatureRe
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.output.V3TileStore;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.output.V3TileStoreFactory;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
-import com.alibaba.fastjson2.JSON;
+import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.hutool.core.util.IdUtil;
+
+import com.alibaba.fastjson2.JSON;
+
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.SparkSession;
-import scala.Tuple2;
 import org.apache.spark.util.LongAccumulator;
 
-import javax.sql.DataSource;
+import scala.Tuple2;
+
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -46,14 +49,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.nio.charset.StandardCharsets;
 
 /**
  * 静态矢量瓦片生成器 V3：一个 tile_data PBF 同时容纳多个 MVT 内部图层。
- * <p>
- * V3 不修改 V1/V2 的 DTO、生成器或写表行为。读取、坐标转换、聚合键、PBF 编码和输出记录
- * 均使用 V3 自己的实现：输出表中一条记录代表一个
- * {@code tileSetName + edition + z/x/y} 的完整瓦片集合。
+ *
+ * <p>V3 不修改 V1/V2 的 DTO、生成器或写表行为。读取、坐标转换、聚合键、PBF 编码和输出记录 均使用 V3 自己的实现：输出表中一条记录代表一个 {@code
+ * tileSetName + edition + z/x/y} 的完整瓦片集合。
  *
  * @author 张逢吉
  */
@@ -81,39 +82,46 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
     /**
      * 执行 V3 多图层静态切片任务，并按 Spark Stage 上报执行进度。
      *
-     * <p>回调语义与 V2 保持一致：{@link GiProgressReporter#report(Number, Number)} 的
-     * {@code allCount/currentCount} 分别代表当前 Spark Stage 的总任务数和已结束任务数。
-     * 因此它反映的是分布式执行进度，而非单纯的要素数量进度。</p>
+     * <p>回调语义与 V2 保持一致：{@link GiProgressReporter#report(Number, Number)} 的 {@code
+     * allCount/currentCount} 分别代表当前 Spark Stage 的总任务数和已结束任务数。 因此它反映的是分布式执行进度，而非单纯的要素数量进度。
      *
      * @param parameter 切片参数
      * @param percentReporter 可选进度上报器；传入 {@code null} 时仅输出日志
      */
     public void doGenerate(
-            MultiLayerTileSliceParameter parameter, GiProgressReporter percentReporter) throws Exception {
+            MultiLayerTileSliceParameter parameter, GiProgressReporter percentReporter)
+            throws Exception {
         validateParameter(parameter);
         if (resolveOutputType(parameter) == V3TileOutputType.POSTGRESQL) {
             createTableIfAbsent(parameter);
         }
 
-        V3ProgressTracker tracker = V3ProgressTracker.init(sparkSession, isArchiveOutput(parameter) ? 4 : 3, percentReporter);
+        V3ProgressTracker tracker =
+                V3ProgressTracker.init(
+                        sparkSession, isArchiveOutput(parameter) ? 4 : 3, percentReporter);
         LongAccumulator featuresRead = tracker.getFeaturesRead();
 
         tracker.setStageName("读取并转换多图层数据");
         JavaPairRDD<String, V3TileFeatureGroup> allTileFeatures = null;
         for (MvtLayerSliceParameter layer : parameter.getLayers()) {
-            TileSliceParameter readParameter = V3LegacyParameterAdapter.toReadParameter(parameter, layer);
-            JavaRDD<GirAdvOneRow> source = V3FeatureReaderFactory.getReader(layer)
-                    .read(sparkSession, layer)
-                    .map(row -> {
-                        if (row != null) {
-                            featuresRead.add(1L);
-                        }
-                        return row;
-                    });
-            JavaPairRDD<String, V3TileFeatureGroup> current = source
-                    .map(V3SparkTaskFunctions.newTransformFunction(readParameter))
-                    .filter(row -> row != null)
-                    .flatMapToPair(new V3SparkTaskFunctions.LayerMapToTileFunction(layer.getLayerName(), readParameter));
+            TileSliceParameter readParameter =
+                    V3LegacyParameterAdapter.toReadParameter(parameter, layer);
+            JavaRDD<GirAdvOneRow> source =
+                    V3FeatureReaderFactory.getReader(layer)
+                            .read(sparkSession, layer)
+                            .map(
+                                    row -> {
+                                        if (row != null) {
+                                            featuresRead.add(1L);
+                                        }
+                                        return row;
+                                    });
+            JavaPairRDD<String, V3TileFeatureGroup> current =
+                    source.map(V3SparkTaskFunctions.newTransformFunction(readParameter))
+                            .filter(row -> row != null)
+                            .flatMapToPair(
+                                    new V3SparkTaskFunctions.LayerMapToTileFunction(
+                                            layer.getLayerName(), readParameter));
             allTileFeatures = allTileFeatures == null ? current : allTileFeatures.union(current);
         }
         if (allTileFeatures == null) {
@@ -123,9 +131,11 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
 
         tracker.setStageName("聚合多图层瓦片");
         int partitionNum = Math.max(1, parameter.getReducePartitionNum());
-        JavaPairRDD<String, V3TileFeatureGroup> aggregated = allTileFeatures.reduceByKey(
-                new V3SparkTaskFunctions.MergeTileFeatureGroupFunction(
-                        parameter.getLayers(), parameter.getOutGridSrid()), partitionNum);
+        JavaPairRDD<String, V3TileFeatureGroup> aggregated =
+                allTileFeatures.reduceByKey(
+                        new V3SparkTaskFunctions.MergeTileFeatureGroupFunction(
+                                parameter.getLayers(), parameter.getOutGridSrid()),
+                        partitionNum);
         tracker.completeStage("目标分区: " + partitionNum);
 
         tracker.setStageName("写入多图层瓦片");
@@ -139,20 +149,24 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         }
         tracker.printSummary();
         // 记录本次任务的写出统计，供使用方直接读取（无需再遍历目录或查表）
-        lastStats = new V3TileWriteStats(
-                tracker.getTilesWritten().value(),
-                tracker.getBytesWritten().value(),
-                tracker.getBatchesWritten().value(),
-                tracker.getFeaturesRead().value(),
-                archiveFileSize(parameter));
-        LOG.info("V3 多图层切片完成，tileSetName:{}，内部图层数:{}，{}",
-                parameter.getTileSetName(), parameter.getLayers().size(), lastStats);
+        lastStats =
+                new V3TileWriteStats(
+                        tracker.getTilesWritten().value(),
+                        tracker.getBytesWritten().value(),
+                        tracker.getBatchesWritten().value(),
+                        tracker.getFeaturesRead().value(),
+                        archiveFileSize(parameter));
+        LOG.info(
+                "V3 多图层切片完成，tileSetName:{}，内部图层数:{}，{}",
+                parameter.getTileSetName(),
+                parameter.getLayers().size(),
+                lastStats);
     }
 
     /**
      * 上一次执行（{@link #doGenerate}）的写出统计；任务结束后可直接读取。
-     * <p>
-     * 一个实例对应一次执行，并发任务请各自新建实例。
+     *
+     * <p>一个实例对应一次执行，并发任务请各自新建实例。
      */
     public V3TileWriteStats getLastStats() {
         return lastStats;
@@ -199,62 +213,70 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         final LongAccumulator tilesWritten = tracker.getTilesWritten();
         final LongAccumulator batchesWritten = tracker.getBatchesWritten();
         final LongAccumulator bytesWritten = tracker.getBytesWritten();
-        aggregated.foreachPartition((VoidFunction<Iterator<Tuple2<String, V3TileFeatureGroup>>>) iterator -> {
-            DataSourceConfig output = getPostgresqlOutputSource(parameter);
-            String table = output.getTableNameForSql();
-            try (Connection connection = output.toDataSource().getConnection();
-                 PreparedStatement delete = connection.prepareStatement(deleteSql(table));
-                 PreparedStatement insert = connection.prepareStatement(insertSql(table))) {
-                connection.setAutoCommit(false);
-                int batchSize = 0;
-                long batchBytes = 0L;
-                try {
-                    while (iterator.hasNext()) {
-                        Tuple2<String, V3TileFeatureGroup> item = iterator.next();
-                        PbfInfo pbf = MultiLayerMvtEncoderV3.encode(item._1, item._2, parameter);
-                        // 空瓦片不写：没有要素的瓦片应当表现为"不存在"，
-                        // 而不是一条 tile_data 为空的记录（会虚高瓦片数、干扰预览与统计）
-                        if (isBlankTile(pbf)) {
-                            continue;
-                        }
-                        bindDelete(delete, item._1, pbf, parameter);
-                        bindInsert(insert, item._1, pbf, parameter);
-                        batchSize++;
-                        batchBytes += pbf.getData() == null ? 0L : pbf.getData().length;
-                        if (batchSize >= WRITE_BATCH_SIZE) {
-                            delete.executeBatch();
-                            insert.executeBatch();
-                            connection.commit();
-                            tilesWritten.add(batchSize);
-                            batchesWritten.add(1L);
-                            bytesWritten.add(batchBytes);
-                            batchSize = 0;
-                            batchBytes = 0L;
-                        }
-                    }
-                    if (batchSize > 0) {
-                        delete.executeBatch();
-                        insert.executeBatch();
-                        connection.commit();
-                        tilesWritten.add(batchSize);
-                        batchesWritten.add(1L);
-                        bytesWritten.add(batchBytes);
-                    }
-                } catch (Exception e) {
-                    connection.rollback();
-                    throw e;
-                } finally {
-                    connection.setAutoCommit(true);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("V3 多图层瓦片写入失败", e);
-            }
-        });
+        aggregated.foreachPartition(
+                (VoidFunction<Iterator<Tuple2<String, V3TileFeatureGroup>>>)
+                        iterator -> {
+                            DataSourceConfig output = getPostgresqlOutputSource(parameter);
+                            String table = output.getTableNameForSql();
+                            try (Connection connection = output.toDataSource().getConnection();
+                                    PreparedStatement delete =
+                                            connection.prepareStatement(deleteSql(table));
+                                    PreparedStatement insert =
+                                            connection.prepareStatement(insertSql(table))) {
+                                connection.setAutoCommit(false);
+                                int batchSize = 0;
+                                long batchBytes = 0L;
+                                try {
+                                    while (iterator.hasNext()) {
+                                        Tuple2<String, V3TileFeatureGroup> item = iterator.next();
+                                        PbfInfo pbf =
+                                                MultiLayerMvtEncoderV3.encode(
+                                                        item._1, item._2, parameter);
+                                        // 空瓦片不写：没有要素的瓦片应当表现为"不存在"，
+                                        // 而不是一条 tile_data 为空的记录（会虚高瓦片数、干扰预览与统计）
+                                        if (isBlankTile(pbf)) {
+                                            continue;
+                                        }
+                                        bindDelete(delete, item._1, pbf, parameter);
+                                        bindInsert(insert, item._1, pbf, parameter);
+                                        batchSize++;
+                                        batchBytes +=
+                                                pbf.getData() == null ? 0L : pbf.getData().length;
+                                        if (batchSize >= WRITE_BATCH_SIZE) {
+                                            delete.executeBatch();
+                                            insert.executeBatch();
+                                            connection.commit();
+                                            tilesWritten.add(batchSize);
+                                            batchesWritten.add(1L);
+                                            bytesWritten.add(batchBytes);
+                                            batchSize = 0;
+                                            batchBytes = 0L;
+                                        }
+                                    }
+                                    if (batchSize > 0) {
+                                        delete.executeBatch();
+                                        insert.executeBatch();
+                                        connection.commit();
+                                        tilesWritten.add(batchSize);
+                                        batchesWritten.add(1L);
+                                        bytesWritten.add(batchBytes);
+                                    }
+                                } catch (Exception e) {
+                                    connection.rollback();
+                                    throw e;
+                                } finally {
+                                    connection.setAutoCommit(true);
+                                }
+                            } catch (Exception e) {
+                                throw new RuntimeException("V3 多图层瓦片写入失败", e);
+                            }
+                        });
     }
 
     /**
      * 将每个已聚合的 PBF 直接写入目录或对象存储。
-     * <p>一个聚合键只会在一个 Reduce 分区中出现，因而不会有多个 Spark task 并发覆盖同一瓦片对象。</p>
+     *
+     * <p>一个聚合键只会在一个 Reduce 分区中出现，因而不会有多个 Spark task 并发覆盖同一瓦片对象。
      */
     private void writeTilesToStore(
             JavaPairRDD<String, V3TileFeatureGroup> aggregated,
@@ -264,36 +286,57 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         final LongAccumulator batchesWritten = tracker.getBatchesWritten();
         final LongAccumulator bytesWritten = tracker.getBytesWritten();
         final V3TileOutputConfig outputConfig = parameter.getOutputConfig();
-        aggregated.foreachPartition((VoidFunction<Iterator<Tuple2<String, V3TileFeatureGroup>>>) iterator -> {
-            long partitionTiles = 0L;
-            long partitionBytes = 0L;
-            try (V3TileStore store = V3TileStoreFactory.open(outputConfig)) {
-                while (iterator.hasNext()) {
-                    Tuple2<String, V3TileFeatureGroup> item = iterator.next();
-                    PbfInfo pbf = MultiLayerMvtEncoderV3.encode(item._1, item._2, parameter);
-                    if (isBlankTile(pbf)) {
-                        // 空瓦片不落盘，也不计入写出统计
-                        continue;
-                    }
-                    TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(item._1);
-                    int outputY = getOutputY(zxy, pbf.getGridSrid(), outputConfig.getTileYAxis());
-                    store.writeTile(zxy.getZ(), zxy.getX(), outputY, pbf.getData(), parameter.isGzipPbf());
-                    partitionTiles++;
-                    partitionBytes += pbf.getData().length;
-                }
-                if (partitionTiles > 0) {
-                    tilesWritten.add(partitionTiles);
-                    bytesWritten.add(partitionBytes);
-                    batchesWritten.add(1L);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("V3 多图层瓦片写入 " + resolveOutputType(parameter) + " 失败", e);
-            }
-        });
+        aggregated.foreachPartition(
+                (VoidFunction<Iterator<Tuple2<String, V3TileFeatureGroup>>>)
+                        iterator -> {
+                            long partitionTiles = 0L;
+                            long partitionBytes = 0L;
+                            try (V3TileStore store = V3TileStoreFactory.open(outputConfig)) {
+                                while (iterator.hasNext()) {
+                                    Tuple2<String, V3TileFeatureGroup> item = iterator.next();
+                                    PbfInfo pbf =
+                                            MultiLayerMvtEncoderV3.encode(
+                                                    item._1, item._2, parameter);
+                                    if (isBlankTile(pbf)) {
+                                        // 空瓦片不落盘，也不计入写出统计
+                                        continue;
+                                    }
+                                    TileZxyApo zxy =
+                                            GirGeoTools.defaultInstance()
+                                                    .getTileGridBingMapOpt()
+                                                    .quadKeyToXyz(item._1);
+                                    int outputY =
+                                            getOutputY(
+                                                    zxy,
+                                                    pbf.getGridSrid(),
+                                                    outputConfig.getTileYAxis());
+                                    store.writeTile(
+                                            zxy.getZ(),
+                                            zxy.getX(),
+                                            outputY,
+                                            pbf.getData(),
+                                            parameter.isGzipPbf());
+                                    partitionTiles++;
+                                    partitionBytes += pbf.getData().length;
+                                }
+                                if (partitionTiles > 0) {
+                                    tilesWritten.add(partitionTiles);
+                                    bytesWritten.add(partitionBytes);
+                                    batchesWritten.add(1L);
+                                }
+                            } catch (Exception e) {
+                                throw new RuntimeException(
+                                        "V3 多图层瓦片写入 " + resolveOutputType(parameter) + " 失败", e);
+                            }
+                        });
     }
 
     private static void bindDelete(
-            PreparedStatement statement, String tileId, PbfInfo pbf, MultiLayerTileSliceParameter parameter) throws Exception {
+            PreparedStatement statement,
+            String tileId,
+            PbfInfo pbf,
+            MultiLayerTileSliceParameter parameter)
+            throws Exception {
         TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileId);
         statement.setInt(1, zxy.getZ());
         statement.setInt(2, zxy.getX());
@@ -305,7 +348,11 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
     }
 
     private static void bindInsert(
-            PreparedStatement statement, String tileId, PbfInfo pbf, MultiLayerTileSliceParameter parameter) throws Exception {
+            PreparedStatement statement,
+            String tileId,
+            PbfInfo pbf,
+            MultiLayerTileSliceParameter parameter)
+            throws Exception {
         TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileId);
         statement.setString(1, IdUtil.getSnowflakeNextIdStr());
         statement.setInt(2, zxy.getZ());
@@ -322,10 +369,12 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
 
     private static int getTmsY(TileZxyApo zxy, int gridSrid) {
         if (gridSrid == 3857) {
-            return GirGeoTools.defaultInstance().getTileGrid3857Opt()
+            return GirGeoTools.defaultInstance()
+                    .getTileGrid3857Opt()
                     .convertY(zxy.getZ(), zxy.getY(), TileYAxis.XYZ, TileYAxis.TMS);
         }
-        return GirGeoTools.defaultInstance().getTileGrid4326SeparateOpt()
+        return GirGeoTools.defaultInstance()
+                .getTileGrid4326SeparateOpt()
                 .convertY(zxy.getZ(), zxy.getY(), TileYAxis.XYZ, TileYAxis.TMS);
     }
 
@@ -335,36 +384,40 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
     }
 
     private static String insertSql(String table) {
-        return "INSERT INTO " + table + " (id,z,x,tms_y,y,grid_srid,tile_data,layer_name,edition,insert_time)"
+        return "INSERT INTO "
+                + table
+                + " (id,z,x,tms_y,y,grid_srid,tile_data,layer_name,edition,insert_time)"
                 + " VALUES (?,?,?,?,?,?,?,?,?,?)";
     }
 
     private static String deleteSql(String table) {
-        return "DELETE FROM " + table + " WHERE z=? AND x=? AND y=? AND grid_srid=? AND layer_name=?"
+        return "DELETE FROM "
+                + table
+                + " WHERE z=? AND x=? AND y=? AND grid_srid=? AND layer_name=?"
                 + " AND COALESCE(edition, '') = COALESCE(?, '')";
     }
 
     private void createTableIfAbsent(MultiLayerTileSliceParameter parameter) {
         DataSourceConfig output = getPostgresqlOutputSource(parameter);
-        IAdvExecutor executor = AdvExecutorFactory.getAdvExecutorByDataSource(output.toDataSource());
+        IAdvExecutor executor =
+                AdvExecutorFactory.getAdvExecutorByDataSource(output.toDataSource());
         String table = executor.tbGetTableNameWithSchema(output.getTableNameForSql());
         validateTableName(table);
         if (executor.dIsTableExists(table)) {
             return;
         }
         String indexName = "zxy_v3_" + IdUtil.getSnowflakeNextIdStr();
-        String ddl = String.format("CREATE TABLE %s ("
-                        + "id text, z int4, x int4, tms_y int4, y int4, grid_srid int4, tile_data bytea, "
-                        + "layer_name text, edition text, insert_time int8);"
-                        + "CREATE INDEX %s ON %s (z,x,y,grid_srid,layer_name,edition);",
-                table, indexName, table);
+        String ddl =
+                String.format(
+                        "CREATE TABLE %s ("
+                                + "id text, z int4, x int4, tms_y int4, y int4, grid_srid int4, tile_data bytea, "
+                                + "layer_name text, edition text, insert_time int8);"
+                                + "CREATE INDEX %s ON %s (z,x,y,grid_srid,layer_name,edition);",
+                        table, indexName, table);
         executor.dExecuteDDL(ddl, table, "创建 V3 多图层瓦片表");
     }
 
-    /**
-     * 为目录与 S3 输出写入一个轻量清单，明确瓦片路径、压缩方式及 Y 轴约定。
-     * 该清单不是 TileJSON，因为离线目录和私有 S3 前缀并不一定存在可公开访问的 URL。
-     */
+    /** 为目录与 S3 输出写入一个轻量清单，明确瓦片路径、压缩方式及 Y 轴约定。 该清单不是 TileJSON，因为离线目录和私有 S3 前缀并不一定存在可公开访问的 URL。 */
     private void writeOutputMetadata(MultiLayerTileSliceParameter parameter) throws Exception {
         V3TileOutputType outputType = resolveOutputType(parameter);
         V3TileOutputConfig outputConfig = parameter.getOutputConfig();
@@ -372,7 +425,9 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
             return;
         }
         try (V3TileStore store = V3TileStoreFactory.open(outputConfig)) {
-            store.writeMetadata(JSON.toJSONString(buildOutputMetadata(parameter)).getBytes(StandardCharsets.UTF_8));
+            store.writeMetadata(
+                    JSON.toJSONString(buildOutputMetadata(parameter))
+                            .getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -383,8 +438,11 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         metadata.put("format", "pbf");
         metadata.put("contentEncoding", parameter.isGzipPbf() ? "gzip" : "none");
         metadata.put("tilePathTemplate", "{z}/{x}/{y}.pbf");
-        metadata.put("yAxis", outputConfig.getTileYAxis() == null
-                ? TileYAxis.XYZ.name() : outputConfig.getTileYAxis().name());
+        metadata.put(
+                "yAxis",
+                outputConfig.getTileYAxis() == null
+                        ? TileYAxis.XYZ.name()
+                        : outputConfig.getTileYAxis().name());
         metadata.put("gridSrid", parameter.getOutGridSrid());
         metadata.put("tileSetName", parameter.getTileSetName());
         metadata.put("edition", parameter.getEdition());
@@ -400,15 +458,22 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
             layers.add(layerMetadata);
             Map<String, Object> vectorLayer = new LinkedHashMap<>();
             vectorLayer.put("id", layer.getLayerName());
-            vectorLayer.put("minzoom", layer.getMinZoom() == null ? parameter.getMinZoom() : layer.getMinZoom());
-            vectorLayer.put("maxzoom", layer.getMaxZoom() == null ? parameter.getMaxZoom() : layer.getMaxZoom());
+            vectorLayer.put(
+                    "minzoom",
+                    layer.getMinZoom() == null ? parameter.getMinZoom() : layer.getMinZoom());
+            vectorLayer.put(
+                    "maxzoom",
+                    layer.getMaxZoom() == null ? parameter.getMaxZoom() : layer.getMaxZoom());
             vectorLayer.put("fields", Collections.emptyMap());
             vectorLayers.add(vectorLayer);
         }
         metadata.put("layers", layers);
         metadata.put("name", parameter.getTileSetName());
-        metadata.put("version", parameter.getEdition() == null || parameter.getEdition().trim().isEmpty()
-                ? "1.0" : parameter.getEdition());
+        metadata.put(
+                "version",
+                parameter.getEdition() == null || parameter.getEdition().trim().isEmpty()
+                        ? "1.0"
+                        : parameter.getEdition());
         metadata.put("type", "overlay");
         metadata.put("vector_layers", vectorLayers);
         return metadata;
@@ -423,16 +488,27 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         String metadataJson = JSON.toJSONString(buildOutputMetadata(parameter));
         if (resolveOutputType(parameter) == V3TileOutputType.MBTILES) {
             MbtilesArchiveUtils.archive(
-                    Paths.get(outputConfig.getStagingDirectory()), Paths.get(outputConfig.getMbtilesFile()),
-                    outputConfig.getTileYAxis(), outputConfig.isOverwrite(), outputConfig.getArchiveBatchSize(),
-                    MbtilesArchiveUtils.metadata(parameter.getTileSetName(), parameter.getEdition(),
-                            parameter.getMinZoom(), parameter.getMaxZoom(), metadataJson));
+                    Paths.get(outputConfig.getStagingDirectory()),
+                    Paths.get(outputConfig.getMbtilesFile()),
+                    outputConfig.getTileYAxis(),
+                    outputConfig.isOverwrite(),
+                    outputConfig.getArchiveBatchSize(),
+                    MbtilesArchiveUtils.metadata(
+                            parameter.getTileSetName(),
+                            parameter.getEdition(),
+                            parameter.getMinZoom(),
+                            parameter.getMaxZoom(),
+                            metadataJson));
             return;
         }
         if (resolveOutputType(parameter) == V3TileOutputType.PMTILES) {
             PmtilesUtils.archive(
-                    Paths.get(outputConfig.getStagingDirectory()), Paths.get(outputConfig.getPmtilesFile()),
-                    outputConfig.getTileYAxis(), outputConfig.isOverwrite(), parameter.isGzipPbf(), metadataJson);
+                    Paths.get(outputConfig.getStagingDirectory()),
+                    Paths.get(outputConfig.getPmtilesFile()),
+                    outputConfig.getTileYAxis(),
+                    outputConfig.isOverwrite(),
+                    parameter.isGzipPbf(),
+                    metadataJson);
         }
     }
 
@@ -452,7 +528,8 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         } else {
             V3TileStoreFactory.validate(parameter.getOutputConfig());
             if (isArchiveOutput(parameter) && parameter.getOutGridSrid() != 3857) {
-                throw new IllegalArgumentException("V3 MBTiles/PMTiles 输出仅支持 WebMercator（EPSG:3857）网格");
+                throw new IllegalArgumentException(
+                        "V3 MBTiles/PMTiles 输出仅支持 WebMercator（EPSG:3857）网格");
             }
         }
         if (parameter.getTileSetName() == null || parameter.getTileSetName().trim().isEmpty()) {
@@ -466,8 +543,11 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
         }
         Set<String> layerNames = new HashSet<>();
         for (MvtLayerSliceParameter layer : parameter.getLayers()) {
-            if (layer == null || layer.getLayerName() == null || layer.getLayerName().trim().isEmpty()
-                    || layer.getGeomFieldName() == null || layer.getGeomFieldName().trim().isEmpty()) {
+            if (layer == null
+                    || layer.getLayerName() == null
+                    || layer.getLayerName().trim().isEmpty()
+                    || layer.getGeomFieldName() == null
+                    || layer.getGeomFieldName().trim().isEmpty()) {
                 throw new IllegalArgumentException("V3 每个图层都必须配置 layerName 和 geomFieldName");
             }
             V3FeatureReaderFactory.validate(layer);
@@ -479,14 +559,16 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
 
     /** 获取已选择的 V3 输出类型。 */
     private static V3TileOutputType resolveOutputType(MultiLayerTileSliceParameter parameter) {
-        if (parameter.getOutputConfig() == null || parameter.getOutputConfig().getOutputType() == null) {
+        if (parameter.getOutputConfig() == null
+                || parameter.getOutputConfig().getOutputType() == null) {
             throw new IllegalArgumentException("V3 outputConfig 与 outputType 不能为空");
         }
         return parameter.getOutputConfig().getOutputType();
     }
 
     /** 获取 V3 输出配置中声明的 PostgreSQL 数据源。 */
-    private static DataSourceConfig getPostgresqlOutputSource(MultiLayerTileSliceParameter parameter) {
+    private static DataSourceConfig getPostgresqlOutputSource(
+            MultiLayerTileSliceParameter parameter) {
         V3TileOutputConfig outputConfig = parameter.getOutputConfig();
         return outputConfig == null ? null : outputConfig.getPostgresqlOutputSource();
     }
@@ -499,8 +581,8 @@ public class SparkVectorTileGeneratorV3 implements Serializable {
 
     /**
      * 是否为"无内容"的瓦片。
-     * <p>编码器对没有要素可写的瓦片返回空数组，这类瓦片不应当落盘：
-     * 它们在产物里应当表现为"不存在"，写出一条空记录只会虚高瓦片数、干扰预览与统计。</p>
+     *
+     * <p>编码器对没有要素可写的瓦片返回空数组，这类瓦片不应当落盘： 它们在产物里应当表现为"不存在"，写出一条空记录只会虚高瓦片数、干扰预览与统计。
      */
     private static boolean isBlankTile(PbfInfo pbf) {
         return pbf == null || pbf.getData() == null || pbf.getData().length == 0;

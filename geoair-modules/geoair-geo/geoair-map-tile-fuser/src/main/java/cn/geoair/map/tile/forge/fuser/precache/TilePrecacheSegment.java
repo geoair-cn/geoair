@@ -2,18 +2,18 @@ package cn.geoair.map.tile.forge.fuser.precache;
 
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.cache.TileCacheQuery;
+import cn.geoair.map.tile.forge.fuser.encoding.TileEncodingContext;
+import cn.geoair.map.tile.forge.fuser.encoding.TileEncodingScope;
 import cn.geoair.map.tile.forge.fuser.execution.TileCancellationToken;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationScope;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationStatus;
-import cn.geoair.map.tile.forge.fuser.encoding.TileEncodingContext;
-import cn.geoair.map.tile.forge.fuser.encoding.TileEncodingScope;
 import cn.geoair.map.tile.forge.fuser.image.TileImageProcessingOutcome;
 import cn.geoair.map.tile.forge.fuser.image.TileImageProcessingState;
 import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
-import java.io.IOException;
 
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,10 +33,27 @@ final class TilePrecacheSegment implements Callable<Void> {
     private final List<TilePrecacheFailure> failures;
 
     TilePrecacheSegment(
-            TilePrecacheLevel level, TileCacheQuery query, TilePrecacheCounter counter, TileCache cache,
-            TileContentLoader loader, TileCancellationToken cancellation, TilePrecacheOptions options,
-            TilePrecachePipeline pipeline, TileEncodingContext encoding) {
-        this(level, query, counter, cache, loader, cancellation, options, pipeline, encoding, null, null);
+            TilePrecacheLevel level,
+            TileCacheQuery query,
+            TilePrecacheCounter counter,
+            TileCache cache,
+            TileContentLoader loader,
+            TileCancellationToken cancellation,
+            TilePrecacheOptions options,
+            TilePrecachePipeline pipeline,
+            TileEncodingContext encoding) {
+        this(
+                level,
+                query,
+                counter,
+                cache,
+                loader,
+                cancellation,
+                options,
+                pipeline,
+                encoding,
+                null,
+                null);
     }
 
     TilePrecacheSegment(
@@ -46,8 +63,11 @@ final class TilePrecacheSegment implements Callable<Void> {
             TileCache cache,
             TileContentLoader loader,
             TileCancellationToken cancellation,
-            TilePrecacheOptions options, TilePrecachePipeline pipeline, TileEncodingContext encoding,
-            BitSet selection, List<TilePrecacheFailure> failures) {
+            TilePrecacheOptions options,
+            TilePrecachePipeline pipeline,
+            TileEncodingContext encoding,
+            BitSet selection,
+            List<TilePrecacheFailure> failures) {
         this.level = level;
         this.query = query;
         this.counter = counter;
@@ -55,7 +75,8 @@ final class TilePrecacheSegment implements Callable<Void> {
         this.loader = loader;
         this.cancellation = cancellation;
         this.options = options;
-        this.pipeline = pipeline; this.encoding = encoding;
+        this.pipeline = pipeline;
+        this.encoding = encoding;
         this.selection = selection;
         this.failures = failures;
     }
@@ -63,7 +84,8 @@ final class TilePrecacheSegment implements Callable<Void> {
     public Void call() {
         TileOperationContext inspection =
                 new TileOperationContext(cancellation, options.getInspectionTimeoutMillis());
-        try (TileEncodingScope taskEncoding = encoding.bind(); TileOperationScope ignored = inspection.bind()) {
+        try (TileEncodingScope taskEncoding = encoding.bind();
+                TileOperationScope ignored = inspection.bind()) {
             inspection.check();
             BitSet inside;
             if (level.getMask() == null) {
@@ -85,15 +107,19 @@ final class TilePrecacheSegment implements Callable<Void> {
             BitSet existing = cache.findExisting(query, inspection);
             existing.and(inside);
             if (pipeline != null) {
-                for (int offset = inside.nextSetBit(0); offset >= 0; offset = inside.nextSetBit(offset + 1)) {
+                for (int offset = inside.nextSetBit(0);
+                        offset >= 0;
+                        offset = inside.nextSetBit(offset + 1)) {
                     cancellation.throwIfCancelled();
-                    TilePrecacheTileResult result = processCombined(query.getFrom() + offset, existing.get(offset));
+                    TilePrecacheTileResult result =
+                            processCombined(query.getFrom() + offset, existing.get(offset));
                     counter.add(result);
                     recordFailure(query.getFrom() + offset, result.getStatus());
                     // 回调故障是接入故障，不能吞成一张图片的处理失败。
                     pipeline.completed(result);
                     if (result.getStatus() == TileOperationStatus.CANCELLED)
-                        throw new TileOperationException(TileOperationStatus.CANCELLED, "预缓存与处理已停止");
+                        throw new TileOperationException(
+                                TileOperationStatus.CANCELLED, "预缓存与处理已停止");
                 }
                 return null;
             }
@@ -154,29 +180,44 @@ final class TilePrecacheSegment implements Callable<Void> {
 
     private void recordFailure(long position, TileOperationStatus status) {
         if (failures != null && TilePrecacheFailure.retryable(status))
-            failures.add(new TilePrecacheFailure(position, query.x(position), query.y(position), status));
+            failures.add(
+                    new TilePrecacheFailure(
+                            position, query.x(position), query.y(position), status));
     }
 
     private TilePrecacheTileResult processCombined(long index, boolean existed) {
         int zoom = query.getZoom(), x = query.x(index), y = query.y(index);
-        TileOperationContext tile = new TileOperationContext(cancellation, options.getTileTimeoutMillis());
+        TileOperationContext tile =
+                new TileOperationContext(cancellation, options.getTileTimeoutMillis());
         TileOperationStatus source = null, status = TileOperationStatus.FAILED;
         TileImageProcessingOutcome processed = null;
         Throwable failure = null;
         try (TileOperationScope scope = tile.bind()) {
             tile.check();
-            byte[] beforeEncoding = existed ? cache.get(query.getLayerName(), zoom, x, y, query.getFormat()) : null;
+            byte[] beforeEncoding =
+                    existed ? cache.get(query.getLayerName(), zoom, x, y, query.getFormat()) : null;
             tile.check();
-            if (beforeEncoding != null && beforeEncoding.length > 0) source = TileOperationStatus.CACHED;
+            if (beforeEncoding != null && beforeEncoding.length > 0)
+                source = TileOperationStatus.CACHED;
             else {
                 // 索引命中后被删除/过期时重新下载，不把旧快照当作已有图片。
                 beforeEncoding = loader.load(zoom, x, y, tile);
                 tile.check();
-                if (beforeEncoding == null || beforeEncoding.length == 0) source = TileOperationStatus.MISSING;
+                if (beforeEncoding == null || beforeEncoding.length == 0)
+                    source = TileOperationStatus.MISSING;
                 else {
-                    if (beforeEncoding.length > TileResourceLimits.getMaxTileBytes()) throw new IOException("源瓦片超过字节限制");
-                    source = cache.put(query.getLayerName(), zoom, x, y, beforeEncoding, query.getFormat())
-                            ? TileOperationStatus.DOWNLOADED : TileOperationStatus.FAILED;
+                    if (beforeEncoding.length > TileResourceLimits.getMaxTileBytes())
+                        throw new IOException("源瓦片超过字节限制");
+                    source =
+                            cache.put(
+                                            query.getLayerName(),
+                                            zoom,
+                                            x,
+                                            y,
+                                            beforeEncoding,
+                                            query.getFormat())
+                                    ? TileOperationStatus.DOWNLOADED
+                                    : TileOperationStatus.FAILED;
                 }
             }
             tile.check();
@@ -185,17 +226,31 @@ final class TilePrecacheSegment implements Callable<Void> {
                 // 仅本张持有压缩前字节，不把数据挂在任务或长期线程上下文中。
                 processed = pipeline.process(beforeEncoding, zoom, x, y);
                 tile.check();
-                status = processed.getResult().getState() == TileImageProcessingState.FAILED ? TileOperationStatus.FAILED : source;
+                status =
+                        processed.getResult().getState() == TileImageProcessingState.FAILED
+                                ? TileOperationStatus.FAILED
+                                : source;
                 failure = processed.getFailure();
             }
-        } catch (TileOperationException stopped) { status = stopped.getStatus(); failure = stopped; }
-        catch (InterruptedException stopped) {
-            Thread.currentThread().interrupt(); cancellation.cancel(); status = TileOperationStatus.CANCELLED; failure = stopped;
+        } catch (TileOperationException stopped) {
+            status = stopped.getStatus();
+            failure = stopped;
+        } catch (InterruptedException stopped) {
+            Thread.currentThread().interrupt();
+            cancellation.cancel();
+            status = TileOperationStatus.CANCELLED;
+            failure = stopped;
         } catch (Exception error) {
             failure = error;
-            try { tile.check(); status = TileOperationStatus.FAILED; }
-            catch (TileOperationException stopped) { status = stopped.getStatus(); failure = stopped; }
+            try {
+                tile.check();
+                status = TileOperationStatus.FAILED;
+            } catch (TileOperationException stopped) {
+                status = stopped.getStatus();
+                failure = stopped;
+            }
         }
-        return new TilePrecacheTileResult(zoom, x, y, source == null ? status : source, status, processed, failure);
+        return new TilePrecacheTileResult(
+                zoom, x, y, source == null ? status : source, status, processed, failure);
     }
 }

@@ -2,9 +2,11 @@ package cn.geoair.map.dynamic.mvt.tools.model;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.unit.DataSizeUtil;
+
+import lombok.Data;
+
 import java.util.List;
 import java.util.Set;
-import lombok.Data;
 
 /**
  * @author ：张逢吉

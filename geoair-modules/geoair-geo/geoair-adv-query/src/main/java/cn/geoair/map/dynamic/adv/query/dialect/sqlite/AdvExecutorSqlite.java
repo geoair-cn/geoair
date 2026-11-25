@@ -14,6 +14,7 @@ import cn.geoair.map.dynamic.adv.query.IAdvWhereSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractPxyAdvExecutor;
 
 import java.sql.Connection;
+
 import javax.sql.DataSource;
 
 /** SQLite Core 的动态高级查询执行器。 */
@@ -51,8 +52,7 @@ public class AdvExecutorSqlite extends AbstractPxyAdvExecutor {
         if (dataSourceGetter == null) {
             synchronized (this) {
                 if (dataSourceGetter == null) {
-                    dataSourceGetter =
-                            new GirDsTransactionManager(new RealDataSourceOpt());
+                    dataSourceGetter = new GirDsTransactionManager(new RealDataSourceOpt());
                 }
             }
         }
@@ -88,8 +88,9 @@ public class AdvExecutorSqlite extends AbstractPxyAdvExecutor {
         if (geoOpt == null) {
             synchronized (this) {
                 if (geoOpt == null) {
-                    geoOpt = new SqliteAdvGeoOpt(
-                            getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
+                    geoOpt =
+                            new SqliteAdvGeoOpt(
+                                    getDataSourceGetter(), getAdvBaseOpt(), getAdvDDLOpt());
                 }
             }
         }
@@ -101,8 +102,12 @@ public class AdvExecutorSqlite extends AbstractPxyAdvExecutor {
         if (pageOpt == null) {
             synchronized (this) {
                 if (pageOpt == null) {
-                    pageOpt = new SqliteAdvSimplePageOpt(
-                            getDataSourceGetter(), getAdvBaseOpt(), getGeoOpt(), getAdvDDLOpt());
+                    pageOpt =
+                            new SqliteAdvSimplePageOpt(
+                                    getDataSourceGetter(),
+                                    getAdvBaseOpt(),
+                                    getGeoOpt(),
+                                    getAdvDDLOpt());
                 }
             }
         }
@@ -114,8 +119,12 @@ public class AdvExecutorSqlite extends AbstractPxyAdvExecutor {
         if (whereSelectOpt == null) {
             synchronized (this) {
                 if (whereSelectOpt == null) {
-                    whereSelectOpt = new SqliteAdvWhereSelectOpt(
-                            getDataSourceGetter(), getAdvBaseOpt(), getSimplePageOpt(), getGeoOpt());
+                    whereSelectOpt =
+                            new SqliteAdvWhereSelectOpt(
+                                    getDataSourceGetter(),
+                                    getAdvBaseOpt(),
+                                    getSimplePageOpt(),
+                                    getGeoOpt());
                 }
             }
         }

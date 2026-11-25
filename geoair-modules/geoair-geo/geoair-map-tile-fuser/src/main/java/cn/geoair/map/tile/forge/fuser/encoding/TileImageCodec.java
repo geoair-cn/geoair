@@ -3,12 +3,14 @@ package cn.geoair.map.tile.forge.fuser.encoding;
 import cn.geoair.map.tile.forge.fuser.image.TileImageFormats;
 import cn.geoair.map.tile.forge.fuser.utils.TileImageUtils;
 import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Locale;
+
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -27,6 +29,7 @@ public final class TileImageCodec {
     public static String canonical(String format) {
         return TileImageFormats.canonical(format);
     }
+
     /** 缓存驱动也承担历史非图片字节的透明读写；只有已知栅格签名才进入格式适配。 */
     public static byte[] normalizeCache(byte[] bytes, String requested) throws IOException {
         if (bytes == null || bytes.length < 3) return bytes;
@@ -45,14 +48,19 @@ public final class TileImageCodec {
     }
 
     /** 仅转换响应；JPEG 用指定的不透明底色合成，现有瓦片和缓存编码策略不参与。 */
-    public static byte[] encodeForResponse(byte[] bytes, String requested, int jpegQuality, Color jpegBackground)
+    public static byte[] encodeForResponse(
+            byte[] bytes, String requested, int jpegQuality, Color jpegBackground)
             throws IOException {
-        if (jpegQuality < 1 || jpegQuality > 100 || jpegBackground == null || jpegBackground.getAlpha() != 255)
+        if (jpegQuality < 1
+                || jpegQuality > 100
+                || jpegBackground == null
+                || jpegBackground.getAlpha() != 255)
             throw new IllegalArgumentException("JPEG 质量应为 1 到 100，底色必须不透明");
         return normalize(bytes, requested, jpegQuality, jpegBackground);
     }
 
-    private static byte[] normalize(byte[] bytes, String requested, int quality, Color background) throws IOException {
+    private static byte[] normalize(byte[] bytes, String requested, int quality, Color background)
+            throws IOException {
         if (bytes == null || bytes.length == 0) return bytes;
         String target = canonical(requested);
         if (detect(bytes).equals(target)) return bytes;
@@ -80,7 +88,8 @@ public final class TileImageCodec {
             String target = mode == TileEncodingMode.PNG || alpha ? "png" : "jpeg";
             if ("png".equals(target) && "png".equals(actual))
                 return new EncodedTile(bytes, actual, alpha);
-            return new EncodedTile(encodeImage(image, target, policy.getQuality(), null), target, alpha);
+            return new EncodedTile(
+                    encodeImage(image, target, policy.getQuality(), null), target, alpha);
         } finally {
             image.flush();
         }
@@ -94,8 +103,8 @@ public final class TileImageCodec {
         return false;
     }
 
-    private static byte[] encodeImage(BufferedImage image, String format, int quality, Color background)
-            throws IOException {
+    private static byte[] encodeImage(
+            BufferedImage image, String format, int quality, Color background) throws IOException {
         if (!"jpeg".equals(format)) return TileImageUtils.writeImage(image, format);
         ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
         BufferedImage rgb = image;

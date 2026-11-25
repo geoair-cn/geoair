@@ -4,9 +4,11 @@ import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.comp.db.service.core.basic.apo.GroupApo;
 import cn.geoair.comp.db.service.starter.model.entity.DsApiGroupPo;
 import cn.hutool.core.bean.BeanUtil;
+
+import org.springframework.beans.BeanUtils;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.BeanUtils;
 
 /**
  * api分组信息(DbapiGroup)DTO

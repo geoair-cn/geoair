@@ -7,6 +7,7 @@ import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessCoordinator;
 import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessLease;
 import cn.hutool.json.JSONUtil;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -234,6 +235,7 @@ public class MbtilesInPlaceTranscoder {
     private String identity(Path file) throws Exception {
         return fileIdentity(file);
     }
+
     /** 接入方可在提交业务任务时固定该值，用于发现没有旧恢复点的新替换文件。 */
     public static String fileIdentity(Path file) throws Exception {
         BasicFileAttributes attrs = Files.readAttributes(file, BasicFileAttributes.class);

@@ -17,7 +17,9 @@ package cn.geoair.map.tile.forge.core.bygwc.grid;
 import java.io.Serializable;
 import java.util.Objects;
 
-/** @author groldan */
+/**
+ * @author groldan
+ */
 public class Grid implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
@@ -61,42 +63,58 @@ public class Grid implements Serializable, Cloneable {
         return scaleDenom;
     }
 
-    /** @return the resolution */
+    /**
+     * @return the resolution
+     */
     public double getResolution() {
         return resolution;
     }
 
-    /** @param resolution the resolution to set */
+    /**
+     * @param resolution the resolution to set
+     */
     public void setResolution(double resolution) {
         this.resolution = resolution;
     }
 
-    /** @param scaleDenom the scaleDenom to set */
+    /**
+     * @param scaleDenom the scaleDenom to set
+     */
     public void setScaleDenominator(double scaleDenom) {
         this.scaleDenom = scaleDenom;
     }
 
-    /** @param name the name to set */
+    /**
+     * @param name the name to set
+     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /** @return the numTilesWide */
+    /**
+     * @return the numTilesWide
+     */
     public long getNumTilesWide() {
         return numTilesWide;
     }
 
-    /** @param numTilesWide the numTilesWide to set */
+    /**
+     * @param numTilesWide the numTilesWide to set
+     */
     public void setNumTilesWide(long numTilesWide) {
         this.numTilesWide = numTilesWide;
     }
 
-    /** @return the numTilesHigh */
+    /**
+     * @return the numTilesHigh
+     */
     public long getNumTilesHigh() {
         return numTilesHigh;
     }
 
-    /** @param numTilesHigh the numTilesHigh to set */
+    /**
+     * @param numTilesHigh the numTilesHigh to set
+     */
     public void setNumTilesHigh(long numTilesHigh) {
         this.numTilesHigh = numTilesHigh;
     }

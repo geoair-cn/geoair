@@ -13,19 +13,19 @@ import java.util.List;
 @Deprecated
 public class GirGroupPxyDataSource extends GirGroupByIdDataSource {
 
-
     public GirGroupPxyDataSource(String groupName, List<String> dataSourceIds) {
-        super(GirGroupByIdDataSource
-                .builderById().
-                dataSourceIds(dataSourceIds).
-                groupName(groupName));
+        super(
+                GirGroupByIdDataSource.builderById()
+                        .dataSourceIds(dataSourceIds)
+                        .groupName(groupName));
     }
 
-    public GirGroupPxyDataSource(String groupName, List<String> dataSourceIds, LoadStrategyType strategyType) {
-        super(GirGroupByIdDataSource
-                .builderById().
-                dataSourceIds(dataSourceIds).
-                groupName(groupName).
-                strategy(strategyType));
+    public GirGroupPxyDataSource(
+            String groupName, List<String> dataSourceIds, LoadStrategyType strategyType) {
+        super(
+                GirGroupByIdDataSource.builderById()
+                        .dataSourceIds(dataSourceIds)
+                        .groupName(groupName)
+                        .strategy(strategyType));
     }
 }

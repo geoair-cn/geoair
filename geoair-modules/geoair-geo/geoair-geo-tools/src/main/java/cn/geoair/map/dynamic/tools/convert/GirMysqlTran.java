@@ -1,10 +1,9 @@
 package cn.geoair.map.dynamic.tools.convert;
 
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.ParseException;
 
-import java.nio.ByteBuffer;
+import org.locationtech.jts.geom.Geometry;
+
 import java.sql.Blob;
 import java.sql.SQLException;
 
@@ -48,15 +47,17 @@ public class GirMysqlTran {
             // 尝试解析几何类型（1-20为有效类型）
             int geomType;
             if (byteOrder == 0x00) { // 大端
-                geomType = ((wkbData[1] & 0xFF) << 24) |
-                        ((wkbData[2] & 0xFF) << 16) |
-                        ((wkbData[3] & 0xFF) << 8) |
-                        (wkbData[4] & 0xFF);
+                geomType =
+                        ((wkbData[1] & 0xFF) << 24)
+                                | ((wkbData[2] & 0xFF) << 16)
+                                | ((wkbData[3] & 0xFF) << 8)
+                                | (wkbData[4] & 0xFF);
             } else { // 小端
-                geomType = (wkbData[1] & 0xFF) |
-                        ((wkbData[2] & 0xFF) << 8) |
-                        ((wkbData[3] & 0xFF) << 16) |
-                        ((wkbData[4] & 0xFF) << 24);
+                geomType =
+                        (wkbData[1] & 0xFF)
+                                | ((wkbData[2] & 0xFF) << 8)
+                                | ((wkbData[3] & 0xFF) << 16)
+                                | ((wkbData[4] & 0xFF) << 24);
             }
 
             // 几何类型范围：1=Point, 2=LineString, 3=Polygon,
@@ -83,15 +84,11 @@ public class GirMysqlTran {
             // 2. 提取SRID（前4字节，小端序）
             int srid = readLittleEndianInt(mysqlBinary, 0);
 
-
-
             // 3. 提取标准WKB数据（去除前4字节）
             byte[] wkbData = extractWkbData(mysqlBinary);
 
-            Geometry jtsGeom = GirGeoTools.defaultInstance()
-                    .getFormatOpt()
-                    .getWKBReader()
-                    .read(wkbData);
+            Geometry jtsGeom =
+                    GirGeoTools.defaultInstance().getFormatOpt().getWKBReader().read(wkbData);
 
             // 5. 设置SRID
             if (jtsGeom != null && srid != 0) {
@@ -105,16 +102,13 @@ public class GirMysqlTran {
         }
     }
 
-    /**
-     * 从字节数组中读取小端序的 int（4字节）
-     */
+    /** 从字节数组中读取小端序的 int（4字节） */
     private static int readLittleEndianInt(byte[] bytes, int offset) {
         return (bytes[offset] & 0xFF)
-               | ((bytes[offset + 1] & 0xFF) << 8)
-               | ((bytes[offset + 2] & 0xFF) << 16)
-               | ((bytes[offset + 3] & 0xFF) << 24);
+                | ((bytes[offset + 1] & 0xFF) << 8)
+                | ((bytes[offset + 2] & 0xFF) << 16)
+                | ((bytes[offset + 3] & 0xFF) << 24);
     }
-
 
     /**
      * 将各种类型的对象转换为字节数组

@@ -2,6 +2,7 @@ package cn.geoair.map.tile.forge.fuser.precache;
 
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationStatus;
 import cn.geoair.map.tile.forge.fuser.image.TileImageProcessingOutcome;
+
 import lombok.Getter;
 
 /** 一张瓦片的多阶段结果；下载落盘后处理失败，保留下载事实而整体只计一次失败。 */

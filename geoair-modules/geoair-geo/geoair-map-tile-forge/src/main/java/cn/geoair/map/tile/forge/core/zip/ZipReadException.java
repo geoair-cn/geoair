@@ -8,5 +8,7 @@ public class ZipReadException extends RuntimeException {
         this.failure = failure;
     }
 
-    public ZipReadFailure getFailure() { return failure; }
+    public ZipReadFailure getFailure() {
+        return failure;
+    }
 }

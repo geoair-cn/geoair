@@ -1,14 +1,13 @@
 package cn.geoair.base.concurrent;
 
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 
-/**@author     ：张俊
- * @date       ：Created in 2025/6/16 15:11
+/**
+ * @author ：张俊
+ * @date ：Created in 2025/6/16 15:11
  * @description： 默认任务拦截器实现
  */
-
 public class DefaultLogTaskInterceptor implements GirTaskInterceptor {
     private static final GiLogger log = GirLoggerFactory.getLogger(GirPxyExecutorService.class);
 

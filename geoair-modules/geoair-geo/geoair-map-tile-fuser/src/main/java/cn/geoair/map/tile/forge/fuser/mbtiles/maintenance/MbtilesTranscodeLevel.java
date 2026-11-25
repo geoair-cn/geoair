@@ -1,6 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.mbtiles.maintenance;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
+
 import lombok.Data;
 
 /** 各级转码累计量，与总任务一并在缓存库提交。 */

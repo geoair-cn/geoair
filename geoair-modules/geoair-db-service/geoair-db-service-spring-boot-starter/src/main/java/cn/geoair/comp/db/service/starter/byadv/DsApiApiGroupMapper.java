@@ -7,6 +7,7 @@ import cn.geoair.comp.db.service.starter.model.entity.DsApiGroupPo;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.spring.GirSpringAdvExecutor;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,15 +22,19 @@ import java.util.List;
 public class DsApiApiGroupMapper implements GirDsApiGroupDao {
 
     public List<GroupApo> searchAll() {
-        List<GirAdvOneRow> girAdvOneRows = GirSpringAdvExecutor.getInstance().wSelectList(GirAdvQueryRequest.builder(DsApiGroupPo.class).build());
+        List<GirAdvOneRow> girAdvOneRows =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectList(GirAdvQueryRequest.builder(DsApiGroupPo.class).build());
         return GirAdvOneRow.toBeanObjList(girAdvOneRows, GroupApo.class);
     }
 
     public List<GroupApo> selectBatchIds(List<String> ids) {
-        List<GirAdvOneRow> girAdvOneRows = GirSpringAdvExecutor.getInstance().wSelectList(
-                GirAdvQueryRequest.builder(DsApiGroupPo.class)
-                        .whereLambda(w -> w.in(DsApiGroupPo::getId, ids))
-                        .build());
+        List<GirAdvOneRow> girAdvOneRows =
+                GirSpringAdvExecutor.getInstance()
+                        .wSelectList(
+                                GirAdvQueryRequest.builder(DsApiGroupPo.class)
+                                        .whereLambda(w -> w.in(DsApiGroupPo::getId, ids))
+                                        .build());
         return GirAdvOneRow.toBeanObjList(girAdvOneRows, GroupApo.class);
     }
 

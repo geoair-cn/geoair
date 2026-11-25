@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.web.util.GutilMimeType;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,12 +52,17 @@ public class SpiMimeLoaderConcurrencyTest {
             assertTrue(loading.await(5, TimeUnit.SECONDS));
             CountDownLatch started = new CountDownLatch(32);
             List<Future<List<IMimeTypeGetter>>> readers = new ArrayList<>();
-            for (int index = 0; index < 32; index++) readers.add(threads.submit(() -> {
-                started.countDown();
-                return SpiMimeLoader.getMimeTypeGetters();
-            }));
+            for (int index = 0; index < 32; index++)
+                readers.add(
+                        threads.submit(
+                                () -> {
+                                    started.countDown();
+                                    return SpiMimeLoader.getMimeTypeGetters();
+                                }));
             assertTrue(started.await(5, TimeUnit.SECONDS));
-            assertThrows("首次加载结束前不能返回半初始化列表", TimeoutException.class,
+            assertThrows(
+                    "首次加载结束前不能返回半初始化列表",
+                    TimeoutException.class,
                     () -> readers.get(0).get(100, TimeUnit.MILLISECONDS));
             release.countDown();
             List<IMimeTypeGetter> complete = first.get(5, TimeUnit.SECONDS);
@@ -64,7 +70,10 @@ public class SpiMimeLoaderConcurrencyTest {
             for (Future<List<IMimeTypeGetter>> reader : readers)
                 assertSame(complete, reader.get(5, TimeUnit.SECONDS));
             assertKnownTypes();
-        } finally { release.countDown(); stop(threads); }
+        } finally {
+            release.countDown();
+            stop(threads);
+        }
     }
 
     @Test
@@ -77,16 +86,21 @@ public class SpiMimeLoaderConcurrencyTest {
         try {
             Future<?> reload = threads.submit(SpiMimeLoader::loadMimes);
             assertTrue(loading.await(5, TimeUnit.SECONDS));
-            Future<List<IMimeTypeGetter>> reader = threads.submit(SpiMimeLoader::getMimeTypeGetters);
+            Future<List<IMimeTypeGetter>> reader =
+                    threads.submit(SpiMimeLoader::getMimeTypeGetters);
             assertSame("重载期间读者继续使用完整旧快照", old, reader.get(1, TimeUnit.SECONDS));
             assertEquals(oldContents, old);
             assertKnownTypes();
-            release.countDown(); reload.get(5, TimeUnit.SECONDS);
+            release.countDown();
+            reload.get(5, TimeUnit.SECONDS);
             List<IMimeTypeGetter> replacement = SpiMimeLoader.getMimeTypeGetters();
             assertNotSame(old, replacement);
             assertEquals(providerTypes(oldContents), providerTypes(replacement));
             assertEquals(oldContents, old);
-        } finally { release.countDown(); stop(threads); }
+        } finally {
+            release.countDown();
+            stop(threads);
+        }
     }
 
     @Test
@@ -125,19 +139,30 @@ public class SpiMimeLoaderConcurrencyTest {
         CountDownLatch start = new CountDownLatch(1);
         List<Future<?>> pending = new ArrayList<>();
         try {
-            for (int reader = 0; reader < 32; reader++) pending.add(threads.submit(() -> {
-                start.await();
-                for (int iteration = 0; iteration < 2000; iteration++) assertKnownTypes();
-                return null;
-            }));
-            for (int loader = 0; loader < 2; loader++) pending.add(threads.submit(() -> {
-                start.await();
-                for (int iteration = 0; iteration < 200; iteration++) SpiMimeLoader.loadMimes();
-                return null;
-            }));
+            for (int reader = 0; reader < 32; reader++)
+                pending.add(
+                        threads.submit(
+                                () -> {
+                                    start.await();
+                                    for (int iteration = 0; iteration < 2000; iteration++)
+                                        assertKnownTypes();
+                                    return null;
+                                }));
+            for (int loader = 0; loader < 2; loader++)
+                pending.add(
+                        threads.submit(
+                                () -> {
+                                    start.await();
+                                    for (int iteration = 0; iteration < 200; iteration++)
+                                        SpiMimeLoader.loadMimes();
+                                    return null;
+                                }));
             start.countDown();
             for (Future<?> task : pending) task.get(30, TimeUnit.SECONDS);
-        } finally { start.countDown(); stop(threads); }
+        } finally {
+            start.countDown();
+            stop(threads);
+        }
     }
 
     private List<Class<?>> providerTypes(List<IMimeTypeGetter> providers) {
@@ -149,31 +174,44 @@ public class SpiMimeLoaderConcurrencyTest {
     private void assertKnownTypes() {
         assertEquals("image/png", GutilMimeType.fromContentType("image/png").getMimeType());
         assertEquals("image/jpeg", GutilMimeType.fromExtension("jpg").getMimeType());
-        assertEquals("application/json", GutilMimeType.fromContentType("application/json;charset=UTF-8").getMimeType());
+        assertEquals(
+                "application/json",
+                GutilMimeType.fromContentType("application/json;charset=UTF-8").getMimeType());
     }
 
     private GiLogger blockingLogger(CountDownLatch loading, CountDownLatch release) {
         AtomicBoolean first = new AtomicBoolean(true);
-        return (GiLogger) Proxy.newProxyInstance(GiLogger.class.getClassLoader(), new Class<?>[] {GiLogger.class},
-                (proxy, method, args) -> {
-                    if (isProviderTrace(method.getName(), args) && first.compareAndSet(true, false)) {
-                        loading.countDown();
-                        if (!release.await(5, TimeUnit.SECONDS)) throw new IllegalStateException("等待测试释放加载线程超时");
-                    }
-                    return method.getReturnType() == boolean.class ? Boolean.FALSE : null;
-                });
+        return (GiLogger)
+                Proxy.newProxyInstance(
+                        GiLogger.class.getClassLoader(),
+                        new Class<?>[] {GiLogger.class},
+                        (proxy, method, args) -> {
+                            if (isProviderTrace(method.getName(), args)
+                                    && first.compareAndSet(true, false)) {
+                                loading.countDown();
+                                if (!release.await(5, TimeUnit.SECONDS))
+                                    throw new IllegalStateException("等待测试释放加载线程超时");
+                            }
+                            return method.getReturnType() == boolean.class ? Boolean.FALSE : null;
+                        });
     }
 
     private GiLogger failingLogger() {
-        return (GiLogger) Proxy.newProxyInstance(GiLogger.class.getClassLoader(), new Class<?>[] {GiLogger.class},
-                (proxy, method, args) -> {
-                    if (isProviderTrace(method.getName(), args)) throw new IllegalStateException("模拟加载中途失败");
-                    return method.getReturnType() == boolean.class ? Boolean.FALSE : null;
-                });
+        return (GiLogger)
+                Proxy.newProxyInstance(
+                        GiLogger.class.getClassLoader(),
+                        new Class<?>[] {GiLogger.class},
+                        (proxy, method, args) -> {
+                            if (isProviderTrace(method.getName(), args))
+                                throw new IllegalStateException("模拟加载中途失败");
+                            return method.getReturnType() == boolean.class ? Boolean.FALSE : null;
+                        });
     }
 
     private boolean isProviderTrace(String method, Object[] args) {
-        return "trace".equals(method) && args != null && args.length > 0
+        return "trace".equals(method)
+                && args != null
+                && args.length > 0
                 && String.valueOf(args[0]).startsWith("通过Java SPI");
     }
 

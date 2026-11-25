@@ -6,25 +6,21 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.ProtocolUrl;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.TileSliceParameter;
 import cn.hutool.core.util.IdUtil;
 
-/**
- * TileSliceParameter 示例：演示自定义协议解析、序列化、反序列化。
- */
+/** TileSliceParameter 示例：演示自定义协议解析、序列化、反序列化。 */
 public class TileSliceParameterExample {
 
     public static void main(String[] args) {
-//        System.out.println("========== JdbcUrl 协议解析测试 ==========\n");
-//        testJdbcUrlParser();
+        //        System.out.println("========== JdbcUrl 协议解析测试 ==========\n");
+        //        testJdbcUrlParser();
 
         System.out.println("\n========== TileSliceParameter 序列化 / 反序列化测试 ==========\n");
         testTileSliceParameter();
 
-//        System.out.println("\n========== 多数据库协议格式测试 ==========\n");
-//        testMultiDatabaseProtocol();
+        //        System.out.println("\n========== 多数据库协议格式测试 ==========\n");
+        //        testMultiDatabaseProtocol();
     }
 
-    /**
-     * 测试 JdbcUrl 自定义协议解析
-     */
+    /** 测试 JdbcUrl 自定义协议解析 */
     private static void testJdbcUrlParser() {
         // PostgreSQL：完整格式
         String pgUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/address/test1/big_mian";
@@ -44,7 +40,8 @@ public class TileSliceParameterExample {
         System.out.println();
 
         // PostgreSQL：无表名
-        ProtocolUrl pg2 = new ProtocolUrl("#jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public");
+        ProtocolUrl pg2 =
+                new ProtocolUrl("#jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public");
         System.out.println("[PostgreSQL 无表名]");
         System.out.println("  jdbcUrl: " + pg2.toJdbcUrl());
         System.out.println("  schema:  " + pg2.getSchema());
@@ -65,29 +62,29 @@ public class TileSliceParameterExample {
         System.out.println();
     }
 
-    /**
-     * 测试 TileSliceParameter 的 Base32 序列化 / 反序列化
-     */
+    /** 测试 TileSliceParameter 的 Base32 序列化 / 反序列化 */
     private static void testTileSliceParameter() {
         String inputUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable";
         String tableName = "t_" + IdUtil.getSnowflakeNextId();
-        String outputUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable/" + tableName;
+        String outputUrl =
+                "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable/" + tableName;
 
-        TileSliceParameter parameter = new TileSliceParameter()
-                .setLayerName("road_layer")
-                .setEdition("v1")
-                .setGeomFieldName("geom")
-                .setIdFieldName("link_id")
-                .setReadStrategy(ReadStrategy.ID_PAGE)
-                .setSourceDataSrid(4326)
-                .setOutGridSrid(3857)
-                .setMinZoom(6)
-                .setMaxZoom(14)
-                .setDropDensestAsNeeded(true)
-                .setCoalesceDensestAsNeeded(true)
-                .setQueryStatement("SELECT * FROM flowable.\"amap_traffic_conditions\"")
-                .setInputSource(DataSourceConfig.fromProtocolUrlStr(inputUrl))
-                .setOutputSource(DataSourceConfig.fromProtocolUrlStr(outputUrl));
+        TileSliceParameter parameter =
+                new TileSliceParameter()
+                        .setLayerName("road_layer")
+                        .setEdition("v1")
+                        .setGeomFieldName("geom")
+                        .setIdFieldName("link_id")
+                        .setReadStrategy(ReadStrategy.ID_PAGE)
+                        .setSourceDataSrid(4326)
+                        .setOutGridSrid(3857)
+                        .setMinZoom(6)
+                        .setMaxZoom(14)
+                        .setDropDensestAsNeeded(true)
+                        .setCoalesceDensestAsNeeded(true)
+                        .setQueryStatement("SELECT * FROM flowable.\"amap_traffic_conditions\"")
+                        .setInputSource(DataSourceConfig.fromProtocolUrlStr(inputUrl))
+                        .setOutputSource(DataSourceConfig.fromProtocolUrlStr(outputUrl));
 
         // 序列化
         String encoded = parameter.toBase32();
@@ -130,23 +127,22 @@ public class TileSliceParameterExample {
         System.out.println();
     }
 
-    /**
-     * 测试多数据库协议格式
-     */
+    /** 测试多数据库协议格式 */
     private static void testMultiDatabaseProtocol() {
         String[] urls = {
-                "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public/tile_cache",
-                "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public",
-                "#jdbc:mysql://root#pass123/192.168.1.100:3306/gisdb//tile_cache",
-                "#jdbc:mysql://root#pass123/192.168.1.100:3306/gisdb",
-                "#jdbc:sqlserver://sa#pass123/10.0.0.1:1433/mydb/dbo/tile_cache",
-                "#jdbc:postgis://admin#geo123/10.0.0.1:5432/geodb/gis/tile_cache",
+            "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public/tile_cache",
+            "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/mydb/public",
+            "#jdbc:mysql://root#pass123/192.168.1.100:3306/gisdb//tile_cache",
+            "#jdbc:mysql://root#pass123/192.168.1.100:3306/gisdb",
+            "#jdbc:sqlserver://sa#pass123/10.0.0.1:1433/mydb/dbo/tile_cache",
+            "#jdbc:postgis://admin#geo123/10.0.0.1:5432/geodb/gis/tile_cache",
         };
 
         for (String url : urls) {
             try {
                 ProtocolUrl parsed = new ProtocolUrl(url);
-                System.out.printf("  %-75s → jdbcUrl=%s, table=%s, tableForSql=%s%n",
+                System.out.printf(
+                        "  %-75s → jdbcUrl=%s, table=%s, tableForSql=%s%n",
                         url, parsed.toJdbcUrl(), parsed.getTableName(), parsed.getTableForSql());
             } catch (Exception e) {
                 System.out.printf("  %-75s → 解析失败: %s%n", url, e.getMessage());

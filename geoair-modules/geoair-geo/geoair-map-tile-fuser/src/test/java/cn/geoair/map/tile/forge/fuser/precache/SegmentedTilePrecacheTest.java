@@ -19,15 +19,24 @@ public class SegmentedTilePrecacheTest {
     public void lateLoaderExceptionIsCountedAsTileTimeoutAndOtherTilesContinue() {
         TilePrecacheOptions options = new TilePrecacheOptions();
         options.setTileTimeoutMillis(1);
-        List<TilePrecacheProgress> result = SegmentedTilePrecache.execute(
-                "x", Collections.singletonList(plan(2)), GirImageMime.png, cache(),
-                (z, x, y, context) -> {
-                    Thread.sleep(10);
-                    throw new IllegalStateException("延迟失败");
-                }, workers, new TileCancellationToken(), options, null);
+        List<TilePrecacheProgress> result =
+                SegmentedTilePrecache.execute(
+                        "x",
+                        Collections.singletonList(plan(2)),
+                        GirImageMime.png,
+                        cache(),
+                        (z, x, y, context) -> {
+                            Thread.sleep(10);
+                            throw new IllegalStateException("延迟失败");
+                        },
+                        workers,
+                        new TileCancellationToken(),
+                        options,
+                        null);
         assertEquals(4, result.get(0).getProcessed());
         assertEquals(Long.valueOf(4), result.get(0).getCounts().get(TileOperationStatus.TIMED_OUT));
     }
+
     @Rule public TemporaryFolder folder = new TemporaryFolder();
     private ExecutorService workers, coordinator;
 

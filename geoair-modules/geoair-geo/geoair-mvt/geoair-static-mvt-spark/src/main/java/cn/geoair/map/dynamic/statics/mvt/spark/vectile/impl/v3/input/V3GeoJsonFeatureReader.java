@@ -5,12 +5,14 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParam
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3GeoJsonInputConfig;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3GeoJsonMode;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -18,6 +20,7 @@ import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.input.PortableDataStream;
 import org.apache.spark.sql.SparkSession;
 import org.locationtech.jts.geom.Geometry;
+
 import scala.Tuple2;
 
 import java.io.IOException;
@@ -35,9 +38,8 @@ import java.util.zip.GZIPInputStream;
 /**
  * V3 GeoJSON 要素读取器。
  *
- * <p>标准 FeatureCollection 采用 Jackson 流式解析，一个文件只在内存中保留当前 Feature；
- * GeoJSON Lines 交给 Spark 文本输入按文件块并行读取。两种格式最终都转换为
- * {@link GirAdvOneRow}，因此后续坐标转换和瓦片聚合链路与 JDBC 输入一致。</p>
+ * <p>标准 FeatureCollection 采用 Jackson 流式解析，一个文件只在内存中保留当前 Feature； GeoJSON Lines 交给 Spark
+ * 文本输入按文件块并行读取。两种格式最终都转换为 {@link GirAdvOneRow}，因此后续坐标转换和瓦片聚合链路与 JDBC 输入一致。
  *
  * @author 张逢吉
  */
@@ -48,16 +50,21 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
     @Override
     public JavaRDD<GirAdvOneRow> read(SparkSession sparkSession, MvtLayerSliceParameter layer) {
         V3GeoJsonInputConfig config = layer.getInputConfig().getGeoJson();
-        int minPartitions = config.getMinPartitionNum() == null
-                ? DEFAULT_PARTITIONS : Math.max(1, config.getMinPartitionNum());
+        int minPartitions =
+                config.getMinPartitionNum() == null
+                        ? DEFAULT_PARTITIONS
+                        : Math.max(1, config.getMinPartitionNum());
         String pathExpression = joinPaths(config.getPaths());
-        JavaSparkContext sparkContext = JavaSparkContext.fromSparkContext(sparkSession.sparkContext());
+        JavaSparkContext sparkContext =
+                JavaSparkContext.fromSparkContext(sparkSession.sparkContext());
         V3GeoJsonMode mode = resolveMode(config);
         if (mode == V3GeoJsonMode.GEOJSON_LINES) {
-            return sparkContext.textFile(pathExpression, minPartitions)
+            return sparkContext
+                    .textFile(pathExpression, minPartitions)
                     .flatMap(new GeoJsonLineFunction(layer));
         }
-        JavaPairRDD<String, PortableDataStream> files = sparkContext.binaryFiles(pathExpression, minPartitions);
+        JavaPairRDD<String, PortableDataStream> files =
+                sparkContext.binaryFiles(pathExpression, minPartitions);
         return files.flatMap(new GeoJsonDocumentFunction(layer));
     }
 
@@ -67,8 +74,11 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
         }
         for (String path : config.getPaths()) {
             String lower = path.toLowerCase(Locale.ROOT);
-            if (!(lower.endsWith(".geojsonl") || lower.endsWith(".ndjson") || lower.endsWith(".jsonl")
-                    || lower.endsWith(".geojsonl.gz") || lower.endsWith(".ndjson.gz")
+            if (!(lower.endsWith(".geojsonl")
+                    || lower.endsWith(".ndjson")
+                    || lower.endsWith(".jsonl")
+                    || lower.endsWith(".geojsonl.gz")
+                    || lower.endsWith(".ndjson.gz")
                     || lower.endsWith(".jsonl.gz"))) {
                 return V3GeoJsonMode.FEATURE_COLLECTION;
             }
@@ -88,7 +98,8 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
     }
 
     /** 每行解析一个独立 GeoJSON Feature。 */
-    private static final class GeoJsonLineFunction implements FlatMapFunction<String, GirAdvOneRow> {
+    private static final class GeoJsonLineFunction
+            implements FlatMapFunction<String, GirAdvOneRow> {
         private static final long serialVersionUID = 1L;
         private final String geomFieldName;
         private final String idFieldName;
@@ -110,14 +121,16 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
             }
             try {
                 JsonNode feature = new ObjectMapper().readTree(json);
-                GirAdvOneRow row = V3GeoJsonFeatureMapper.toRow(
-                        feature, geomFieldName, idFieldName, sourceSrid);
+                GirAdvOneRow row =
+                        V3GeoJsonFeatureMapper.toRow(
+                                feature, geomFieldName, idFieldName, sourceSrid);
                 return Collections.singletonList(row).iterator();
             } catch (Exception e) {
                 if (skipInvalidFeature) {
                     return Collections.emptyIterator();
                 }
-                throw new IllegalArgumentException("解析 GeoJSON Lines Feature 失败: " + abbreviate(json), e);
+                throw new IllegalArgumentException(
+                        "解析 GeoJSON Lines Feature 失败: " + abbreviate(json), e);
             }
         }
 
@@ -151,13 +164,14 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
         }
 
         @Override
-        public Iterator<GirAdvOneRow> call(Tuple2<String, PortableDataStream> file) throws Exception {
+        public Iterator<GirAdvOneRow> call(Tuple2<String, PortableDataStream> file)
+                throws Exception {
             InputStream input = file._2().open();
             if (file._1().toLowerCase(Locale.ROOT).endsWith(".gz")) {
                 input = new GZIPInputStream(input);
             }
-            return new GeoJsonDocumentIterator(file._1(), input, geomFieldName,
-                    idFieldName, sourceSrid, skipInvalidFeature);
+            return new GeoJsonDocumentIterator(
+                    file._1(), input, geomFieldName, idFieldName, sourceSrid, skipInvalidFeature);
         }
     }
 
@@ -178,8 +192,14 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
         private transient boolean inFeatureArray;
         private transient boolean finished;
 
-        GeoJsonDocumentIterator(String source, InputStream input, String geomFieldName,
-                String idFieldName, int sourceSrid, boolean skipInvalidFeature) throws IOException {
+        GeoJsonDocumentIterator(
+                String source,
+                InputStream input,
+                String geomFieldName,
+                String idFieldName,
+                int sourceSrid,
+                boolean skipInvalidFeature)
+                throws IOException {
             this.source = source;
             this.geomFieldName = geomFieldName;
             this.idFieldName = idFieldName;
@@ -213,8 +233,10 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
                     inFeatureArray = true;
                     return;
                 }
-                if ("type".equals(fieldName) || "id".equals(fieldName)
-                        || "geometry".equals(fieldName) || "properties".equals(fieldName)) {
+                if ("type".equals(fieldName)
+                        || "id".equals(fieldName)
+                        || "geometry".equals(fieldName)
+                        || "properties".equals(fieldName)) {
                     candidate.set(fieldName, mapper.readTree(parser));
                 } else {
                     parser.skipChildren();
@@ -244,13 +266,15 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
                         return false;
                     }
                     try {
-                        next = V3GeoJsonFeatureMapper.toRow(
-                                feature, geomFieldName, idFieldName, sourceSrid);
+                        next =
+                                V3GeoJsonFeatureMapper.toRow(
+                                        feature, geomFieldName, idFieldName, sourceSrid);
                         return true;
                     } catch (Exception e) {
                         if (!skipInvalidFeature) {
                             close();
-                            throw new IllegalArgumentException("解析 GeoJSON Feature 失败，文件: " + source, e);
+                            throw new IllegalArgumentException(
+                                    "解析 GeoJSON Feature 失败，文件: " + source, e);
                         }
                     }
                 }
@@ -320,12 +344,12 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
     /** 将一个 GeoJSON Feature 映射为切片链路使用的行对象。 */
     static final class V3GeoJsonFeatureMapper {
 
-        private V3GeoJsonFeatureMapper() {
-        }
+        private V3GeoJsonFeatureMapper() {}
 
-        static GirAdvOneRow toRow(JsonNode feature, String geomFieldName,
-                String idFieldName, int sourceSrid) {
-            if (feature == null || !feature.isObject()
+        static GirAdvOneRow toRow(
+                JsonNode feature, String geomFieldName, String idFieldName, int sourceSrid) {
+            if (feature == null
+                    || !feature.isObject()
                     || !"Feature".equals(feature.path("type").asText())) {
                 throw new IllegalArgumentException("GeoJSON 节点不是 Feature");
             }
@@ -333,8 +357,10 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
             if (geometryNode == null || geometryNode.isNull()) {
                 throw new IllegalArgumentException("GeoJSON Feature 缺少 geometry");
             }
-            Geometry geometry = GirGeoTools.defaultInstance().getFormatOpt()
-                    .geojsonToJtsGeometry(geometryNode.toString(), false);
+            Geometry geometry =
+                    GirGeoTools.defaultInstance()
+                            .getFormatOpt()
+                            .geojsonToJtsGeometry(geometryNode.toString(), false);
             if (geometry == null || geometry.isEmpty()) {
                 throw new IllegalArgumentException("GeoJSON Feature geometry 为空或无法解析");
             }
@@ -349,8 +375,10 @@ final class V3GeoJsonFeatureReader implements V3FeatureReader {
                     values.put(field.getKey(), toAttributeValue(field.getValue()));
                 }
             }
-            if (idFieldName != null && !idFieldName.trim().isEmpty()
-                    && !values.containsKey(idFieldName) && feature.has("id")) {
+            if (idFieldName != null
+                    && !idFieldName.trim().isEmpty()
+                    && !values.containsKey(idFieldName)
+                    && feature.has("id")) {
                 values.put(idFieldName, toAttributeValue(feature.get("id")));
             }
             values.put(geomFieldName, geometry);

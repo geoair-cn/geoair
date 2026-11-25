@@ -14,15 +14,13 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.grid;
 
-
+import static java.util.Arrays.asList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.Arrays.asList;
 
 public class SRS implements Comparable<SRS>, Serializable {
 
@@ -152,7 +150,9 @@ public class SRS implements Comparable<SRS>, Serializable {
         return EPSG900913;
     }
 
-    /** @see Comparable#compareTo(Object) */
+    /**
+     * @see Comparable#compareTo(Object)
+     */
     public int compareTo(SRS other) {
         return number - other.number;
     }

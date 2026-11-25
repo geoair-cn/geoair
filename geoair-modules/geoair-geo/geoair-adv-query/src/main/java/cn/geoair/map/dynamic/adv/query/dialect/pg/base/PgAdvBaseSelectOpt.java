@@ -11,7 +11,8 @@ import java.util.function.Supplier;
 public class PgAdvBaseSelectOpt extends AbstractExecAdvBaseSelectOpt {
 
     // 初始化表名处理器
-    public PgAdvBaseSelectOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+    public PgAdvBaseSelectOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         super(configAdvQueryGetter, registry);
         this.dialectTableNameProcessor = PgDialectTableNameUtil.getInstance();
     }

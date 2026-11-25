@@ -2,6 +2,7 @@ package cn.geoair.base.data.model.support;
 
 import cn.geoair.base.data.model.GiModelType;
 import cn.geoair.base.data.model.GiTypeModelable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;

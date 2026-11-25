@@ -21,6 +21,14 @@ import cn.geoair.map.tile.forge.fuser.provider.impl.MBTilesTileGetter;
 import cn.geoair.map.tile.forge.fuser.support.ConstantTileImageProcessor;
 import cn.geoair.map.tile.forge.fuser.support.RasterTestImages;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -30,12 +38,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 
 /** 真实源库和结果库核对原始网格、坐标方向及任务编码，不经过融合。 */
 public class OriginalGridPrecachePipelineTest {

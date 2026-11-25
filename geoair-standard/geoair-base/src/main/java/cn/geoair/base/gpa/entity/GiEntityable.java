@@ -3,6 +3,7 @@ package cn.geoair.base.gpa.entity;
 import cn.geoair.base.data.model.GiModelable;
 import cn.geoair.base.exception.GirException;
 import cn.geoair.base.util.GutilReflection;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

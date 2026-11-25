@@ -2,65 +2,44 @@ package cn.geoair.base.log;
 
 /**
  * 日志级别枚举
- * <p>
- * 通过 code 值的大小可以判断日志级别的高低，code 值越小级别越低（记录越详细），
- * code 值越大级别越高（记录越少）。
- * <p>
- * 级别高低顺序：ALL(0) < TRACE(1) < DEBUG(2) < INFO(3) < WARN(4) < ERROR(5) < FATAL(6) < OFF(7)
+ *
+ * <p>通过 code 值的大小可以判断日志级别的高低，code 值越小级别越低（记录越详细）， code 值越大级别越高（记录越少）。
+ *
+ * <p>级别高低顺序：ALL(0) < TRACE(1) < DEBUG(2) < INFO(3) < WARN(4) < ERROR(5) < FATAL(6) < OFF(7)
  *
  * @author Ray
  * @since 1.0
  */
 public enum GemLogLevel {
 
-    /**
-     * 全部级别，记录所有日志
-     */
+    /** 全部级别，记录所有日志 */
     ALL(0, "ALL"),
 
-    /**
-     * 追踪级别，最详细的日志信息
-     */
+    /** 追踪级别，最详细的日志信息 */
     TRACE(1, "TRACE"),
 
-    /**
-     * 调试级别，用于调试的详细信息
-     */
+    /** 调试级别，用于调试的详细信息 */
     DEBUG(2, "DEBUG"),
 
-    /**
-     * 信息级别，普通运行信息
-     */
+    /** 信息级别，普通运行信息 */
     INFO(3, "INFO"),
 
-    /**
-     * 警告级别，潜在的问题
-     */
+    /** 警告级别，潜在的问题 */
     WARN(4, "WARN"),
 
-    /**
-     * 错误级别，错误事件
-     */
+    /** 错误级别，错误事件 */
     ERROR(5, "ERROR"),
 
-    /**
-     * 致命错误级别，严重错误导致程序终止
-     */
+    /** 致命错误级别，严重错误导致程序终止 */
     FATAL(6, "FATAL"),
 
-    /**
-     * 关闭所有日志
-     */
+    /** 关闭所有日志 */
     OFF(7, "OFF");
 
-    /**
-     * 日志级别代码，数值越小级别越低，数值越大级别越高
-     */
+    /** 日志级别代码，数值越小级别越低，数值越大级别越高 */
     private final int code;
 
-    /**
-     * 日志级别名称
-     */
+    /** 日志级别名称 */
     private final String name;
 
     /**
@@ -94,8 +73,8 @@ public enum GemLogLevel {
 
     /**
      * 判断当前级别是否高于或等于指定级别
-     * <p>
-     * 用于日志级别过滤，例如：当前级别为 INFO，则 INFO、WARN、ERROR、FATAL 都会被记录
+     *
+     * <p>用于日志级别过滤，例如：当前级别为 INFO，则 INFO、WARN、ERROR、FATAL 都会被记录
      *
      * @param level 要比较的日志级别
      * @return {@code true} 如果当前级别 >= 指定级别

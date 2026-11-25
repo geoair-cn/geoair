@@ -14,9 +14,12 @@ final class TilePrecacheCounter {
     private final EnumMap<TileOperationStatus, Long> counts =
             new EnumMap<>(TileOperationStatus.class);
     private final Consumer<TilePrecacheProgress> listener;
-    private final EnumMap<TileOperationStatus, Long> loads = new EnumMap<>(TileOperationStatus.class);
-    private final EnumMap<TileImageProcessingState, Long> processing = new EnumMap<>(TileImageProcessingState.class);
-    private final EnumMap<TileImageWriteState, Long> writes = new EnumMap<>(TileImageWriteState.class);
+    private final EnumMap<TileOperationStatus, Long> loads =
+            new EnumMap<>(TileOperationStatus.class);
+    private final EnumMap<TileImageProcessingState, Long> processing =
+            new EnumMap<>(TileImageProcessingState.class);
+    private final EnumMap<TileImageWriteState, Long> writes =
+            new EnumMap<>(TileImageWriteState.class);
     private long lastNotice;
 
     TilePrecacheCounter(TilePrecacheLevel level, Consumer<TilePrecacheProgress> listener) {
@@ -34,7 +37,9 @@ final class TilePrecacheCounter {
 
     synchronized void add(TilePrecacheTileResult result) {
         counts.put(result.getStatus(), Math.addExact(counts.get(result.getStatus()), 1));
-        loads.put(result.getSourceStatus(), Math.addExact(loads.getOrDefault(result.getSourceStatus(), 0L), 1));
+        loads.put(
+                result.getSourceStatus(),
+                Math.addExact(loads.getOrDefault(result.getSourceStatus(), 0L), 1));
         if (result.getProcessing() != null) {
             TileImageProcessingState state = result.getProcessing().getResult().getState();
             TileImageWriteState write = result.getProcessing().getWriteState();
@@ -50,6 +55,7 @@ final class TilePrecacheCounter {
     }
 
     synchronized TilePrecacheProgress snapshot() {
-        return new TilePrecacheProgress(zoom, total, counts, new TilePrecacheStages(loads, processing, writes));
+        return new TilePrecacheProgress(
+                zoom, total, counts, new TilePrecacheStages(loads, processing, writes));
     }
 }

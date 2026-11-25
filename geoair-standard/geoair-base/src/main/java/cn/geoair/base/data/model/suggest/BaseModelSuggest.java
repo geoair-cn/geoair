@@ -1,44 +1,32 @@
 package cn.geoair.base.data.model.suggest;
 
-
 import cn.geoair.base.data.model.annotation.GaModelField;
 
 import java.util.Date;
 
-/**
- * 简易的审计字段模型，推荐使用，不做要求
- */
-
+/** 简易的审计字段模型，推荐使用，不做要求 */
 public class BaseModelSuggest {
-
 
     @GaModelField(text = "创建人ID", columnName = "id_create")
     private String idCreate;
 
-
     @GaModelField(text = "创建人名称", columnName = "name_create")
     private String nameCreate;
-
 
     @GaModelField(text = "创建时间", columnName = "time_create")
     private Date timeCreate;
 
-
     @GaModelField(text = "更新人名称", columnName = "name_update")
     private String nameUpdate;
-
 
     @GaModelField(text = "更新人ID", columnName = "id_update")
     private String idUpdate;
 
-
     @GaModelField(text = "更新时间", columnName = "time_update")
     private Date timeUpdate;
 
-
     @GaModelField(text = "备注", columnName = "remark")
     private String remark;
-
 
     @GaModelField(text = "是否删除#em=YES:已删除;NO:未删除", columnName = "del_is", em = DelIsEnum.class)
     private String delIs;

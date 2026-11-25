@@ -1,7 +1,8 @@
 package cn.geoair.comp.code.generator.multi.domian;
 
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 业务表 gen_table

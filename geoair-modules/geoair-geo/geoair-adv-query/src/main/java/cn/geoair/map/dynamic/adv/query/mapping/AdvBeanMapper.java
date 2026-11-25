@@ -4,6 +4,7 @@ import cn.geoair.map.dynamic.adv.query.mapping.AdvBeanMappingMeta.AdvBeanPropert
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandler;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -49,7 +50,8 @@ public class AdvBeanMapper {
         }
         for (int i = 1; i <= columnCount; i++) {
             String columnLabel = metaData.getColumnLabel(i);
-            AdvBeanPropertyMeta propertyMeta = mappingMeta.resolvePropertyByColumnOrProperty(columnLabel);
+            AdvBeanPropertyMeta propertyMeta =
+                    mappingMeta.resolvePropertyByColumnOrProperty(columnLabel);
             if (propertyMeta == null || propertyMeta.isIgnored()) {
                 continue;
             }
@@ -58,23 +60,25 @@ public class AdvBeanMapper {
             AdvTypeHandler fieldHandler = propertyMeta.getAdvTypeHandler();
             Object convertedValue;
             if (fieldHandler != null) {
-                convertedValue = fieldHandler.convertForRead(
-                        rawValue,
-                        propertyMeta.getPropertyType(),
-                        AdvTypeHandlerContext.of(
-                                beanType,
-                                propertyMeta.getPropertyName(),
-                                columnLabel,
-                                propertyMeta.getPropertyType()));
+                convertedValue =
+                        fieldHandler.convertForRead(
+                                rawValue,
+                                propertyMeta.getPropertyType(),
+                                AdvTypeHandlerContext.of(
+                                        beanType,
+                                        propertyMeta.getPropertyName(),
+                                        columnLabel,
+                                        propertyMeta.getPropertyType()));
             } else {
-                convertedValue = typeHandlerRegistry.convertForRead(
-                        rawValue,
-                        propertyMeta.getPropertyType(),
-                        AdvTypeHandlerContext.of(
-                                beanType,
-                                propertyMeta.getPropertyName(),
-                                columnLabel,
-                                propertyMeta.getPropertyType()));
+                convertedValue =
+                        typeHandlerRegistry.convertForRead(
+                                rawValue,
+                                propertyMeta.getPropertyType(),
+                                AdvTypeHandlerContext.of(
+                                        beanType,
+                                        propertyMeta.getPropertyName(),
+                                        columnLabel,
+                                        propertyMeta.getPropertyType()));
             }
             propertyMeta.writeValue(bean, convertedValue);
         }
@@ -82,20 +86,20 @@ public class AdvBeanMapper {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void mapCurrentRowToMap(ResultSet rs,
-                                        T bean,
-                                        Class<T> beanType,
-                                        int columnCount,
-                                        ResultSetMetaData metaData) throws SQLException {
+    private <T> void mapCurrentRowToMap(
+            ResultSet rs, T bean, Class<T> beanType, int columnCount, ResultSetMetaData metaData)
+            throws SQLException {
         Map<String, Object> map = (Map<String, Object>) bean;
         for (int i = 1; i <= columnCount; i++) {
             String columnLabel = metaData.getColumnLabel(i);
             Object rawValue = rs.getObject(i);
             Class<?> valueType = rawValue == null ? Object.class : rawValue.getClass();
-            Object convertedValue = typeHandlerRegistry.convertForRead(
-                    rawValue,
-                    valueType,
-                    AdvTypeHandlerContext.of(beanType, columnLabel, columnLabel, valueType));
+            Object convertedValue =
+                    typeHandlerRegistry.convertForRead(
+                            rawValue,
+                            valueType,
+                            AdvTypeHandlerContext.of(
+                                    beanType, columnLabel, columnLabel, valueType));
             map.put(columnLabel, convertedValue);
         }
     }

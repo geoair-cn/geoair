@@ -10,7 +10,6 @@ import java.util.Objects;
 /** 同一文件的只读连接池及借用状态，由 DAO 的锁统一保护。 */
 final class MbtilesReadPool {
 
-
     final DruidDataSource dataSource = new DruidDataSource();
     private final Object fileIdentity;
     int readers;
@@ -25,9 +24,12 @@ final class MbtilesReadPool {
         dataSource.setTestWhileIdle(false);
         dataSource.setValidationQuery("SELECT 1");
         // 控制每个原生 SQLite 连接的页缓存，不主动映射大型源文件。
-        dataSource.setConnectionInitSqls(Arrays.asList(
-                "PRAGMA query_only=ON", "PRAGMA cache_size=-" + options.getPageCacheKiB(), "PRAGMA mmap_size=0",
-                "PRAGMA busy_timeout=" + options.getPoolWaitMillis()));
+        dataSource.setConnectionInitSqls(
+                Arrays.asList(
+                        "PRAGMA query_only=ON",
+                        "PRAGMA cache_size=-" + options.getPageCacheKiB(),
+                        "PRAGMA mmap_size=0",
+                        "PRAGMA busy_timeout=" + options.getPoolWaitMillis()));
     }
 
     boolean matches(BasicFileAttributes attributes) {

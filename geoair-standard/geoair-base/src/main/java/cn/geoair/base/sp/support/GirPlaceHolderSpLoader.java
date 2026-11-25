@@ -6,6 +6,7 @@ import cn.geoair.base.sp.annotation.GkSP;
 import cn.geoair.base.util.GutilArray;
 import cn.geoair.base.util.GutilClass;
 import cn.geoair.base.util.GutilGenericType;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -208,9 +209,7 @@ public class GirPlaceHolderSpLoader extends GirCacheSpLoader {
                 }
             } else if (matched.size() > 1) {
                 throw new GirNoUniqueBeanException(
-                        "类 {} 配置sp 默认placeHolder根据name[{}]发现多个实现类",
-                        requiredType.getName(),
-                        name);
+                        "类 {} 配置sp 默认placeHolder根据name[{}]发现多个实现类", requiredType.getName(), name);
             }
         }
         if (res != null && singleton) {

@@ -8,8 +8,7 @@ import java.io.Serializable;
 /**
  * V3 单个内部图层的输入配置。
  *
- * <p>使用显式类型和对应的配置对象隔离 JDBC 与 GeoJSON 参数，避免文件输入继续携带
- * SQL、分页策略等无意义字段。</p>
+ * <p>使用显式类型和对应的配置对象隔离 JDBC 与 GeoJSON 参数，避免文件输入继续携带 SQL、分页策略等无意义字段。
  *
  * @author 张逢吉
  */

@@ -3,10 +3,10 @@ package cn.geoair.map.tile.forge.fuser.utils;
 import cn.geoair.map.tile.forge.core.bygwc.io.Resource;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 /** 使用 {@link HttpTileRequestUtils} 对三个常见网络瓦片源执行单瓦片测试。 */
 public class HttpTileRequestUtilsProviderTest {
@@ -29,6 +31,7 @@ public class HttpTileRequestUtilsProviderTest {
     private static final String OSM_URL = "https://tile.openstreetmap.org/0/0/0.png";
     private static final String ARCGIS_URL =
             "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/0/0/0";
+
     /** 仅用于验证 HTTP 工具兼容性；正式接入应使用带 API Key 和 session 的 Google Map Tiles API。 */
     private static final String GOOGLE_URL = "https://mt1.google.com/vt/lyrs=s&x=0&y=0&z=0";
 
@@ -78,8 +81,12 @@ public class HttpTileRequestUtilsProviderTest {
     /** 保存 OSM 的原始响应图片，不经过业务方法对 x-blocked 的拦截，便于检查实际响应内容。 */
     private static void captureOpenStreetMapBrowserResponse() throws IOException {
         Proxy proxy = HttpTileRequestUtils.createHttpProxy(PROXY_HOST, PROXY_PORT);
-        HttpRequest request = HttpTileRequestUtils.createGetRequest(
-                OSM_URL, proxy, TIMEOUT_MILLIS, HttpTileRequestUtils.buildHeaders(BROWSER_HEADERS));
+        HttpRequest request =
+                HttpTileRequestUtils.createGetRequest(
+                        OSM_URL,
+                        proxy,
+                        TIMEOUT_MILLIS,
+                        HttpTileRequestUtils.buildHeaders(BROWSER_HEADERS));
         try (HttpResponse response = request.execute()) {
             System.out.println("Raw OSM HTTP status: " + response.getStatus());
             System.out.println("Raw OSM response headers:");
@@ -89,12 +96,16 @@ public class HttpTileRequestUtilsProviderTest {
 
             byte[] responseBytes = response.bodyBytes();
             Files.createDirectories(OUTPUT_DIR);
-            Path outputPath = OUTPUT_DIR.resolve("osm-browser-raw.png").toAbsolutePath().normalize();
+            Path outputPath =
+                    OUTPUT_DIR.resolve("osm-browser-raw.png").toAbsolutePath().normalize();
             Files.write(outputPath, responseBytes);
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(responseBytes));
             System.out.println("Raw OSM response bytes: " + responseBytes.length);
-            System.out.println("Raw OSM image size: "
-                    + (image == null ? "not an image" : image.getWidth() + "x" + image.getHeight()));
+            System.out.println(
+                    "Raw OSM image size: "
+                            + (image == null
+                                    ? "not an image"
+                                    : image.getWidth() + "x" + image.getHeight()));
             System.out.println("Raw OSM image saved to: " + outputPath);
         }
     }
@@ -118,11 +129,12 @@ public class HttpTileRequestUtilsProviderTest {
 
         System.out.println("Requesting " + provider + ": " + url);
         System.out.println("Proxy: http://" + PROXY_HOST + ":" + PROXY_PORT);
-        System.out.println("User-Agent: "
-                + HttpTileRequestUtils.buildDefaultHeaders().get("User-Agent"));
+        System.out.println(
+                "User-Agent: " + HttpTileRequestUtils.buildDefaultHeaders().get("User-Agent"));
 
-        Resource resource = HttpTileRequestUtils.requestTile(
-                url, proxy, TIMEOUT_MILLIS, null, provider + " effective-user-agent test");
+        Resource resource =
+                HttpTileRequestUtils.requestTile(
+                        url, proxy, TIMEOUT_MILLIS, null, provider + " effective-user-agent test");
         Assert.assertNotNull(provider + " tile request failed", resource);
 
         byte[] tileBytes = resource.getByteData();
@@ -135,16 +147,26 @@ public class HttpTileRequestUtilsProviderTest {
         Assert.assertEquals(provider + " tile height", 256, image.getHeight());
 
         Files.write(outputPath, tileBytes);
-        System.out.println(provider + " passed: " + image.getWidth() + "x" + image.getHeight()
-                + ", " + tileBytes.length + " bytes, saved to " + outputPath);
+        System.out.println(
+                provider
+                        + " passed: "
+                        + image.getWidth()
+                        + "x"
+                        + image.getHeight()
+                        + ", "
+                        + tileBytes.length
+                        + " bytes, saved to "
+                        + outputPath);
     }
 
     private static Map<String, String> createBrowserHeaders() {
         Map<String, String> headers = new LinkedHashMap<>();
-        headers.put("User-Agent",
+        headers.put(
+                "User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                         + "(KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36");
-        headers.put("Sec-Ch-Ua",
+        headers.put(
+                "Sec-Ch-Ua",
                 "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"155\", \"Google Chrome\";v=\"155\"");
         headers.put("Sec-Ch-Ua-Mobile", "?0");
         headers.put("Sec-Ch-Ua-Platform", "\"Windows\"");
