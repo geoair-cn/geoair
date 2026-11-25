@@ -2,7 +2,6 @@ package cn.geoair.map.tile.forge.fuser.precache;
 
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
-
 import lombok.Data;
 
 /** 分段大小、单张总超时及待执行窗口；不限制业务任务数或并行级别数。 */

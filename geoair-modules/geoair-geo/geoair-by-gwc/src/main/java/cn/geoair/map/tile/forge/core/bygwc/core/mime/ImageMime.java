@@ -8,12 +8,6 @@ import cn.geoair.web.mime.MimeException;
 import it.geosolutions.jaiext.JAIExt;
 import it.geosolutions.jaiext.colorindexer.ColorIndexer;
 import it.geosolutions.jaiext.colorindexer.Quantizer;
-
-import javax.imageio.ImageWriter;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.ExtremaDescriptor;
 import java.awt.*;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
@@ -23,6 +17,11 @@ import java.awt.image.renderable.ParameterBlock;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import javax.imageio.ImageWriter;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.ExtremaDescriptor;
 
 public class ImageMime extends MimeType {
 
@@ -46,10 +45,8 @@ public class ImageMime extends MimeType {
                 /** Any response mime starting with image/png will do */
                 public boolean isCompatible(String otherMimeType) {
                     return super.isCompatible(otherMimeType)
-                           || otherMimeType.startsWith("image/png");
-                }
-
-                ;
+                            || otherMimeType.startsWith("image/png");
+                };
             };
 
     public static final ImageMime jpeg =
@@ -77,11 +74,9 @@ public class ImageMime extends MimeType {
                 }
             };
 
-    public static final ImageMime gif =
-            new ImageMime(GirImageMime.gif, true, false, true);
+    public static final ImageMime gif = new ImageMime(GirImageMime.gif, true, false, true);
 
-    public static final ImageMime tiff =
-            new ImageMime(GirImageMime.tiff, true, true, true);
+    public static final ImageMime tiff = new ImageMime(GirImageMime.tiff, true, true, true);
 
     public static final ImageMime png8 =
             new ImageMime(GirImageMime.png8, true, false, true) {
@@ -91,7 +86,7 @@ public class ImageMime extends MimeType {
                 public RenderedImage preprocess(RenderedImage canvas) {
                     if (!(canvas.getColorModel() instanceof IndexColorModel)) {
                         if (canvas.getColorModel() instanceof ComponentColorModel
-                            && canvas.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
+                                && canvas.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
                             ColorIndexer indexer =
                                     new Quantizer(256).subsample().buildColorIndexer(canvas);
                             if (indexer != null) {
@@ -110,32 +105,23 @@ public class ImageMime extends MimeType {
                 }
             };
 
-    public static final ImageMime png24 =
-            new ImageMime(GirImageMime.png24, true, true, true);
-    public static final ImageMime png_24 =
-            new ImageMime(GirImageMime.png_24, true, true, true);
+    public static final ImageMime png24 = new ImageMime(GirImageMime.png24, true, true, true);
+    public static final ImageMime png_24 = new ImageMime(GirImageMime.png_24, true, true, true);
 
+    public static final ImageMime dds = new ImageMime(GirImageMime.dds, false, false, false);
 
-    public static final ImageMime dds =
-            new ImageMime(GirImageMime.dds, false, false, false);
+    public static final ImageMime jpegPng = new JpegPngMime(GirImageMime.jpegPng, jpeg, png);
 
-    public static final ImageMime jpegPng =
-            new JpegPngMime(
-                    GirImageMime.jpegPng, jpeg, png);
-
-    public static final ImageMime jpegPng8 =
-            new JpegPngMime(
-                    GirImageMime.jpegPng8,
-                    jpeg,
-                    png8);
-
+    public static final ImageMime jpegPng8 = new JpegPngMime(GirImageMime.jpegPng8, jpeg, png8);
 
     private ImageMime(
-            GirImageMime girImageMime,
-            boolean tiled,
-            boolean alphaChannel,
-            boolean alphaBit) {
-        super(girImageMime.getMimeType(), girImageMime.getFileExtension(), girImageMime.getInternalName(), girImageMime.getFormat(), tiled);
+            GirImageMime girImageMime, boolean tiled, boolean alphaChannel, boolean alphaBit) {
+        super(
+                girImageMime.getMimeType(),
+                girImageMime.getFileExtension(),
+                girImageMime.getInternalName(),
+                girImageMime.getFormat(),
+                tiled);
         this.supportsAlphaChannel = alphaChannel;
         this.supportsAlphaBit = alphaBit;
     }
@@ -182,7 +168,7 @@ public class ImageMime extends MimeType {
         if (fileExtension.equalsIgnoreCase("png")) {
             return png;
         } else if (fileExtension.equalsIgnoreCase("jpeg")
-                   || fileExtension.equalsIgnoreCase("jpg")) {
+                || fileExtension.equalsIgnoreCase("jpg")) {
             return jpeg;
         } else if (fileExtension.equalsIgnoreCase("gif")) {
             return gif;
@@ -219,12 +205,12 @@ public class ImageMime extends MimeType {
         // which will presumably be the pure Java version. A bit hacky, but it's roughly what
         // GeoServer does to make sure it doesn't encode incompatible PNGs with the native writer
         if (this.internalName.equals(ImageMime.png.internalName)
-            || this.internalName.equals(ImageMime.png8.internalName)) {
+                || this.internalName.equals(ImageMime.png8.internalName)) {
 
             int bitDepth = image.getSampleModel().getSampleSize(0);
             if (bitDepth > 1
-                && bitDepth < 8
-                && writer.getClass().getName().equals(NATIVE_PNG_WRITER_CLASS_NAME)) {
+                    && bitDepth < 8
+                    && writer.getClass().getName().equals(NATIVE_PNG_WRITER_CLASS_NAME)) {
 
                 writer = it.next();
             }
@@ -232,9 +218,7 @@ public class ImageMime extends MimeType {
         return writer;
     }
 
-    /**
-     * Preprocesses the image to optimize it for the write about to happen
-     */
+    /** Preprocesses the image to optimize it for the write about to happen */
     public RenderedImage preprocess(RenderedImage tile) {
         return tile;
     }
@@ -246,9 +230,7 @@ public class ImageMime extends MimeType {
         private final ImageMime pngDelegate;
 
         public JpegPngMime(
-                GirImageMime girImageMime,
-                ImageMime jpegDelegate,
-                ImageMime pngDelegate) {
+                GirImageMime girImageMime, ImageMime jpegDelegate, ImageMime pngDelegate) {
             super(girImageMime, true, true, true);
             this.jpegDelegate = jpegDelegate;
             this.pngDelegate = pngDelegate;
@@ -305,14 +287,12 @@ public class ImageMime extends MimeType {
                     return pngDelegate.getMimeType();
                 }
             }
-        }
-
-        ;
+        };
 
         @Override
         public boolean isCompatible(String otherMimeType) {
             return jpegDelegate.isCompatible(otherMimeType)
-                   || pngDelegate.isCompatible(otherMimeType);
+                    || pngDelegate.isCompatible(otherMimeType);
         }
 
         @Override

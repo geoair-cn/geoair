@@ -2,7 +2,6 @@ package cn.geoair.map.tile.forge.fuser.cache;
 
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.web.mime.GiMimeType;
-
 import lombok.Getter;
 
 /** 列优先的闭区间网格，from/to 为当前分段的左闭右开偏移；内存只与分段大小有关。 */

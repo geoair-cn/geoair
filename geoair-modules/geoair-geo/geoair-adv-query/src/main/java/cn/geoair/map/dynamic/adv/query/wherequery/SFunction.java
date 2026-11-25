@@ -5,8 +5,11 @@ import java.util.function.Function;
 
 /**
  * 支持序列化的Function接口
- * <p>用于Lambda表达式的字段名提取，需要继承Serializable</p>
- * <p>使用示例：</p>
+ *
+ * <p>用于Lambda表达式的字段名提取，需要继承Serializable
+ *
+ * <p>使用示例：
+ *
  * <pre>
  * SFunction&lt;User, String&gt; getName = User::getName;
  * String columnName = LambdaUtils.getColumnName(getName);

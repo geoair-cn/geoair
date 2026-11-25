@@ -9,43 +9,47 @@ import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.geoair.map.tile.forge.core.support.ITileStorageSupport;
 import cn.geoair.map.tile.forge.core.support.TileStorageSupportAdapter;
 import cn.geoair.map.tile.forge.core.zip.cache.LayerPerFileDao;
-
 import java.util.Optional;
 
-/**
- * geoair-map-tile-forge 核心入口示例
- */
+/** geoair-map-tile-forge 核心入口示例 */
 public class GirMapTileForgeExample {
 
     public static void main(String[] args) throws Exception {
         GirLayerConfigContext context = new GirLayerConfigContext();
         context.setDataId("base_layer")
-            .setDataId("XYZ")
-            .setMapTileType(GirMapTileType.XYZ)
-            .setStorageType(GirStorageType.LOCAL_ZIP)
-            .setObjectKey("E:/tiles/example.zip");
+                .setDataId("XYZ")
+                .setMapTileType(GirMapTileType.XYZ)
+                .setStorageType(GirStorageType.LOCAL_ZIP)
+                .setObjectKey("E:/tiles/example.zip");
 
-        GirLayerConfigContextHelper helper = new GirLayerConfigContextHelper() {
-            @Override
-            public Optional<GirLayerConfigContext> getByLayerName(String layerName) {
-                return Optional.of(context);
-            }
+        GirLayerConfigContextHelper helper =
+                new GirLayerConfigContextHelper() {
+                    @Override
+                    public Optional<GirLayerConfigContext> getByLayerName(String layerName) {
+                        return Optional.of(context);
+                    }
 
-            @Override
-            public Optional<GirLayerConfigContext> getGirLayerConfigContext(GirMapTileType mapTileType, String layerName, String dataId, String fileName) {
-                return Optional.empty();
-            }
+                    @Override
+                    public Optional<GirLayerConfigContext> getGirLayerConfigContext(
+                            GirMapTileType mapTileType,
+                            String layerName,
+                            String dataId,
+                            String fileName) {
+                        return Optional.empty();
+                    }
 
-            @Override
-            public LayerPerFileDao getLayerPerFileDao(GirLayerConfigContext layerConfigContext) {
-                return null;
-            }
+                    @Override
+                    public LayerPerFileDao getLayerPerFileDao(
+                            GirLayerConfigContext layerConfigContext) {
+                        return null;
+                    }
 
-            @Override
-            public Long getLayerPerCacheBatchSize(GirLayerConfigContext layerConfigContext) {
-                return 0l;
-            }
-        };
+                    @Override
+                    public Long getLayerPerCacheBatchSize(
+                            GirLayerConfigContext layerConfigContext) {
+                        return 0l;
+                    }
+                };
 
         TileStorageSupportAdapter adapter = new TileStorageSupportAdapter(helper);
         ITileStorageSupport support = adapter.getSupport(context);
@@ -57,7 +61,9 @@ public class GirMapTileForgeExample {
             TileRequest tileRequest = service.getLayerTile(context, "10", "388", "845");
             System.out.println("tileRequest exists = " + tileRequest.isExists());
         } catch (Exception e) {
-            System.out.println("getLayerTile skipped because no real tile source was provided: " + e.getMessage());
+            System.out.println(
+                    "getLayerTile skipped because no real tile source was provided: "
+                            + e.getMessage());
         }
     }
 }

@@ -15,20 +15,19 @@ import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
-
-import org.locationtech.jts.geom.Geometry;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.locationtech.jts.geom.Geometry;
 
-
-@GaApi(text = "矢量瓦片服务", tags = {"矢量瓦片服务"})
+@GaApi(
+        text = "矢量瓦片服务",
+        tags = {"矢量瓦片服务"})
 public class VectorTileV2Servlet extends TileCommonServlet {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
@@ -40,7 +39,8 @@ public class VectorTileV2Servlet extends TileCommonServlet {
     String mockDebugUrl = "vectorTileService/v2/debug/preview/1/2/3.pbf?paramTile=XXXX";
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             String requestUri = request.getRequestURI();
             if (request.getQueryString() != null) {
@@ -53,9 +53,7 @@ public class VectorTileV2Servlet extends TileCommonServlet {
         }
     }
 
-    /**
-     * 根据 URI 或完整 URL 构建 MVT 响应，不依赖 HttpServletRequest。
-     */
+    /** 根据 URI 或完整 URL 构建 MVT 响应，不依赖 HttpServletRequest。 */
     @Override
     public TileResponse getTileResponse(String requestUri, String requestHost) {
         JSONObject re = new JSONObject();
@@ -77,7 +75,8 @@ public class VectorTileV2Servlet extends TileCommonServlet {
         }
     }
 
-    private TileResponse getRealTileResponse(ParsedTileUri parsed, Map<String, String> queryParams) throws Exception {
+    private TileResponse getRealTileResponse(ParsedTileUri parsed, Map<String, String> queryParams)
+            throws Exception {
         TileRequestParams params;
         String paramTile = queryParams.get("paramTile");
         if (ObjectUtil.isNotEmpty(paramTile)) {
@@ -122,27 +121,40 @@ public class VectorTileV2Servlet extends TileCommonServlet {
             BoxReferencedEnvelope boxReferencedEnvelope;
             int gridSrid = params.isGeoIs() ? 4326 : 3857;
             if (params.isGeoIs()) {
-                boxReferencedEnvelope = GirGeoTools.defaultInstance().getTileGrid4326Opt()
-                        .xyzToTileBox(parsed.z, parsed.x, parsed.y, TileYAxis.XYZ, 4326);
+                boxReferencedEnvelope =
+                        GirGeoTools.defaultInstance()
+                                .getTileGrid4326Opt()
+                                .xyzToTileBox(parsed.z, parsed.x, parsed.y, TileYAxis.XYZ, 4326);
             } else {
-                boxReferencedEnvelope = GirGeoTools.defaultInstance().getTileGrid3857Opt()
-                        .xyzToTileBox(parsed.z, parsed.x, parsed.y, TileYAxis.XYZ, 3857);
+                boxReferencedEnvelope =
+                        GirGeoTools.defaultInstance()
+                                .getTileGrid3857Opt()
+                                .xyzToTileBox(parsed.z, parsed.x, parsed.y, TileYAxis.XYZ, 3857);
             }
-            Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(boxReferencedEnvelope);
+            Geometry geometry =
+                    GirGeoTools.defaultInstance().getSridOpt().convertToGeom(boxReferencedEnvelope);
             re.put("bbox", geometry.toText());
-            re.put("bbox4326", GirGeoTools.defaultInstance().getSridOpt()
-                    .convert(geometry, gridSrid, 4326).toText());
+            re.put(
+                    "bbox4326",
+                    GirGeoTools.defaultInstance()
+                            .getSridOpt()
+                            .convert(geometry, gridSrid, 4326)
+                            .toText());
         } catch (Exception ignored) {
             // 调试信息中的 bbox 为附加信息，计算失败不影响主响应。
         }
 
         return TileResponseByByte.of()
-                .setBytesAndUpdateSize(JSON.toJSONString(re, JSONWriter.Feature.PrettyFormat)
-                        .getBytes(StandardCharsets.UTF_8))
+                .setBytesAndUpdateSize(
+                        JSON.toJSONString(re, JSONWriter.Feature.PrettyFormat)
+                                .getBytes(StandardCharsets.UTF_8))
                 .setMimeType(cn.geoair.web.mime.GirApplicationMime.json)
                 .setDataSource("real-mvt-debug")
-                .setCoordinate(cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo.of()
-                        .setZ(parsed.z).setX(parsed.x).setY(parsed.y))
+                .setCoordinate(
+                        cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo.of()
+                                .setZ(parsed.z)
+                                .setX(parsed.x)
+                                .setY(parsed.y))
                 .setGridEpsgStr(params.isGeoIs() ? "EPSG:4490" : "EPSG:3857");
     }
 

@@ -14,8 +14,6 @@
  */
 package cn.geoair.web.mime;
 
-
-
 public class MimeException extends RuntimeException {
 
     /** */

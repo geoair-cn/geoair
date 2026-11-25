@@ -7,9 +7,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
-/**
- * 坐标转换 API 示例
- */
+/** 坐标转换 API 示例 */
 public class GirGeoToolsCoordinateExample {
 
     public static void main(String[] args) {
@@ -30,18 +28,20 @@ public class GirGeoToolsCoordinateExample {
         Point pointBd09 = coordinateOpt.wgs84ToBd09(point);
         System.out.println("point wgs84ToBd09 = " + pointBd09);
 
-        double[][] batch = new double[][] {
-            {116.40, 39.90},
-            {121.47, 31.23},
-            {113.26, 23.13}
-        };
+        double[][] batch =
+                new double[][] {
+                    {116.40, 39.90},
+                    {121.47, 31.23},
+                    {113.26, 23.13}
+                };
         double[][] batchGcj02 = coordinateOpt.wgs84ToGcj02Batch(batch, false);
         System.out.println("batch size = " + batchGcj02.length);
 
-        Geometry line = geometryFactory.createLineString(new Coordinate[] {
-            new Coordinate(116.40, 39.90),
-            new Coordinate(116.45, 39.92)
-        });
+        Geometry line =
+                geometryFactory.createLineString(
+                        new Coordinate[] {
+                            new Coordinate(116.40, 39.90), new Coordinate(116.45, 39.92)
+                        });
         Geometry mercatorLine = coordinateOpt.wgs84ToMercatorGeometry(line);
         System.out.println("mercator line = " + mercatorLine);
 

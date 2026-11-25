@@ -21,7 +21,10 @@ public final class TileCacheGeneration {
     public TileCacheGeneration(Path pointer) throws IOException {
         this.pointer = pointer.toAbsolutePath().normalize();
         try {
-            current = Long.parseLong(new String(Files.readAllBytes(this.pointer), StandardCharsets.UTF_8).trim());
+            current =
+                    Long.parseLong(
+                            new String(Files.readAllBytes(this.pointer), StandardCharsets.UTF_8)
+                                    .trim());
             if (current <= 0) throw new IOException("缓存代次必须大于零");
         } catch (NoSuchFileException missing) {
             current = 1;
@@ -30,7 +33,9 @@ public final class TileCacheGeneration {
         }
     }
 
-    public long current() { return current; }
+    public long current() {
+        return current;
+    }
 
     /** 切换代次后，仍在出图的旧请求只能将结果返回给调用方。 */
     public boolean writeIfCurrent(long expected, Runnable write) {
@@ -58,7 +63,11 @@ public final class TileCacheGeneration {
                     while (bytes.hasRemaining()) file.write(bytes);
                     file.force(true);
                 }
-                Files.move(temporary, pointer, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                Files.move(
+                        temporary,
+                        pointer,
+                        StandardCopyOption.ATOMIC_MOVE,
+                        StandardCopyOption.REPLACE_EXISTING);
                 current = next;
                 return next;
             } finally {

@@ -2,10 +2,6 @@ package cn.geoair.map.tile.forge.fuser.mbtiles;
 
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
-import org.sqlite.ProgressHandler;
-import org.sqlite.SQLiteConnection;
-
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,33 +17,40 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.sqlite.ProgressHandler;
+import org.sqlite.SQLiteConnection;
 
 /** 按坐标读取源瓦片。全库统计和源文件写入不进入出图链路。 */
-
 public class MbtilesSourceReader implements AutoCloseable {
     private final MbtilesReadOptions options;
 
-
     private static final int PROGRESS_OPCODES = 1000;
     // 先在 SQLite 中限制 BLOB 长度，避免异常瓦片被整块复制到 Java 堆。
-    private static final String SELECT_TILE = "SELECT length(tile_data), CASE WHEN length(tile_data) <= ? THEN tile_data END "
-            + "FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ? LIMIT 1";
-    private static final String SELECT_SAMPLE = "SELECT zoom_level, tile_column, tile_row FROM tiles "
-            + "WHERE zoom_level BETWEEN ? AND ? AND length(tile_data) BETWEEN 1 AND ? LIMIT 1";
+    private static final String SELECT_TILE =
+            "SELECT length(tile_data), CASE WHEN length(tile_data) <= ? THEN tile_data END "
+                    + "FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ? LIMIT 1";
+    private static final String SELECT_SAMPLE =
+            "SELECT zoom_level, tile_column, tile_row FROM tiles "
+                    + "WHERE zoom_level BETWEEN ? AND ? AND length(tile_data) BETWEEN 1 AND ? LIMIT 1";
     private final Map<Path, MbtilesReadPool> pools = new LinkedHashMap<>(8, 0.75f, true);
-    private final ScheduledExecutorService reaper = Executors.newSingleThreadScheduledExecutor(task -> {
-        Thread thread = new Thread(task, "mbtiles-source-idle");
-        thread.setDaemon(true);
-        return thread;
-    });
+    private final ScheduledExecutorService reaper =
+            Executors.newSingleThreadScheduledExecutor(
+                    task -> {
+                        Thread thread = new Thread(task, "mbtiles-source-idle");
+                        thread.setDaemon(true);
+                        return thread;
+                    });
     private boolean closed;
 
-    public MbtilesSourceReader() { this(new MbtilesReadOptions()); }
+    public MbtilesSourceReader() {
+        this(new MbtilesReadOptions());
+    }
 
     public MbtilesSourceReader(MbtilesReadOptions options) {
         this.options = options.copy();
         long interval = Math.min(options.getIdleMillis(), 30000L);
-        reaper.scheduleWithFixedDelay(this::closeIdlePools, interval, interval, TimeUnit.MILLISECONDS);
+        reaper.scheduleWithFixedDelay(
+                this::closeIdlePools, interval, interval, TimeUnit.MILLISECONDS);
     }
 
     public byte[] readTile(String source, int z, int x, int row) throws IOException, SQLException {
@@ -55,18 +58,27 @@ public class MbtilesSourceReader implements AutoCloseable {
     }
 
     /** 返回一张现有瓦片的坐标。Y 保留文件中的行号，调用方根据其行原点转换。 */
-    public TileZxyApo sampleTile(String source, int minZoom, int maxZoom) throws IOException, SQLException {
-        if (minZoom < 0 || maxZoom < minZoom) throw new IllegalArgumentException("MBTiles 取样级别范围无效");
-        return read(source, connection -> {
-            try (PreparedStatement query = connection.prepareStatement(SELECT_SAMPLE)) {
-                query.setInt(1, minZoom);
-                query.setInt(2, maxZoom);
-                query.setInt(3, options.getMaxTileBytes());
-                try (ResultSet tiles = query.executeQuery()) {
-                    return tiles.next() ? TileZxyApo.of().setZ(tiles.getInt(1)).setX(tiles.getInt(2)).setY(tiles.getInt(3)) : null;
-                }
-            }
-        });
+    public TileZxyApo sampleTile(String source, int minZoom, int maxZoom)
+            throws IOException, SQLException {
+        if (minZoom < 0 || maxZoom < minZoom)
+            throw new IllegalArgumentException("MBTiles 取样级别范围无效");
+        return read(
+                source,
+                connection -> {
+                    try (PreparedStatement query = connection.prepareStatement(SELECT_SAMPLE)) {
+                        query.setInt(1, minZoom);
+                        query.setInt(2, maxZoom);
+                        query.setInt(3, options.getMaxTileBytes());
+                        try (ResultSet tiles = query.executeQuery()) {
+                            return tiles.next()
+                                    ? TileZxyApo.of()
+                                            .setZ(tiles.getInt(1))
+                                            .setX(tiles.getInt(2))
+                                            .setY(tiles.getInt(3))
+                                    : null;
+                        }
+                    }
+                });
     }
 
     private <T> T read(String source, SourceQuery<T> query) throws IOException, SQLException {
@@ -82,11 +94,13 @@ public class MbtilesSourceReader implements AutoCloseable {
                 release(pool);
             }
         } catch (InterruptedException stopped) {
-            Thread.currentThread().interrupt(); throw new IOException("MBTiles读取已取消", stopped);
+            Thread.currentThread().interrupt();
+            throw new IOException("MBTiles读取已取消", stopped);
         }
     }
 
-    private <T> T queryWithDeadline(Connection connection, SourceQuery<T> query) throws SQLException {
+    private <T> T queryWithDeadline(Connection connection, SourceQuery<T> query)
+            throws SQLException {
         SQLiteConnection sqlite = connection.unwrap(SQLiteConnection.class);
         TileOperationContext.checkCurrent();
         TileOperationContext context = TileOperationContext.current();
@@ -96,11 +110,20 @@ public class MbtilesSourceReader implements AutoCloseable {
         long started = System.nanoTime();
         Thread owner = Thread.currentThread();
         // 兼容旧库和 tiles 视图，遇到无索引等慢查询时限制 SQLite 虚拟机执行时间。
-        ProgressHandler.setHandler(sqlite, PROGRESS_OPCODES, new ProgressHandler() {
-            @Override protected int progress() {
-                return owner.isInterrupted() || (context != null && context.getCancellation().isCancelled()) || System.nanoTime() - started >= timeout ? 1 : 0;
-            }
-        });
+        ProgressHandler.setHandler(
+                sqlite,
+                PROGRESS_OPCODES,
+                new ProgressHandler() {
+                    @Override
+                    protected int progress() {
+                        return owner.isInterrupted()
+                                        || (context != null
+                                                && context.getCancellation().isCancelled())
+                                        || System.nanoTime() - started >= timeout
+                                ? 1
+                                : 0;
+                    }
+                });
         try {
             return query.execute(connection);
         } finally {
@@ -129,7 +152,8 @@ public class MbtilesSourceReader implements AutoCloseable {
         }
     }
 
-    private synchronized MbtilesReadPool borrow(Path path, BasicFileAttributes attributes) throws SQLException {
+    private synchronized MbtilesReadPool borrow(Path path, BasicFileAttributes attributes)
+            throws SQLException {
         if (closed) throw new SQLException("MBTiles 读取服务已关闭");
         MbtilesReadPool pool = pools.get(path);
         if (pool != null && !pool.matches(attributes)) {
@@ -174,13 +198,14 @@ public class MbtilesSourceReader implements AutoCloseable {
         Iterator<MbtilesReadPool> iterator = pools.values().iterator();
         while (iterator.hasNext()) {
             MbtilesReadPool pool = iterator.next();
-            if (pool.readers == 0 && now - pool.lastUsedNanos >= TimeUnit.MILLISECONDS.toNanos(options.getIdleMillis())) {
+            if (pool.readers == 0
+                    && now - pool.lastUsedNanos
+                            >= TimeUnit.MILLISECONDS.toNanos(options.getIdleMillis())) {
                 iterator.remove();
                 pool.dataSource.close();
             }
         }
     }
-
 
     public synchronized void close() {
         closed = true;

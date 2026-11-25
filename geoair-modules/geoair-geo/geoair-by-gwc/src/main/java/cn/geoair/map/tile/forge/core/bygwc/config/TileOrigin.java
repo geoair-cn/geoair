@@ -1,11 +1,9 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
 
 /**
  * 表示ArcGIS缓存配置文件中的{@code TileOrigin}元素。
  *
- * <p>瓦片网格的左上角点。瓦片原点通常不是开始创建瓦片的位置；
- * 这只发生在地图的完整范围内。通常瓦片原点位于地图很远的外部，
+ * <p>瓦片网格的左上角点。瓦片原点通常不是开始创建瓦片的位置； 这只发生在地图的完整范围内。通常瓦片原点位于地图很远的外部，
  * 以确保地图区域能够被覆盖，并且具有相同瓦片原点的其他缓存可以叠加到您的缓存上。
  *
  * <p>XML结构:
@@ -21,16 +19,12 @@ package cn.geoair.map.tile.forge.core.bygwc.config;
  *
  * @author Gabriel Roldan
  */
-public class TileOrigin   implements   java.io.Serializable{
+public class TileOrigin implements java.io.Serializable {
 
-    /**
-     * X坐标值
-     */
+    /** X坐标值 */
     private double X;
 
-    /**
-     * Y坐标值
-     */
+    /** Y坐标值 */
     private double Y;
 
     /**
@@ -50,7 +44,6 @@ public class TileOrigin   implements   java.io.Serializable{
     public double getY() {
         return Y;
     }
-
 
     /**
      * 设置X坐标值

@@ -1,9 +1,8 @@
 package cn.geoair.map.tile.forge.fuser.utils;
 
+import java.awt.image.BufferedImage;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.awt.image.BufferedImage;
 
 /**
  * @author ：张俊
@@ -21,5 +20,4 @@ public class LargeBlankCheck {
     Boolean blankIs;
 
     BufferedImage image = null;
-
 }

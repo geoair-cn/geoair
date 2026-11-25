@@ -10,7 +10,11 @@ public final class TransactionalStatsSnapshot {
     private final boolean complete;
     private final long scanned;
     private final List<TransactionalStatsLevel> levels;
-    public TransactionalStatsSnapshot(boolean complete,long scanned,List<TransactionalStatsLevel> levels) {
-        this.complete=complete;this.scanned=scanned;this.levels=Collections.unmodifiableList(levels);
+
+    public TransactionalStatsSnapshot(
+            boolean complete, long scanned, List<TransactionalStatsLevel> levels) {
+        this.complete = complete;
+        this.scanned = scanned;
+        this.levels = Collections.unmodifiableList(levels);
     }
 }

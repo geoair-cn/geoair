@@ -1,13 +1,11 @@
-
 package cn.geoair.web.mime.getter;
+
+import static cn.geoair.web.mime.GirTextMime.*;
 
 import cn.geoair.web.mime.GiMimeType;
 import cn.geoair.web.mime.IMimeTypeGetter;
 
-import static cn.geoair.web.mime.GirTextMime.*;
-
 public class TextMimeGetter implements IMimeTypeGetter {
-
 
     @Override
     public GiMimeType checkForFormat(String formatStr) {

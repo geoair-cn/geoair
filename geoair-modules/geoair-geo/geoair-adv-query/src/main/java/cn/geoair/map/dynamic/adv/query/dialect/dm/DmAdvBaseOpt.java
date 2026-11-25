@@ -13,7 +13,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseSelectOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.dm.base.DmAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.db.dialect.DialectName;
-
 import java.util.function.Supplier;
 
 /**
@@ -25,11 +24,13 @@ public class DmAdvBaseOpt extends AbstractPxyAdvBaseOpt {
 
     private final AdvTypeHandlerRegistry typeHandlerRegistry;
 
-    public DmAdvBaseOpt(IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+    public DmAdvBaseOpt(
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter, configAdvQueryGetter);
-        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
-                DialectName.DM,
-                configAdvQueryGetter.get().getTypeHandlers());
+        this.typeHandlerRegistry =
+                AdvTypeHandlerRegistry.create(
+                        DialectName.DM, configAdvQueryGetter.get().getTypeHandlers());
     }
 
     @Override

@@ -4,7 +4,6 @@ import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.comp.db.service.core.config.GirDsServiceProperties;
 import cn.hutool.core.util.StrUtil;
- 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -17,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
  * @author: kensan
  * @create: 2022-04-16 12:45
  */
- 
 @Configuration
 public class GirDsServiceServletConfig {
     public static GiLogger log = GirLoggerFactory.getLogger();

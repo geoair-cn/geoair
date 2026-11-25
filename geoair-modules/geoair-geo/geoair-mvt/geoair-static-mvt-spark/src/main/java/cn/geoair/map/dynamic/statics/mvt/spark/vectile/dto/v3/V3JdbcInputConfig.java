@@ -2,10 +2,9 @@ package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3;
 
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.ReadStrategy;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.DataSourceConfig;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
 
 /**
  * V3 JDBC 图层输入配置。

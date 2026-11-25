@@ -10,27 +10,23 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileTimeoutException;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileWriteException;
+import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.tran.model.TranContext;
 import cn.geoair.map.dynamic.file.core.tran.model.TranProgress;
 import cn.geoair.map.dynamic.file.core.tran.model.TranResult;
-import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
-
+import cn.geoair.map.dynamic.tools.GirAdvTools;
+import cn.geoair.map.dynamic.tools.page.PageConditionDef;
+import cn.geoair.map.dynamic.tools.page.PageConfig;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-
-import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.dynamic.tools.page.PageConditionDef;
-import cn.geoair.map.dynamic.tools.page.PageConfig;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-/**
- * 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制
- */
+/** 改造后的 GeoFileTran 实现类 支持：上下文传递、进度监听、预处理/后处理、结构化结果、超时控制 */
 public class GeoFileTranImpl implements GeoFileTran {
 
     private static GiLogger log = GirLoggerFactory.getLogger(GeoFileTranImpl.class);
@@ -40,11 +36,9 @@ public class GeoFileTranImpl implements GeoFileTran {
 
     // 全局异常处理器
     private ExceptionConsumer exceptionConsumer;
-    private Consumer<GirAdvOneRow> oneRowConsumer = girAdvOneRow -> {
-    };
+    private Consumer<GirAdvOneRow> oneRowConsumer = girAdvOneRow -> {};
 
-    private Consumer<SimpleFeatureType> headConsumer = simpleFeatureType -> {
-    };
+    private Consumer<SimpleFeatureType> headConsumer = simpleFeatureType -> {};
 
     // 进度监听器
     private TranProgressListener progressListener;
@@ -75,8 +69,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         this.status = TranStatus.RUNNING;
         this.startTime = System.currentTimeMillis();
         TranResult result = new TranResult().setStatus(TranStatus.RUNNING).setStartTime(startTime);
-        ExceptionConsumer internalExceptionConsumer = e -> {
-        };
+        ExceptionConsumer internalExceptionConsumer = e -> {};
 
         try {
             if (reader == null || writer == null) {
@@ -84,7 +77,8 @@ public class GeoFileTranImpl implements GeoFileTran {
             }
 
             if (this.context.getPreProcessor() != null) {
-                boolean continueFlag = this.context.getPreProcessor().process(reader, writer, this.context);
+                boolean continueFlag =
+                        this.context.getPreProcessor().process(reader, writer, this.context);
                 if (!continueFlag) {
                     status = TranStatus.ABORTED;
                     result.setErrorMsg("转换被终止");
@@ -104,60 +98,64 @@ public class GeoFileTranImpl implements GeoFileTran {
 
             featureCount = reader.getFeatureCount();
 
+            GirAdvTools.getPageActuatorOpt(
+                            new PageConditionDef<GirAdvOneRow>() {
+                                @Override
+                                public Consumer<GirAdvOneRow> getEachRecordConsumer() {
+                                    return t -> {
+                                        checkTimeout();
+                                        oneRowConsumer.accept(t);
+                                        totalCount.incrementAndGet();
+                                        updateProgress();
+                                    };
+                                }
 
-            GirAdvTools.getPageActuatorOpt(new PageConditionDef<GirAdvOneRow>() {
-                @Override
-                public Consumer<GirAdvOneRow> getEachRecordConsumer() {
-                    return t -> {
-                        checkTimeout();
-                        oneRowConsumer.accept(t);
-                        totalCount.incrementAndGet();
-                        updateProgress();
-                    };
-                }
+                                @Override
+                                public Long getTotalRecordCount() {
+                                    return featureCount;
+                                }
 
-                @Override
-                public Long getTotalRecordCount() {
-                    return featureCount;
-                }
+                                @Override
+                                public void setPageConfig(PageConfig pageConfig) {
+                                    // 分页任务会同时读取并写入；任一端不支持并发时都必须串行执行。
+                                    boolean parallelPageProcess =
+                                            reader.supportParallelPageRead()
+                                                    && writer.supportParallelPageWrite();
+                                    pageConfig.setParallelConsumeRecordIs(parallelPageProcess);
+                                    pageConfig.setParallelExecPageIs(parallelPageProcess);
+                                    pageConfig.setPageNumStartByZero(false);
+                                    pageConfig
+                                            .setSaveResultListIs(false)
+                                            .setPageSize((long) context.getBatchSize());
+                                }
 
-                @Override
-                public void setPageConfig(PageConfig pageConfig) {
-                    // 分页任务会同时读取并写入；任一端不支持并发时都必须串行执行。
-                    boolean parallelPageProcess = reader.supportParallelPageRead()
-                            && writer.supportParallelPageWrite();
-                    pageConfig.setParallelConsumeRecordIs(parallelPageProcess);
-                    pageConfig.setParallelExecPageIs(parallelPageProcess);
-                    pageConfig.setPageNumStartByZero(false);
-                    pageConfig.setSaveResultListIs(false).setPageSize((long) context.getBatchSize());
-                }
-
-                @Override
-                public List<GirAdvOneRow> getPageRecords(Integer pageNo, Integer pageSize) {
-                    logBatchProgress();
-                    GirPageParam pageParam = new GirPageParam();
-                    pageParam.putParam(pageSize, pageNo, 0L, false);
-                    GirPager<GirAdvOneRow> pager = reader.readRowPage(pageParam, exceptionConsumer);
-                    List<GirAdvOneRow> list = (List<GirAdvOneRow>) pager.getList();
-                    try {
-                        writer.writeRows(list, internalExceptionConsumer);
-                        successCount.addAndGet(list.size());
-                        return list;
-                    } catch (Exception e) {
-                        onRecordFailure(result, e, "写入记录失败");
-                        if (context.isSkipErrorRecord()) {
-                            totalCount.addAndGet(list.size());
-                            updateProgress();
-                            logBatchProgress();
-                            return Collections.emptyList();
-                        } else {
-                            throw new GeoFileWriteException("写入失败！", e);
-                        }
-                    }
-
-                }
-            }).execute();
-
+                                @Override
+                                public List<GirAdvOneRow> getPageRecords(
+                                        Integer pageNo, Integer pageSize) {
+                                    logBatchProgress();
+                                    GirPageParam pageParam = new GirPageParam();
+                                    pageParam.putParam(pageSize, pageNo, 0L, false);
+                                    GirPager<GirAdvOneRow> pager =
+                                            reader.readRowPage(pageParam, exceptionConsumer);
+                                    List<GirAdvOneRow> list = (List<GirAdvOneRow>) pager.getList();
+                                    try {
+                                        writer.writeRows(list, internalExceptionConsumer);
+                                        successCount.addAndGet(list.size());
+                                        return list;
+                                    } catch (Exception e) {
+                                        onRecordFailure(result, e, "写入记录失败");
+                                        if (context.isSkipErrorRecord()) {
+                                            totalCount.addAndGet(list.size());
+                                            updateProgress();
+                                            logBatchProgress();
+                                            return Collections.emptyList();
+                                        } else {
+                                            throw new GeoFileWriteException("写入失败！", e);
+                                        }
+                                    }
+                                }
+                            })
+                    .execute();
 
             if (status == TranStatus.RUNNING) {
                 status = TranStatus.SUCCESS;
@@ -191,9 +189,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         return result;
     }
 
-    /**
-     * 超时检查
-     */
+    /** 超时检查 */
     private void checkTimeout() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - startTime > context.getTimeout()) {
@@ -201,9 +197,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 更新进度并回调监听器
-     */
+    /** 更新进度并回调监听器 */
     private void updateProgress() {
         if (progressListener == null) {
             return;
@@ -227,9 +221,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 统一异常处理
-     */
+    /** 统一异常处理 */
     private void handleException(TranResult result, Exception e) {
         if (e == null) {
             return;
@@ -254,9 +246,7 @@ public class GeoFileTranImpl implements GeoFileTran {
         }
     }
 
-    /**
-     * 静默关闭资源
-     */
+    /** 静默关闭资源 */
     private void closeQuietly(Closeable closeable, TranResult result) {
         if (closeable == null) {
             return;
@@ -299,7 +289,9 @@ public class GeoFileTranImpl implements GeoFileTran {
                     totalCount.get(),
                     successCount.get(),
                     failCount.get(),
-                    totalCount.get() == 0 ? 0.0 : (double) successCount.get() / totalCount.get() * 100);
+                    totalCount.get() == 0
+                            ? 0.0
+                            : (double) successCount.get() / totalCount.get() * 100);
         }
     }
 

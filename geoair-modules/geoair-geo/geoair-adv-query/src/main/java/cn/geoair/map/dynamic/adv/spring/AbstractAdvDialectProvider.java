@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.adv.spring;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.dialect.DialectName;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -20,7 +19,8 @@ public abstract class AbstractAdvDialectProvider implements AdvDialectProvider {
     private final DialectName dialectName;
     private final Set<String> productNameKeywords;
 
-    protected AbstractAdvDialectProvider(String dialectId, DialectName dialectName, String... productNameKeywords) {
+    protected AbstractAdvDialectProvider(
+            String dialectId, DialectName dialectName, String... productNameKeywords) {
         if (StrUtil.isBlank(dialectId)) {
             throw new IllegalArgumentException("dialectId 不能为空");
         }

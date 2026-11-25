@@ -1,7 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.cache;
 
-import cn.geoair.web.mime.GiMimeType;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
+import cn.geoair.web.mime.GiMimeType;
 import java.util.BitSet;
 
 /**
@@ -13,31 +13,41 @@ import java.util.BitSet;
  */
 public interface TileCache {
     /** 显式准备独立输出层；旧驱动默认不支持，不能假装初始化成功。 */
-    default boolean prepareLayer(String layerName) { return false; }
+    default boolean prepareLayer(String layerName) {
+        return false;
+    }
     /** 返回当前分段中有效缓存的位置；旧驱动使用兼容回退，新驱动可批量读取元数据。 */
     default BitSet findExisting(TileCacheQuery query, TileOperationContext context) {
-        BitSet found=new BitSet(query.size());
-        if(!isEnabled()) return found;
-        for(long index=query.getFrom();index<query.getTo();index++) {
+        BitSet found = new BitSet(query.size());
+        if (!isEnabled()) return found;
+        for (long index = query.getFrom(); index < query.getTo(); index++) {
             context.check();
-            byte[] data=get(query.getLayerName(),query.getZoom(),query.x(index),query.y(index),query.getFormat());
+            byte[] data =
+                    get(
+                            query.getLayerName(),
+                            query.getZoom(),
+                            query.x(index),
+                            query.y(index),
+                            query.getFormat());
             context.check();
-            if(data!=null && data.length>0) found.set((int)(index-query.getFrom()));
+            if (data != null && data.length > 0) found.set((int) (index - query.getFrom()));
         }
         return found;
     }
     /** 默认显式返回不支持；FILE/MBTiles 提供真实统计。 */
     default TileCacheStatistics statistics(String layerName, TileOperationContext context) {
-        TileCacheStatistics result=new TileCacheStatistics(); result.setLayerName(layerName); return result;
+        TileCacheStatistics result = new TileCacheStatistics();
+        result.setLayerName(layerName);
+        return result;
     }
 
     /**
      * 从缓存获取瓦片
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
-     * @param y         Y坐标
+     * @param z 层级
+     * @param x X坐标
+     * @param y Y坐标
      * @param format
      * @return 瓦片字节数组，不存在则返回null
      */
@@ -47,10 +57,10 @@ public interface TileCache {
      * 保存瓦片到缓存
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
-     * @param y         Y坐标
-     * @param data      瓦片数据
+     * @param z 层级
+     * @param x X坐标
+     * @param y Y坐标
+     * @param data 瓦片数据
      * @param format
      * @return 是否保存成功
      */
@@ -68,8 +78,8 @@ public interface TileCache {
      * 删除指定瓦片的缓存
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
+     * @param z 层级
+     * @param x X坐标
      * @return 是否删除成功
      */
     boolean delete(String layerName, Integer z, Integer x);
@@ -78,17 +88,15 @@ public interface TileCache {
      * 删除指定瓦片的缓存
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
-     * @param y         Y坐标
+     * @param z 层级
+     * @param x X坐标
+     * @param y Y坐标
      * @param format
      * @return 是否删除成功
      */
     boolean delete(String layerName, int z, int x, int y, GiMimeType format);
 
-    /**
-     * 清空所有缓存
-     */
+    /** 清空所有缓存 */
     void clearAll();
 
     /**
@@ -102,9 +110,9 @@ public interface TileCache {
      * 检查缓存是否存在
      *
      * @param layerName 图层名称
-     * @param z         层级
-     * @param x         X坐标
-     * @param y         Y坐标
+     * @param z 层级
+     * @param x X坐标
+     * @param y Y坐标
      * @param format
      * @return 是否存在
      */

@@ -1,33 +1,34 @@
-//package cn.geoair.map.tile.forge.fuser.converter;
+// package cn.geoair.map.tile.forge.fuser.converter;
 //
-//import cn.geoair.base.log.GiLogger;
-//import cn.geoair.base.log.GirLoggerFactory;
-//import cn.geoair.base.runtime.GutilShutdownHook;
-//import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
-//import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
-//import cn.hutool.core.io.unit.DataSizeUtil;
-//import com.alibaba.druid.pool.DruidDataSource;
-//import lombok.Data;
-//import lombok.Getter;
+// import cn.geoair.base.log.GiLogger;
+// import cn.geoair.base.log.GirLoggerFactory;
+// import cn.geoair.base.runtime.GutilShutdownHook;
+// import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesInfo;
+// import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesUtils;
+// import cn.hutool.core.io.unit.DataSizeUtil;
+// import com.alibaba.druid.pool.DruidDataSource;
+// import lombok.Data;
+// import lombok.Getter;
 //
-//import java.io.File;
-//import java.io.IOException;
-//import java.nio.file.*;
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.function.Consumer;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
+// import java.io.File;
+// import java.io.IOException;
+// import java.nio.file.*;
+// import java.util.ArrayList;
+// import java.util.List;
+// import java.util.function.Consumer;
+// import java.util.regex.Matcher;
+// import java.util.regex.Pattern;
 //
-///**
+/// **
 // * @author ：张俊
 // * @date ：Created in 2026/6/24 17:05
 // * @description： 本地的散列文件瓦片转换成Mbtile工具类
 // * <p>
 // */
-//public class MbtilesFromLocalFileConverterBack {
+// public class MbtilesFromLocalFileConverterBack {
 //
-//    private static GiLogger log = GirLoggerFactory.getLogger(MbtilesFromLocalFileConverterBack.class);
+//    private static GiLogger log =
+// GirLoggerFactory.getLogger(MbtilesFromLocalFileConverterBack.class);
 //
 //    /**
 //     * 路径模板占位符
@@ -54,7 +55,8 @@
 //        private boolean deleteSourceAfterConvert = false; // 转换后是否删除源文件
 //
 //        public ConvertConfig setSourceRoot(String sourceRoot) {
-//            this.sourceRoot = sourceRoot.endsWith(File.separator) ? sourceRoot : sourceRoot + File.separator;
+//            this.sourceRoot = sourceRoot.endsWith(File.separator) ? sourceRoot : sourceRoot +
+// File.separator;
 //            return this;
 //        }
 //
@@ -137,7 +139,8 @@
 //     * @param layerName    图层名称
 //     * @return 转换结果
 //     */
-//    public static ConvertResult convert(String sourceRoot, String pathTemplate, String mbtilesPath, String layerName, boolean needReverseY) {
+//    public static ConvertResult convert(String sourceRoot, String pathTemplate, String
+// mbtilesPath, String layerName, boolean needReverseY) {
 //        ConvertConfig config = new ConvertConfig()
 //                .setSourceRoot(sourceRoot)
 //                .setPathTemplate(pathTemplate)
@@ -147,7 +150,8 @@
 //        return convert(config);
 //    }
 //
-//    public static ConvertResult convert(String sourceRoot, String pathTemplate, String mbtilesPath, String layerName, Consumer<ConvertConfig> consumer) {
+//    public static ConvertResult convert(String sourceRoot, String pathTemplate, String
+// mbtilesPath, String layerName, Consumer<ConvertConfig> consumer) {
 //        ConvertConfig config = new ConvertConfig()
 //                .setSourceRoot(sourceRoot)
 //                .setPathTemplate(pathTemplate)
@@ -377,8 +381,10 @@
 //    public static class TileInfoConsumer implements Consumer<TileInfo> {
 //        MbtilesInfoBatchPutConsumer mbtilesInfoBatchPutConsumer;
 //
-//        public TileInfoConsumer(boolean needReverseY, boolean overwrite, int batchSize, DruidDataSource dataSource, Integer zoom) {
-//            mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(needReverseY, overwrite, batchSize, dataSource, zoom);
+//        public TileInfoConsumer(boolean needReverseY, boolean overwrite, int batchSize,
+// DruidDataSource dataSource, Integer zoom) {
+//            mbtilesInfoBatchPutConsumer = new MbtilesInfoBatchPutConsumer(needReverseY, overwrite,
+// batchSize, dataSource, zoom);
 //        }
 //
 //        @Override
@@ -391,7 +397,8 @@
 //                log.error(e.getMessage());
 //
 //            }
-//            mbtilesInfoBatchPutConsumer.accept(MbtilesInfo.of().setX(tile.x).setY(tile.y).setZoomLevel(tile.z).setTileData(data));
+//
+// mbtilesInfoBatchPutConsumer.accept(MbtilesInfo.of().setX(tile.x).setY(tile.y).setZoomLevel(tile.z).setTileData(data));
 //        }
 //
 //        public void doImportEnd() {
@@ -406,14 +413,16 @@
 //    /**
 //     * 转换瓦片
 //     */
-//    private static ConvertStats convertTiles(ConvertConfig config, DruidDataSource dataSource, List<Integer> zoomLevels) {
+//    private static ConvertStats convertTiles(ConvertConfig config, DruidDataSource dataSource,
+// List<Integer> zoomLevels) {
 //
 //        ConvertStats convertStats = new ConvertStats();
 //        try {
 //            for (int z : zoomLevels) {
 //                log.info("处理层级: z={}", z);
 //                // 扫描该层级下的所有瓦片
-//                TileInfoConsumer consumerTileInfo = new TileInfoConsumer(config.needReverseY, config.overwrite, config.batchSize, dataSource, z);
+//                TileInfoConsumer consumerTileInfo = new TileInfoConsumer(config.needReverseY,
+// config.overwrite, config.batchSize, dataSource, z);
 //                scanTiles(config, z, consumerTileInfo);
 //                consumerTileInfo.doImportEnd();
 //                convertStats.total += consumerTileInfo.getStats().total;
@@ -424,7 +433,8 @@
 //            }
 //
 //            log.info("所有层级转换完成: 总数={}, 成功={}, 跳过={}, 失败={}, 总大小={}",
-//                    convertStats.total, convertStats.success, convertStats.skipped, convertStats.failed, DataSizeUtil.format(convertStats.totalSize));
+//                    convertStats.total, convertStats.success, convertStats.skipped,
+// convertStats.failed, DataSizeUtil.format(convertStats.totalSize));
 //
 //        } catch (Exception e) {
 //            log.error("数据库操作失败", e);
@@ -510,7 +520,8 @@
 //     * 递归遍历并匹配路径模板
 //     */
 //    private static void traverseAndMatch(File dir, String currentPath, String template,
-//                                         int z, TileInfoConsumer tileInfoConsumer, ConvertConfig config) {
+//                                         int z, TileInfoConsumer tileInfoConsumer, ConvertConfig
+// config) {
 //        if (template == null || template.isEmpty()) {
 //            // 没有模板了，当前目录下所有文件都是瓦片
 //            scanAllFiles(dir, z, currentPath, tileInfoConsumer, config);
@@ -538,7 +549,8 @@
 //                traverseAndMatch(subDir, newPath, restPart, z, tileInfoConsumer, config);
 //            } else {
 //                // 尝试作为占位符处理（可能是数字目录）
-//                matchDirectories(dir, firstPart, restPart, z, currentPath, tileInfoConsumer, config);
+//                matchDirectories(dir, firstPart, restPart, z, currentPath, tileInfoConsumer,
+// config);
 //            }
 //        }
 //    }
@@ -548,7 +560,8 @@
 //     */
 //    private static void matchDirectories(File dir, String dirPattern, String restTemplate,
 //                                         int z, String currentPath,
-//                                         TileInfoConsumer tileInfoConsumer, ConvertConfig config) {
+//                                         TileInfoConsumer tileInfoConsumer, ConvertConfig config)
+// {
 //        File[] subDirs = dir.listFiles(File::isDirectory);
 //        if (subDirs == null) {
 //            return;
@@ -603,7 +616,8 @@
 //     * 扫描瓦片文件 - 递归遍历目录
 //     * 根据路径模板递归查找所有瓦片文件
 //     */
-//    private static void scanTiles(ConvertConfig config, int z, TileInfoConsumer tileInfoConsumer) {
+//    private static void scanTiles(ConvertConfig config, int z, TileInfoConsumer tileInfoConsumer)
+// {
 //
 //
 //        // 1. 构建 z 层级的路径（只替换 {z}）
@@ -713,10 +727,12 @@
 //                            // 根据模板中的位置来判断
 //                            if (firstPart.equals(PLACEHOLDER_Y)) {
 //                                // 这个目录是 y
-//                                scanDirectoryWithTemplate(subDir, newPath, remainingTemplate, z, tileInfoConsumer, config);
+//                                scanDirectoryWithTemplate(subDir, newPath, remainingTemplate, z,
+// tileInfoConsumer, config);
 //                            } else {
 //                                // 这个目录是 x
-//                                scanDirectoryWithTemplate(subDir, newPath, remainingTemplate, z, tileInfoConsumer, config);
+//                                scanDirectoryWithTemplate(subDir, newPath, remainingTemplate, z,
+// tileInfoConsumer, config);
 //                            }
 //                        } catch (NumberFormatException e) {
 //                            // 跳过非数字目录
@@ -729,7 +745,8 @@
 //                File targetDir = new File(dir, firstPart);
 //                if (targetDir.exists() && targetDir.isDirectory()) {
 //                    String newPath = currentPath + firstPart + File.separator;
-//                    scanDirectoryWithTemplate(targetDir, newPath, remainingTemplate, z, tileInfoConsumer, config);
+//                    scanDirectoryWithTemplate(targetDir, newPath, remainingTemplate, z,
+// tileInfoConsumer, config);
 //                }
 //            }
 //        } else {
@@ -737,7 +754,8 @@
 //            // firstPart 应该是 {x}.png 或 {y}.png 或具体文件名
 //            if (firstPart.contains(PLACEHOLDER_X) || firstPart.contains(PLACEHOLDER_Y)) {
 //                // 匹配文件
-//                scanTileFilesWithPattern(dir, firstPart, z, currentPath, tileInfoConsumer, config);
+//                scanTileFilesWithPattern(dir, firstPart, z, currentPath, tileInfoConsumer,
+// config);
 //            } else {
 //                // 具体文件名，直接匹配
 //                File targetFile = new File(dir, firstPart);
@@ -1013,7 +1031,8 @@
 //
 //    public static void main(String[] args) {
 //        // 1. 基本用法 - 转换所有瓦片到 MBTiles
-//        MbtilesFromLocalFileConverterBack.ConvertResult result = MbtilesFromLocalFileConverterBack.convert(
+//        MbtilesFromLocalFileConverterBack.ConvertResult result =
+// MbtilesFromLocalFileConverterBack.convert(
 //                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1-13",  // 源根路径
 //                "{z}\\{y}\\{x}.png",                     // 路径模板
 //                "G:\\softdir\\nginx-1.18.0\\nginx_pxy\\1_13.mbtiles",          // MBTiles 文件路径
@@ -1021,4 +1040,4 @@
 //                true
 //        );
 //    }
-//}
+// }

@@ -13,8 +13,8 @@ import cn.geoair.map.dynamic.adv.mybatis.SqlMeta;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.SqlParamList;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
-import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandler;
+import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.convert.GirDMSpatialTran;
@@ -27,21 +27,16 @@ import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisOrgTran;
 import cn.geoair.map.dynamic.tools.convert.GirPostGisTran;
 import cn.hutool.core.util.StrUtil;
-import org.locationtech.jts.geom.Geometry;
-
 import java.util.*;
 import java.util.Date;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-
+import org.locationtech.jts.geom.Geometry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * SQL安全执行工具类 功能：拦截危险SQL操作（新增/删除/修改/清空表/删除库等），仅允许查询操作
- */
+/** SQL安全执行工具类 功能：拦截危险SQL操作（新增/删除/修改/清空表/删除库等），仅允许查询操作 */
 public class SafeSqlExecutor {
-
 
     private static final Logger log = LoggerFactory.getLogger(SafeSqlExecutor.class);
 
@@ -62,22 +57,17 @@ public class SafeSqlExecutor {
                     "^\\s*DROP\\s+(DATABASE|SCHEMA|TABLE|VIEW|INDEX)\\s+",
                     Pattern.CASE_INSENSITIVE);
 
-
-    /**
-     * 检测是否为危险SQL
-     */
+    /** 检测是否为危险SQL */
     private static boolean isDangerousSql(String sql) {
         // 去除注释（简单处理）
         String cleanSql = removeComments(sql);
         // 检测危险模式
         return DANGEROUS_SQL_PATTERN.matcher(cleanSql).find()
-               || TRUNCATE_PATTERN.matcher(cleanSql).find()
-               || DROP_PATTERN.matcher(cleanSql).find();
+                || TRUNCATE_PATTERN.matcher(cleanSql).find()
+                || DROP_PATTERN.matcher(cleanSql).find();
     }
 
-    /**
-     * 移除SQL中的注释（简单处理）
-     */
+    /** 移除SQL中的注释（简单处理） */
     private static String removeComments(String sql) {
         // 移除/* */注释
         String noBlockComments = sql.replaceAll("/\\*.*?\\*/", " ");
@@ -87,16 +77,17 @@ public class SafeSqlExecutor {
 
     /**
      * 构建 ds-service 专用的类型处理器注册表。
-     * <p>
-     * 基于 executor 的 typeHandlers（含方言几何 handler）+ ds-service 专用的 Clob/Blob/ByteArray handler。
-     * 用于在 {@link #tranOneRow} 中对数据库原始值做类型转换。
+     *
+     * <p>基于 executor 的 typeHandlers（含方言几何 handler）+ ds-service 专用的 Clob/Blob/ByteArray handler。 用于在
+     * {@link #tranOneRow} 中对数据库原始值做类型转换。
      */
     private static AdvTypeHandlerRegistry buildRegistry(IAdvExecutor executor) {
         List<AdvTypeHandler<?>> handlers = new ArrayList<>(executor.getConfig().getTypeHandlers());
         // 添加 ds-service 专用的 handler（如果尚未存在）
         boolean hasClob = false, hasByteArray = false;
         for (AdvTypeHandler<?> h : handlers) {
-            if (GirOracleTran.isStructClassAvailable() && h instanceof ClobAdvTypeHandler) hasClob = true;
+            if (GirOracleTran.isStructClassAvailable() && h instanceof ClobAdvTypeHandler)
+                hasClob = true;
             else if (h instanceof ByteArrayBase64AdvTypeHandler) hasByteArray = true;
         }
         if (!hasClob && GirOracleTran.isStructClassAvailable()) {
@@ -108,7 +99,11 @@ public class SafeSqlExecutor {
         return AdvTypeHandlerRegistry.create(null, handlers);
     }
 
-    public static List<Object> getObjects(SQLTaskDto task, Map<String, Object> sqlParam, IAdvExecutor iAdvExecutor, boolean humpIs) {
+    public static List<Object> getObjects(
+            SQLTaskDto task,
+            Map<String, Object> sqlParam,
+            IAdvExecutor iAdvExecutor,
+            boolean humpIs) {
         // 构建包含 ds-service handler 的类型转换注册表
         AdvTypeHandlerRegistry registry = buildRegistry(iAdvExecutor);
 
@@ -142,15 +137,22 @@ public class SafeSqlExecutor {
             }
             if (task.pageIs()) {
                 int pageSize = giPageParam.pageSize();
-                Number number = iAdvExecutor.bSelectRecordRowCount(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()));
+                Number number =
+                        iAdvExecutor.bSelectRecordRowCount(
+                                sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()));
 
                 Long count = number.longValue();
-                String pageSql = iAdvExecutor.tbBuildPageSql(sqlMeta.getSql(), giPageParam.pageNum(), pageSize, true);
+                String pageSql =
+                        iAdvExecutor.tbBuildPageSql(
+                                sqlMeta.getSql(), giPageParam.pageNum(), pageSize, true);
                 List<GirAdvOneRow> advOneRows = new ArrayList<>();
-                iAdvExecutor.bSelectListStream(pageSql, SqlParamList.of(sqlMeta.getJdbcParamValues()), advOneRow -> {
-                    GirAdvOneRow row = tranOneRow(advOneRow, humpIs, registry);
-                    advOneRows.add(row);
-                });
+                iAdvExecutor.bSelectListStream(
+                        pageSql,
+                        SqlParamList.of(sqlMeta.getJdbcParamValues()),
+                        advOneRow -> {
+                            GirAdvOneRow row = tranOneRow(advOneRow, humpIs, registry);
+                            advOneRows.add(row);
+                        });
 
                 GiPager<GirAdvOneRow> pager = new GirPager<>();
                 giPageParam.setPageNumStartZero(true);
@@ -158,15 +160,17 @@ public class SafeSqlExecutor {
                 dataList.add(pager);
             } else {
                 List<GirAdvOneRow> advOneRows = new ArrayList<>();
-                iAdvExecutor.bSelectListStream(sqlMeta.getSql(), SqlParamList.of(sqlMeta.getJdbcParamValues()), new Consumer<GirAdvOneRow>() {
-                    @Override
-                    public void accept(GirAdvOneRow advOneRow) {
-                        GirAdvOneRow row = tranOneRow(advOneRow, humpIs, registry);
-                        advOneRows.add(row);
-                    }
-                });
+                iAdvExecutor.bSelectListStream(
+                        sqlMeta.getSql(),
+                        SqlParamList.of(sqlMeta.getJdbcParamValues()),
+                        new Consumer<GirAdvOneRow>() {
+                            @Override
+                            public void accept(GirAdvOneRow advOneRow) {
+                                GirAdvOneRow row = tranOneRow(advOneRow, humpIs, registry);
+                                advOneRows.add(row);
+                            }
+                        });
                 dataList.add(advOneRows);
-
             }
         }
 
@@ -175,15 +179,17 @@ public class SafeSqlExecutor {
 
     /**
      * 对数据库原始值做类型转换 + API 响应格式化。
-     * <p>
-     * 转换流程：
+     *
+     * <p>转换流程：
+     *
      * <ol>
-     *   <li>通过 AdvTypeHandlerRegistry 做通用类型转换（Clob→String、Blob→占位符、byte[]→Base64）</li>
-     *   <li>方言特定的几何类型转换（PGobject/MySQL binary/Oracle SDO → JTS Geometry）</li>
-     *   <li>API 响应格式化（Date→字符串、Geometry→WKT）</li>
+     *   <li>通过 AdvTypeHandlerRegistry 做通用类型转换（Clob→String、Blob→占位符、byte[]→Base64）
+     *   <li>方言特定的几何类型转换（PGobject/MySQL binary/Oracle SDO → JTS Geometry）
+     *   <li>API 响应格式化（Date→字符串、Geometry→WKT）
      * </ol>
      */
-    private static GirAdvOneRow tranOneRow(GirAdvOneRow advOneRow, boolean humpIs, AdvTypeHandlerRegistry registry) {
+    private static GirAdvOneRow tranOneRow(
+            GirAdvOneRow advOneRow, boolean humpIs, AdvTypeHandlerRegistry registry) {
         GirAdvOneRow row = GirAdvOneRow.ofByMap(new HashMap<>());
         Set<Map.Entry<String, Object>> entries = advOneRow.entrySet();
         for (Map.Entry<String, Object> entry : entries) {
@@ -191,15 +197,19 @@ public class SafeSqlExecutor {
             Object value = entry.getValue();
             if (value != null) {
                 // 1. 通用类型转换（Clob/Blob/byte[]/String 等）
-                value = registry.convertForRead(value, value.getClass(), AdvTypeHandlerContext.simple(key));
+                value =
+                        registry.convertForRead(
+                                value, value.getClass(), AdvTypeHandlerContext.simple(key));
                 // 2. 方言特定的几何类型转换（registry 无法匹配的数据库原生几何对象）
                 value = convertGeometry(value);
                 // 3. API 响应格式化
                 if (value instanceof Date) {
                     value = formatDate((Date) value);
                 } else if (value instanceof Geometry) {
-                    value = GirGeoTools.defaultInstance().getFormatOpt()
-                            .jtsGeometryToWktString((Geometry) value, true);
+                    value =
+                            GirGeoTools.defaultInstance()
+                                    .getFormatOpt()
+                                    .jtsGeometryToWktString((Geometry) value, true);
                 }
             }
             key = humpIs ? StrUtil.toCamelCase(key) : key;
@@ -210,9 +220,9 @@ public class SafeSqlExecutor {
 
     /**
      * 方言特定的几何类型转换。
-     * <p>
-     * 处理 registry 无法识别的数据库原生几何对象（因为 value.getClass() 不是 Geometry.class，
-     * 导致 AdvTypeHandler 的 supports() 不匹配）。
+     *
+     * <p>处理 registry 无法识别的数据库原生几何对象（因为 value.getClass() 不是 Geometry.class， 导致 AdvTypeHandler 的
+     * supports() 不匹配）。
      *
      * @return 转换后的 JTS Geometry，如果不是几何类型则原样返回
      */
@@ -244,14 +254,9 @@ public class SafeSqlExecutor {
         return value;
     }
 
-
-    /**
-     * 日期格式化
-     */
+    /** 日期格式化 */
     private static String formatDate(Date date) {
         // 可根据需要修改日期格式
         return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
-
-
 }

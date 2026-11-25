@@ -2,15 +2,12 @@ package cn.geoair.map.tile.forge.core.zip;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
- 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 
- 
 public class LocalCompressionHandler extends AbstractZipCompressionHandler {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
@@ -40,10 +37,15 @@ public class LocalCompressionHandler extends AbstractZipCompressionHandler {
     @Override
     public String getSourceVersion(String source) {
         try {
-            BasicFileAttributes attributes = Files.readAttributes(new File(source).toPath(), BasicFileAttributes.class);
-            return attributes.size() + ":" + attributes.lastModifiedTime() + ":" + attributes.fileKey();
-        } catch (IOException e) { throw new ZipReadException(ZipReadFailure.READ_FAILED, "无法读取ZIP源文件信息", e); }
+            BasicFileAttributes attributes =
+                    Files.readAttributes(new File(source).toPath(), BasicFileAttributes.class);
+            return attributes.size()
+                    + ":"
+                    + attributes.lastModifiedTime()
+                    + ":"
+                    + attributes.fileKey();
+        } catch (IOException e) {
+            throw new ZipReadException(ZipReadFailure.READ_FAILED, "无法读取ZIP源文件信息", e);
+        }
     }
-
-
 }

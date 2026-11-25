@@ -3,7 +3,6 @@ package cn.geoair.map.tile.forge.core.bygwc;
 import cn.geoair.base.Gir;
 import lombok.Data;
 
-
 /**
  * @author ：张俊
  * @date ：Created in 2025/11/19 17:14
@@ -11,9 +10,7 @@ import lombok.Data;
  */
 @Data
 public class ProviderConfig {
-    /**
-     * 配置实例对象
-     */
+    /** 配置实例对象 */
     static ProviderConfig instance = null;
 
     /**
@@ -25,19 +22,11 @@ public class ProviderConfig {
         return instance = instance == null ? Gir.beans.getBean(ProviderConfig.class) : instance;
     }
 
-    /**
-     * 服务提供者站点地址
-     */
+    /** 服务提供者站点地址 */
     private String providerSite = "XXXX";
 
-    /**
-     * 服务提供者名称
-     */
+    /** 服务提供者名称 */
     private String providerName = "http://www.XXXX.cn";
-    /**
-     * 服务提供者简介
-     */
+    /** 服务提供者简介 */
     private String abstractInfo = "";
-
-
 }

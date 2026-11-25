@@ -12,12 +12,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 class ZipFixtureHelper implements GirLayerConfigContextHelper {
     final AtomicInteger lookups = new AtomicInteger();
     boolean broken;
-    public Optional<GirLayerConfigContext> getByLayerName(String name) { return Optional.empty(); }
-    public Optional<GirLayerConfigContext> getGirLayerConfigContext(GirMapTileType type, String layer, String id, String file) { return Optional.empty(); }
+
+    public Optional<GirLayerConfigContext> getByLayerName(String name) {
+        return Optional.empty();
+    }
+
+    public Optional<GirLayerConfigContext> getGirLayerConfigContext(
+            GirMapTileType type, String layer, String id, String file) {
+        return Optional.empty();
+    }
+
     public LayerPerFileDao getLayerPerFileDao(GirLayerConfigContext context) {
         lookups.incrementAndGet();
         if (broken) throw new IllegalStateException("模拟索引不可用");
         return new SQLiteLayerPerFileDao(context.getDataId());
     }
-    public Long getLayerPerCacheBatchSize(GirLayerConfigContext context) { return 2000L; }
+
+    public Long getLayerPerCacheBatchSize(GirLayerConfigContext context) {
+        return 2000L;
+    }
 }

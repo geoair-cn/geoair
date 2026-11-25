@@ -1,13 +1,13 @@
 package cn.geoair.map.dynamic.adv.query.dialect.sqlserver;
 
-import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
-import cn.geoair.map.dynamic.adv.query.typehandler.impl.SqlServerGeometryAdvTypeHandler;
-import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
-import org.junit.Test;
-import org.locationtech.jts.geom.GeometryFactory;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
+import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
+import cn.geoair.map.dynamic.adv.query.typehandler.impl.SqlServerGeometryAdvTypeHandler;
+import org.junit.Test;
+import org.locationtech.jts.geom.GeometryFactory;
 
 /** SQL Server 原生 SQL 片段和 Geometry 参数处理测试。 */
 public class SqlServerDialectSupportTest {
@@ -28,13 +28,15 @@ public class SqlServerDialectSupportTest {
     @Test
     public void shouldUseGeometryConstructorAndNativeSpatialPredicates() {
         GeometryFactory factory = new GeometryFactory();
-        org.locationtech.jts.geom.Point point = factory.createPoint(new org.locationtech.jts.geom.Coordinate(120, 30));
+        org.locationtech.jts.geom.Point point =
+                factory.createPoint(new org.locationtech.jts.geom.Coordinate(120, 30));
         point.setSRID(4326);
 
         SqlPlaceholder placeholder = new SqlServerGeometryAdvTypeHandler().getSqlPlaceholder(point);
         assertEquals("geometry::STGeomFromText(N'POINT (120 30)', 4326)", placeholder.getSql());
-        assertTrue(SqlServerSpatialSql.intersects("geom", "POINT (120 30)", 4326)
-                .contains("[geom].STIntersects(geometry::STGeomFromText"));
+        assertTrue(
+                SqlServerSpatialSql.intersects("geom", "POINT (120 30)", 4326)
+                        .contains("[geom].STIntersects(geometry::STGeomFromText"));
         assertEquals("[geom].STIsValid() = 0", SqlServerSpatialSql.isValid("geom"));
     }
 
@@ -42,12 +44,16 @@ public class SqlServerDialectSupportTest {
     public void shouldBuildNativeSqlServerDdlAndSpatialIndexSql() {
         SqlServerAdvDDLOpt ddl = new SqlServerAdvDDLOpt(null, null);
 
-        assertEquals("DROP TABLE IF EXISTS [dbo].[feature]", ddl.buildDropTableSql("[dbo].[feature]"));
-        assertEquals("SELECT TOP 0 * FROM (SELECT * FROM [feature]) AS temp_table",
+        assertEquals(
+                "DROP TABLE IF EXISTS [dbo].[feature]", ddl.buildDropTableSql("[dbo].[feature]"));
+        assertEquals(
+                "SELECT TOP 0 * FROM (SELECT * FROM [feature]) AS temp_table",
                 ddl.buildMetadataQuerySql("SELECT * FROM [feature]"));
-        assertEquals("CREATE UNIQUE INDEX [idx_feature_name] ON [dbo].[feature] ([name])",
+        assertEquals(
+                "CREATE UNIQUE INDEX [idx_feature_name] ON [dbo].[feature] ([name])",
                 ddl.buildCreateIndexSql("[dbo].[feature]", "idx_feature_name", "[name]", true));
-        assertEquals("INSERT INTO [dbo].[feature_copy] SELECT * FROM [dbo].[feature]",
+        assertEquals(
+                "INSERT INTO [dbo].[feature_copy] SELECT * FROM [dbo].[feature]",
                 ddl.buildCreateTableFromTableSql("[dbo].[feature_copy]", "[dbo].[feature]"));
     }
 
@@ -60,7 +66,8 @@ public class SqlServerDialectSupportTest {
         field.setCharacterMaximumLength(-1);
         field.setIsNullable("YES");
 
-        assertEquals("ALTER TABLE [dbo].[feature] ALTER COLUMN [name] varchar(MAX) NULL",
+        assertEquals(
+                "ALTER TABLE [dbo].[feature] ALTER COLUMN [name] varchar(MAX) NULL",
                 ddl.buildAlterColumnSql("[dbo].[feature]", "[name]", field));
     }
 }

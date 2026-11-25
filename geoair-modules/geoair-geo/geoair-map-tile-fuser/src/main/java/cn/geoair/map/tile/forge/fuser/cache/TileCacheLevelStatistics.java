@@ -2,7 +2,6 @@ package cn.geoair.map.tile.forge.fuser.cache;
 
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
-
 import lombok.Data;
 
 /** 有效非空瓦片数量及数据字节数，不包含数据库页开销。 */

@@ -9,13 +9,12 @@ import java.util.Comparator;
  *
  * <ul>
  *   <li>自定义{@link Comparator}比较：{@link #compare(Object, Object, Comparator)}
- *   <li>自然比较（对象必须实现{@link Comparable}）：{@link #compare(Object, Object)} 与
- *       {@link #compare(Object, Object, boolean)}
+ *   <li>自然比较（对象必须实现{@link Comparable}）：{@link #compare(Object, Object)} 与 {@link #compare(Object,
+ *       Object, boolean)}
  * </ul>
  *
- * <p>自然比较策略：{@code null} 被特殊处理（可配置排在末尾或排在前列），非 {@code null} 对象按
- * {@code compareTo} 比较；比较结果与 {@code equals} 的一致性取决于被比较对象的
- * {@code compareTo} 与 {@code equals} 是否一致（即是否满足 Comparable 契约）。
+ * <p>自然比较策略：{@code null} 被特殊处理（可配置排在末尾或排在前列），非 {@code null} 对象按 {@code compareTo} 比较；比较结果与 {@code
+ * equals} 的一致性取决于被比较对象的 {@code compareTo} 与 {@code equals} 是否一致（即是否满足 Comparable 契约）。
  *
  * @author
  */
@@ -47,9 +46,8 @@ public class GutilCompare {
     /**
      * {@code null}安全的对象比较，{@code null}对象小于任何对象（即{@code null}排在末尾）
      *
-     * <p>比较策略：两个引用相同（含均为{@code null}）返回0；一侧为{@code null}时按规则排后；
-     * 否则要求对象实现{@link Comparable}并按{@code compareTo}比较。不提供 hashCode/toString
-     * 兜底比较，以保证比较的传递性。
+     * <p>比较策略：两个引用相同（含均为{@code null}）返回0；一侧为{@code null}时按规则排后； 否则要求对象实现{@link Comparable}并按{@code
+     * compareTo}比较。不提供 hashCode/toString 兜底比较，以保证比较的传递性。
      *
      * @param <T> 被比较对象类型（必须实现Comparable接口）
      * @param c1 对象1，可以为{@code null}
@@ -65,9 +63,8 @@ public class GutilCompare {
     /**
      * {@code null}安全的对象比较
      *
-     * <p>比较策略：两个引用相同（含均为{@code null}）返回0；一侧为{@code null}时按{@code
-     * isNullGreater}排前或排后；否则要求对象实现{@link Comparable}并按{@code compareTo}比较。
-     * 不提供 hashCode/toString 兜底比较，以保证比较的传递性。
+     * <p>比较策略：两个引用相同（含均为{@code null}）返回0；一侧为{@code null}时按{@code isNullGreater}排前或排后；否则要求对象实现{@link
+     * Comparable}并按{@code compareTo}比较。 不提供 hashCode/toString 兜底比较，以保证比较的传递性。
      *
      * @param <T> 被比较对象类型（必须实现Comparable接口）
      * @param c1 对象1，可以为{@code null}
@@ -77,8 +74,7 @@ public class GutilCompare {
      * @throws IllegalArgumentException 对象未实现{@link Comparable}接口
      * @see java.util.Comparator#compare(Object, Object)
      */
-    public static <T extends Comparable<? super T>> int compare(
-            T c1, T c2, boolean isNullGreater) {
+    public static <T extends Comparable<? super T>> int compare(T c1, T c2, boolean isNullGreater) {
         return compare((Object) c1, (Object) c2, isNullGreater);
     }
 
@@ -93,8 +89,8 @@ public class GutilCompare {
      * 3、要求对象实现Comparable，按compareTo比较；未实现时抛出IllegalArgumentException
      * </pre>
      *
-     * <p>与equals的一致性：当被比较对象的{@code compareTo}与{@code equals}一致时，比较结果为0等价于
-     * {@code equals}为true；否则仅保证排序语义，不保证与equals一致。
+     * <p>与equals的一致性：当被比较对象的{@code compareTo}与{@code equals}一致时，比较结果为0等价于 {@code
+     * equals}为true；否则仅保证排序语义，不保证与equals一致。
      *
      * @param <T> 被比较对象类型
      * @param o1 对象1，可以为{@code null}

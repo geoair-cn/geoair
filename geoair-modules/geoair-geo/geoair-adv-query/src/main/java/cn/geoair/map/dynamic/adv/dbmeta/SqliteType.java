@@ -7,7 +7,7 @@ import java.util.Locale;
 /**
  * SQLite 声明类型到五种类型亲和性的映射。
  *
- * <p>SQLite 允许任意声明类型，因此不能按固定类型名做穷举匹配。</p>
+ * <p>SQLite 允许任意声明类型，因此不能按固定类型名做穷举匹配。
  */
 public enum SqliteType implements DataBaseFieldType {
     INTEGER("INTEGER", DefaultJavaType.JAVA_LONG, CategoryEnum.INT),

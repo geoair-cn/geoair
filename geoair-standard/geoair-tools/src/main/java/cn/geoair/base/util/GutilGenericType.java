@@ -4,7 +4,6 @@ import cn.geoair.base.lang.invoke.GaMethodHandDefine;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl;
 import cn.geoair.base.lang.invoke.GaMethodHandImpl.ImplType;
 import cn.geoair.base.lang.invoke.GkMethodHand;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -40,8 +39,8 @@ public class GutilGenericType {
      * 获取类的泛型
      *
      * <p>优先使用已设置的{@link GenericTypeProvider}解析，否则使用默认继承链递归解析。<br>
-     * 注意：返回数组中的元素可能是{@link java.lang.reflect.TypeVariable}或
-     * {@link java.lang.reflect.WildcardType}，调用方需自行判断。
+     * 注意：返回数组中的元素可能是{@link java.lang.reflect.TypeVariable}或 {@link
+     * java.lang.reflect.WildcardType}，调用方需自行判断。
      *
      * @param clazz 目标class
      * @param genericIfc 设置泛型的类或接口
@@ -49,8 +48,7 @@ public class GutilGenericType {
      */
     @GaMethodHandDefine(
             expectClassName = "cn.geoair.spi.util.SpringGenericTypeBridge",
-            expectMethodName = "resolveTypeArguments"
-    )
+            expectMethodName = "resolveTypeArguments")
     public static Type[] resolveTypeArguments(final Class<?> clazz, final Class<?> genericIfc) {
         GenericTypeProvider provider = genericTypeProvider;
         if (provider != null) {
@@ -62,8 +60,8 @@ public class GutilGenericType {
     /**
      * 获取类的泛型（默认实现）
      *
-     * <p>注意：返回数组中的元素可能是{@link java.lang.reflect.TypeVariable}或
-     * {@link java.lang.reflect.WildcardType}，调用方需自行判断。
+     * <p>注意：返回数组中的元素可能是{@link java.lang.reflect.TypeVariable}或 {@link
+     * java.lang.reflect.WildcardType}，调用方需自行判断。
      *
      * @param clazz 目标class
      * @param forClass 设置泛型的类或接口
@@ -73,8 +71,7 @@ public class GutilGenericType {
     @GaMethodHandImpl(
             implClass = GutilGenericType.class,
             implMethod = "resolveTypeArguments",
-            type = ImplType.comity
-    )
+            type = ImplType.comity)
     private static Type[] _resolveTypeArguments(Class<?> clazz, Class<?> forClass) {
         if (null == clazz || null == forClass) {
             throw new IllegalArgumentException("clazz and forClass must not be null");

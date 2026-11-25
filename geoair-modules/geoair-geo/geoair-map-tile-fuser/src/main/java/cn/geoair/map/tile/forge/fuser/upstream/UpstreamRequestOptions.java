@@ -2,12 +2,10 @@ package cn.geoair.map.tile.forge.fuser.upstream;
 
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
-
-import lombok.Data;
-import lombok.ToString;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+import lombok.Data;
+import lombok.ToString;
 
 /** 每图层的上游参数。业务方负责安全存储，不应直接返回到公开元数据。 */
 @Data

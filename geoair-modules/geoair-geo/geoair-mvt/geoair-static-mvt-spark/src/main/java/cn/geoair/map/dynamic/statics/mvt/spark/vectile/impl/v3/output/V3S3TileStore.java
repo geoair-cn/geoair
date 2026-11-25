@@ -9,7 +9,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -52,7 +51,8 @@ final class V3S3TileStore implements V3TileStore {
         }
     }
 
-    private void put(String key, byte[] data, String contentType, String contentEncoding) throws IOException {
+    private void put(String key, byte[] data, String contentType, String contentEncoding)
+            throws IOException {
         try {
             if (!overwrite && client.doesObjectExist(bucket, key)) {
                 throw new IOException("目标 S3 对象已存在且未开启覆盖: s3://" + bucket + "/" + key);
@@ -63,7 +63,8 @@ final class V3S3TileStore implements V3TileStore {
             if (contentEncoding != null) {
                 metadata.setContentEncoding(contentEncoding);
             }
-            client.putObject(new PutObjectRequest(bucket, key, new ByteArrayInputStream(data), metadata));
+            client.putObject(
+                    new PutObjectRequest(bucket, key, new ByteArrayInputStream(data), metadata));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -76,14 +77,17 @@ final class V3S3TileStore implements V3TileStore {
         if (config.getS3AccessKeyId() == null || config.getS3AccessKeyId().trim().isEmpty()) {
             builder.withCredentials(DefaultAWSCredentialsProviderChain.getInstance());
         } else {
-            builder.withCredentials(new AWSStaticCredentialsProvider(
-                    new BasicAWSCredentials(config.getS3AccessKeyId(), config.getS3SecretKey())));
+            builder.withCredentials(
+                    new AWSStaticCredentialsProvider(
+                            new BasicAWSCredentials(
+                                    config.getS3AccessKeyId(), config.getS3SecretKey())));
         }
         if (config.getS3Endpoint() == null || config.getS3Endpoint().trim().isEmpty()) {
             builder.withRegion(config.getS3Region());
         } else {
             builder.withEndpointConfiguration(
-                    new AwsClientBuilder.EndpointConfiguration(config.getS3Endpoint(), config.getS3Region()));
+                    new AwsClientBuilder.EndpointConfiguration(
+                            config.getS3Endpoint(), config.getS3Region()));
             builder.enablePathStyleAccess();
         }
         return builder.build();

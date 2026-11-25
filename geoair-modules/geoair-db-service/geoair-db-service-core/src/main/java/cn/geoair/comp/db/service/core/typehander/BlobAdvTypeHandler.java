@@ -6,8 +6,8 @@ import java.sql.Blob;
 
 /**
  * BLOB 类型处理器：读取 {@link Blob} 为占位符字符串。
- * <p>
- * 注册到 ds-service 的类型转换注册表中使用。
+ *
+ * <p>注册到 ds-service 的类型转换注册表中使用。
  *
  * @author zhangjun
  */
@@ -29,7 +29,8 @@ public class BlobAdvTypeHandler extends AdvBaseTypeHandler<String> {
     }
 
     @Override
-    protected String convertNonNullForRead(Object value, Class<?> javaType, AdvTypeHandlerContext context) {
+    protected String convertNonNullForRead(
+            Object value, Class<?> javaType, AdvTypeHandlerContext context) {
         return placeholder;
     }
 }

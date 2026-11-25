@@ -3,15 +3,13 @@ package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 import cn.geoair.map.dynamic.adv.query.typehandler.SqlPlaceholder;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.convert.GirMysqlTran;
-import cn.hutool.core.util.StrUtil;
 import org.locationtech.jts.geom.Geometry;
 
 /**
  * @author ：张逢吉
  * @date ：Created in 2026/8/11
  * @description： MySQL 空间类型处理器 —— MySQL binary ↔ JTS Geometry
- * <p>MySQL JDBC 驱动原生支持 WKT 字符串写入 GEOMETRY 列，
- * 读取时通过 GirMysqlTran 解析 MySQL 的二进制几何格式</p>
+ *     <p>MySQL JDBC 驱动原生支持 WKT 字符串写入 GEOMETRY 列， 读取时通过 GirMysqlTran 解析 MySQL 的二进制几何格式
  */
 public class MysqlGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
 
@@ -36,7 +34,11 @@ public class MysqlGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
             if (srid <= 0) srid = 4326;
             String wkt = (String) writeGeometry(geom);
             return new SqlPlaceholder(
-                    "ST_GeomFromText('" + wkt.replace("'", "''") + "', " + srid + ", 'axis-order=long-lat')",
+                    "ST_GeomFromText('"
+                            + wkt.replace("'", "''")
+                            + "', "
+                            + srid
+                            + ", 'axis-order=long-lat')",
                     null);
         }
         return null;

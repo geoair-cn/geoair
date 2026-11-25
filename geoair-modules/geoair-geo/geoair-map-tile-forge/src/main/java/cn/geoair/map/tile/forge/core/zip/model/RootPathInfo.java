@@ -16,25 +16,15 @@ public class RootPathInfo {
         return new RootPathInfo();
     }
 
-    /**
-     * 移除名称的路径
-     */
+    /** 移除名称的路径 */
     String rootPath;
 
-    /**
-     * 不带路径的文件名称
-     */
+    /** 不带路径的文件名称 */
     String rootFileName;
 
-    /**
-     * 根文件的带路径的全路径
-     */
+    /** 根文件的带路径的全路径 */
     String rootFilePath;
 
-    /**
-     * 根文件的标准名称
-     */
+    /** 根文件的标准名称 */
     String rootFileStandardName;
-
-
 }

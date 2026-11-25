@@ -19,10 +19,10 @@ public class NotOptTileCacheTest {
     @Test
     public void allDisabledCacheImplementationsUseTheSameMissContract() {
         TileCache[] caches = {
-                new NotOptTileCache(),
-                new FileTileCache("target/cache-contract-file", 0, false),
-                new MBTilesTileCache("target/cache-contract-mbtiles", false),
-                new PostgresTileCache(null, false)
+            new NotOptTileCache(),
+            new FileTileCache("target/cache-contract-file", 0, false),
+            new MBTilesTileCache("target/cache-contract-mbtiles", false),
+            new PostgresTileCache(null, false)
         };
 
         for (TileCache cache : caches) {

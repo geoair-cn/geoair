@@ -8,8 +8,8 @@ import org.dom4j.Element;
 
 /**
  * {@code <if>} 标签处理器。
- * <p>
- * 从 XML 元素中提取 {@code test} 属性，递归解析子元素，构建 {@link IfSqlNode}。
+ *
+ * <p>从 XML 元素中提取 {@code test} 属性，递归解析子元素，构建 {@link IfSqlNode}。
  *
  * @author zhangjun
  */

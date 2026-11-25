@@ -13,15 +13,14 @@ import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
 import cn.geoair.map.dynamic.file.core.write.config.WriteConfig;
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoWriterLinkInfo;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.sql.DataSource;
 import org.geotools.data.DataStore;
 import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.GeometryDescriptor;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 基于 JDBC 方言和 GirAdvQuery 的通用空间写入器。
@@ -56,7 +55,9 @@ public abstract class AbstractJdbcGeoFileWriter implements GeoFileWriter {
             factory.setPassword(this.linkInfo.getPassword());
             factory.setInitialSize(1);
             factory.setMinIdle(1);
-            factory.setConfigurator(dataSource -> dataSource.setConnectTimeout(this.linkInfo.getConnectTimeoutMillis()));
+            factory.setConfigurator(
+                    dataSource ->
+                            dataSource.setConnectTimeout(this.linkInfo.getConnectTimeoutMillis()));
             this.dataSource = factory.toDataSource();
             this.dataStore = dialect.createDataStore(this.linkInfo);
             this.executor = GirAdvQuery.getIAdvExecutor(dataSource);
@@ -75,7 +76,8 @@ public abstract class AbstractJdbcGeoFileWriter implements GeoFileWriter {
     }
 
     @Override
-    public GeoFileWriter writeHeader(SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer) {
+    public GeoFileWriter writeHeader(
+            SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer) {
         try {
             if (featureType == null) {
                 throw new IllegalArgumentException("featureType 不能为空");
@@ -86,19 +88,27 @@ public abstract class AbstractJdbcGeoFileWriter implements GeoFileWriter {
                 }
                 dataStore.removeSchema(linkInfo.getTableName());
             }
-            org.geotools.feature.simple.SimpleFeatureTypeBuilder builder = new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
+            org.geotools.feature.simple.SimpleFeatureTypeBuilder builder =
+                    new org.geotools.feature.simple.SimpleFeatureTypeBuilder();
             builder.init(featureType);
             builder.setName(linkInfo.getTableName());
-            builder.setCRS(GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid()));
+            builder.setCRS(
+                    GirGeoTools.defaultInstance().getSridOpt().getCRS(writeConfig.getOutPutSrid()));
             SimpleFeatureType outputType = builder.buildFeatureType();
             dataStore.createSchema(outputType);
 
             GeometryDescriptor descriptor = outputType.getGeometryDescriptor();
             if (descriptor != null) {
-                AdvEnumsTypeGeom type = AdvEnumsTypeGeom.findByGeoToolsClassValue(descriptor.getType().getBinding());
-                executor.eDropGeomColumn(linkInfo.getTableName(), descriptor.getName().getLocalPart());
+                AdvEnumsTypeGeom type =
+                        AdvEnumsTypeGeom.findByGeoToolsClassValue(
+                                descriptor.getType().getBinding());
+                executor.eDropGeomColumn(
+                        linkInfo.getTableName(), descriptor.getName().getLocalPart());
                 executor.eAddGeomColumn(
-                        linkInfo.getTableName(), descriptor.getName().getLocalPart(), type, writeConfig.getOutPutSrid());
+                        linkInfo.getTableName(),
+                        descriptor.getName().getLocalPart(),
+                        type,
+                        writeConfig.getOutPutSrid());
             }
             return this;
         } catch (Exception e) {
@@ -114,10 +124,12 @@ public abstract class AbstractJdbcGeoFileWriter implements GeoFileWriter {
         }
         try {
             GirAdvOneRow converted = convertRow(row);
-            executor.bInsertIgnore(converted, option -> option
-                    .setTableName(linkInfo.getTableName())
-                    .setConflictKeys(linkInfo.getConflictKeys())
-                    .setToUnderlineCase(false));
+            executor.bInsertIgnore(
+                    converted,
+                    option ->
+                            option.setTableName(linkInfo.getTableName())
+                                    .setConflictKeys(linkInfo.getConflictKeys())
+                                    .setToUnderlineCase(false));
             return this;
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);
@@ -135,11 +147,13 @@ public abstract class AbstractJdbcGeoFileWriter implements GeoFileWriter {
             for (GirAdvOneRow row : rows) {
                 converted.add(convertRow(row));
             }
-            executor.bInsertIgnoreBatch(converted, option -> option
-                    .setTableName(linkInfo.getTableName())
-                    .setBatchSize(linkInfo.getBatchSize())
-                    .setConflictKeys(linkInfo.getConflictKeys())
-                    .setToUnderlineCase(false));
+            executor.bInsertIgnoreBatch(
+                    converted,
+                    option ->
+                            option.setTableName(linkInfo.getTableName())
+                                    .setBatchSize(linkInfo.getBatchSize())
+                                    .setConflictKeys(linkInfo.getConflictKeys())
+                                    .setToUnderlineCase(false));
             return this;
         } catch (Exception e) {
             notifyException(exceptionConsumer, e);
@@ -158,8 +172,10 @@ public abstract class AbstractJdbcGeoFileWriter implements GeoFileWriter {
             if (entry.getValue() instanceof Geometry) {
                 Geometry geometry = (Geometry) entry.getValue();
                 int sourceSrid = geometry.getSRID() > 0 ? geometry.getSRID() : linkInfo.getSrid();
-                entry.setValue(GirGeoTools.defaultInstance().getSridOpt()
-                        .convert(geometry, sourceSrid, writeConfig.getOutPutSrid()));
+                entry.setValue(
+                        GirGeoTools.defaultInstance()
+                                .getSridOpt()
+                                .convert(geometry, sourceSrid, writeConfig.getOutPutSrid()));
             }
         }
         return copy;

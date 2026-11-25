@@ -3,12 +3,10 @@ package cn.geoair.map.dynamic.tools.measure;
 import cn.geoair.map.dynamic.tools.ToolsConfig;
 import cn.geoair.map.dynamic.tools.srid.GirSridConvertUtils;
 import cn.hutool.core.util.ObjectUtil;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
-
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.*;
 
@@ -24,6 +22,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     /** 按 ToolsConfig 对象身份复用测量工具。 */
     private static final Map<ToolsConfig, GirGeoMeasureUtils> CONFIGURED_INSTANCES =
             Collections.synchronizedMap(new IdentityHashMap<ToolsConfig, GirGeoMeasureUtils>());
+
     ToolsConfig advToolsConfig;
     private final GirSridConvertUtils sridConvert;
 
@@ -45,9 +44,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
             return measureUtils;
         }
     }
-    /**
-     * 获取单例实例
-     */
+    /** 获取单例实例 */
     @Deprecated
     public static GirGeoMeasureUtils getInstance() {
         if (INSTANCE == null) {
@@ -83,7 +80,8 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
             Geometry geometry, int srid, MeasureUnitEnum unit, MeasureMethodEnum method) {
         validateMeasureArguments(unit, method, MeasureUnitEnum.MeasureDimension.LENGTH);
         validateGeometryType(
-                geometry, new String[]{"LineString", "MultiLineString", "Polygon", "MultiPolygon"});
+                geometry,
+                new String[] {"LineString", "MultiLineString", "Polygon", "MultiPolygon"});
         switch (method) {
             case WEB_MERCATOR:
                 return calculateLengthWithWebMercator(geometry, srid, unit);
@@ -100,7 +98,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     /** 使用几何中心所在 UTM 投影带计算局部面积。 */
     private double calculateAreaWithUtm(Geometry geometry, int srid, MeasureUnitEnum unit) {
         try {
-            validateGeometryType(geometry, new String[]{"Polygon", "MultiPolygon"});
+            validateGeometryType(geometry, new String[] {"Polygon", "MultiPolygon"});
             // 使用几何中心所在的 UTM 投影带进行局部平面测量。
             Geometry utmGeom = convertToUTMCRS(geometry, srid);
             double areaInM2 = utmGeom.getArea();
@@ -111,10 +109,9 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     }
 
     /** 使用 Web Mercator 计算地图展示场景下的面积。 */
-    private double calculateAreaWithWebMercator(
-            Geometry geometry, int srid, MeasureUnitEnum unit) {
+    private double calculateAreaWithWebMercator(Geometry geometry, int srid, MeasureUnitEnum unit) {
         try {
-            validateGeometryType(geometry, new String[]{"Polygon", "MultiPolygon"});
+            validateGeometryType(geometry, new String[] {"Polygon", "MultiPolygon"});
             return convertFromBaseUnit(convertToProjectedCRS(geometry, srid).getArea(), unit);
         } catch (Exception e) {
             throw new RuntimeException("Web Mercator 面积计算失败", e);
@@ -126,7 +123,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
         try {
             validateGeometryType(
                     geometry,
-                    new String[]{"LineString", "MultiLineString", "Polygon", "MultiPolygon"});
+                    new String[] {"LineString", "MultiLineString", "Polygon", "MultiPolygon"});
             // 使用几何中心所在的 UTM 投影带进行局部平面测量。
             Geometry utmGeom = convertToUTMCRS(geometry, srid);
             return convertFromBaseUnit(utmGeom.getLength(), unit);
@@ -141,7 +138,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
         try {
             validateGeometryType(
                     geometry,
-                    new String[]{"LineString", "MultiLineString", "Polygon", "MultiPolygon"});
+                    new String[] {"LineString", "MultiLineString", "Polygon", "MultiPolygon"});
             return convertFromBaseUnit(convertToProjectedCRS(geometry, srid).getLength(), unit);
         } catch (Exception e) {
             throw new RuntimeException("Web Mercator 长度计算失败", e);
@@ -179,14 +176,10 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
 
     @Override
     public double calculatePointToPointDistance(
-            Point point1,
-            Point point2,
-            int srid,
-            MeasureUnitEnum unit,
-            MeasureMethodEnum method) {
+            Point point1, Point point2, int srid, MeasureUnitEnum unit, MeasureMethodEnum method) {
         validateMeasureArguments(unit, method, MeasureUnitEnum.MeasureDimension.LENGTH);
-        validateGeometryType(point1, new String[]{"Point"});
-        validateGeometryType(point2, new String[]{"Point"});
+        validateGeometryType(point1, new String[] {"Point"});
+        validateGeometryType(point2, new String[] {"Point"});
         try {
             double distanceInM;
             switch (method) {
@@ -196,15 +189,21 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
                     distanceInM = mercatorPoint1.distance(mercatorPoint2);
                     break;
                 case UTM:
-                    LineString sourceLine = advToolsConfig.getGeometryFactory().createLineString(
-                            new Coordinate[]{point1.getCoordinate(), point2.getCoordinate()});
+                    LineString sourceLine =
+                            advToolsConfig
+                                    .getGeometryFactory()
+                                    .createLineString(
+                                            new Coordinate[] {
+                                                point1.getCoordinate(), point2.getCoordinate()
+                                            });
                     distanceInM = convertToUTMCRS(sourceLine, srid).getLength();
                     break;
                 case GEODETIC:
                     Point wgs84Point1 = (Point) convertToWGS84(point1, srid);
                     Point wgs84Point2 = (Point) convertToWGS84(point2, srid);
-                    distanceInM = calculateGeodeticSegmentLength(
-                            wgs84Point1.getCoordinate(), wgs84Point2.getCoordinate());
+                    distanceInM =
+                            calculateGeodeticSegmentLength(
+                                    wgs84Point1.getCoordinate(), wgs84Point2.getCoordinate());
                     break;
                 default:
                     throw new IllegalArgumentException("不支持的测量方式：" + method);
@@ -240,9 +239,12 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
                 projected1 = convertToProjectedCRS(geometry1, srid);
                 projected2 = convertToProjectedCRS(geometry2, srid);
             } else if (method == MeasureMethodEnum.UTM) {
-                GeometryCollection sourceGeometries = advToolsConfig.getGeometryFactory()
-                        .createGeometryCollection(new Geometry[]{geometry1, geometry2});
-                GeometryCollection utmGeometries = (GeometryCollection) convertToUTMCRS(sourceGeometries, srid);
+                GeometryCollection sourceGeometries =
+                        advToolsConfig
+                                .getGeometryFactory()
+                                .createGeometryCollection(new Geometry[] {geometry1, geometry2});
+                GeometryCollection utmGeometries =
+                        (GeometryCollection) convertToUTMCRS(sourceGeometries, srid);
                 projected1 = utmGeometries.getGeometryN(0);
                 projected2 = utmGeometries.getGeometryN(1);
             } else {
@@ -255,14 +257,12 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     }
 
     @Override
-    public double convertUnit(
-            double value, MeasureUnitEnum srcUnit, MeasureUnitEnum targetUnit) {
+    public double convertUnit(double value, MeasureUnitEnum srcUnit, MeasureUnitEnum targetUnit) {
         if (srcUnit == null || targetUnit == null) {
             throw new IllegalArgumentException("原始单位和目标单位不能为空");
         }
         if (srcUnit.getDimension() != targetUnit.getDimension()) {
-            throw new IllegalArgumentException(
-                    "不能在不同量纲之间转换：" + srcUnit + " -> " + targetUnit);
+            throw new IllegalArgumentException("不能在不同量纲之间转换：" + srcUnit + " -> " + targetUnit);
         }
         return value * srcUnit.getToBaseFactor() / targetUnit.getToBaseFactor();
     }
@@ -281,8 +281,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
             throw new IllegalArgumentException("测量单位和测量方式不能为空");
         }
         if (unit.getDimension() != expectedDimension) {
-            throw new IllegalArgumentException(
-                    "测量结果需要 " + expectedDimension + " 单位，当前为：" + unit);
+            throw new IllegalArgumentException("测量结果需要 " + expectedDimension + " 单位，当前为：" + unit);
         }
     }
 
@@ -324,9 +323,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
 
     // ====================== 新增私有工具方法（UTM投影转换） ======================
 
-    /**
-     * 转换为WGS84地理坐标系（4326）
-     */
+    /** 转换为WGS84地理坐标系（4326） */
     private Geometry convertToWGS84(Geometry geometry, int srcSrid) {
         if (srcSrid == 4326) {
             return geometry;
@@ -334,9 +331,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
         return sridConvert.convert(geometry, srcSrid, 4326);
     }
 
-    /**
-     * 转换为几何中心所在的 UTM 投影坐标系，用于局部平面测量。
-     */
+    /** 转换为几何中心所在的 UTM 投影坐标系，用于局部平面测量。 */
     private Geometry convertToUTMCRS(Geometry geometry, int srcSrid) {
         // 先转换为WGS84
         Geometry wgs84Geom = convertToWGS84(geometry, srcSrid);
@@ -352,7 +347,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
     /**
      * 转换为 EPSG:3857，用于地图展示和快速测量。
      *
-     * <p>Web Mercator 并非等面积或等距投影；该转换仅承载历史默认行为。</p>
+     * <p>Web Mercator 并非等面积或等距投影；该转换仅承载历史默认行为。
      */
     private Geometry convertToProjectedCRS(Geometry geometry, int srcSrid) {
         if (srcSrid == 3857) {
@@ -361,9 +356,7 @@ public class GirGeoMeasureUtils implements GirGeoMeasureOpt {
         return sridConvert.convert(geometry, srcSrid, 3857);
     }
 
-    /**
-     * 校验几何对象类型
-     */
+    /** 校验几何对象类型 */
     private void validateGeometryType(Geometry geometry, String[] allowedTypes) {
         if (ObjectUtil.isNull(geometry)) {
             throw new IllegalArgumentException("几何对象不能为空");

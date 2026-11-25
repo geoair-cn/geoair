@@ -15,23 +15,25 @@ public class SparkJavaTileLocalAppExample {
     public static void main(String[] args) throws Exception {
         String inputUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable";
         String tableName = "t_" + IdUtil.getSnowflakeNextId();
-        String outputUrl = "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable/" + tableName;
+        String outputUrl =
+                "#jdbc:postgresql://postgres#secret/10.0.0.1:5432/jwyt_v3/flowable/" + tableName;
 
-        TileSliceParameter parameter = new TileSliceParameter()
-                .setLayerName("amap_traffic_conditions")
-                .setEdition("v1")
-                .setGeomFieldName("geom")
-                .setIdFieldName("link_id")
-                .setReadStrategy(ReadStrategy.ID_PAGE)
-                .setSourceDataSrid(4326)
-                .setOutGridSrid(3857)
-                .setMinZoom(6)
-                .setMaxZoom(14)
-                .setDropDensestAsNeeded(true)
-                .setCoalesceDensestAsNeeded(true)
-                .setQueryStatement("SELECT * FROM flowable.\"amap_traffic_conditions\"")
-                .setInputSource(DataSourceConfig.fromProtocolUrlStr(inputUrl))
-                .setOutputSource(DataSourceConfig.fromProtocolUrlStr(outputUrl));
+        TileSliceParameter parameter =
+                new TileSliceParameter()
+                        .setLayerName("amap_traffic_conditions")
+                        .setEdition("v1")
+                        .setGeomFieldName("geom")
+                        .setIdFieldName("link_id")
+                        .setReadStrategy(ReadStrategy.ID_PAGE)
+                        .setSourceDataSrid(4326)
+                        .setOutGridSrid(3857)
+                        .setMinZoom(6)
+                        .setMaxZoom(14)
+                        .setDropDensestAsNeeded(true)
+                        .setCoalesceDensestAsNeeded(true)
+                        .setQueryStatement("SELECT * FROM flowable.\"amap_traffic_conditions\"")
+                        .setInputSource(DataSourceConfig.fromProtocolUrlStr(inputUrl))
+                        .setOutputSource(DataSourceConfig.fromProtocolUrlStr(outputUrl));
 
         // 序列化
         String encoded = parameter.toBase32();

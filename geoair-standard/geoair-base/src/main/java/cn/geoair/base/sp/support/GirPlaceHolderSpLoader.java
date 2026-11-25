@@ -208,9 +208,7 @@ public class GirPlaceHolderSpLoader extends GirCacheSpLoader {
                 }
             } else if (matched.size() > 1) {
                 throw new GirNoUniqueBeanException(
-                        "类 {} 配置sp 默认placeHolder根据name[{}]发现多个实现类",
-                        requiredType.getName(),
-                        name);
+                        "类 {} 配置sp 默认placeHolder根据name[{}]发现多个实现类", requiredType.getName(), name);
             }
         }
         if (res != null && singleton) {

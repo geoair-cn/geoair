@@ -1,20 +1,15 @@
 package cn.geoair.web.util;
 
-
 import cn.geoair.base.util.GutilStr;
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-/**
- * 跨域过滤器
- */
-
+/** 跨域过滤器 */
 public class GirCorsFilter implements Filter {
 
     // 默认允许的请求头，同时动态允许客户端声明的请求头，不作为白名单。
@@ -49,9 +44,7 @@ public class GirCorsFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    /**
-     * 设置跨域响应头
-     */
+    /** 设置跨域响应头 */
     private void setCorsResponseHeaders(HttpServletRequest request, HttpServletResponse response) {
         // 无 Origin 的响应也需要区分缓存，避免被后续跨域请求复用。
         addVaryOrigin(response);
@@ -61,12 +54,12 @@ public class GirCorsFilter implements Filter {
         if (GutilStr.isNotBlank(origin)) {
             response.setHeader("Access-Control-Allow-Origin", origin);
             response.setHeader("Access-Control-Allow-Credentials", "true");
-        }else{
+        } else {
             response.setHeader("Access-Control-Allow-Origin", "*");
         }
 
-
-        response.setHeader("Access-Control-Allow-Methods", "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS");
+        response.setHeader(
+                "Access-Control-Allow-Methods", "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
 
         // 构建允许的请求头（固定+前端传入，自动去重）
@@ -74,9 +67,7 @@ public class GirCorsFilter implements Filter {
         response.setHeader("Access-Control-Allow-Headers", allowHeaders);
     }
 
-    /**
-     * 补充 Origin 缓存区分条件，保留已有 Vary 响应头且不重复添加。
-     */
+    /** 补充 Origin 缓存区分条件，保留已有 Vary 响应头且不重复添加。 */
     private void addVaryOrigin(HttpServletResponse response) {
         for (String vary : response.getHeaders("Vary")) {
             for (String field : vary.split(",")) {
@@ -91,9 +82,7 @@ public class GirCorsFilter implements Filter {
         response.addHeader("Vary", "Origin");
     }
 
-    /**
-     * 合并默认允许头与前端预检请求头，按大小写不敏感去重后返回。
-     */
+    /** 合并默认允许头与前端预检请求头，按大小写不敏感去重后返回。 */
     private String buildAllowHeaders(HttpServletRequest request) {
         // HTTP 请求头名称不区分大小写，同时保持输出顺序稳定。
         Set<String> headerSet = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);

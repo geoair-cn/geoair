@@ -7,7 +7,6 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
-
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
@@ -64,16 +62,17 @@ public class ShpGeoFileReader implements GeoFileReader {
     }
 
     /**
-     * 初始化 Shapefile 读取器。
-     * 仅创建 DataStore / FeatureSource / FeatureCollection / FeatureType，
-     * 不打开 FeatureIterator——迭代器由读取方法按需懒初始化。
+     * 初始化 Shapefile 读取器。 仅创建 DataStore / FeatureSource / FeatureCollection / FeatureType， 不打开
+     * FeatureIterator——迭代器由读取方法按需懒初始化。
      */
     private void initShpReader() {
         try {
             File shpFile = new File(linkInfo.getShpFilePath());
             Map<String, Object> params = new HashMap<>();
             params.put(ShapefileDataStoreFactory.URLP.key, shpFile.toURI().toURL());
-            params.put(ShapefileDataStoreFactory.DBFCHARSET.key, Charset.forName(linkInfo.getCharset()));
+            params.put(
+                    ShapefileDataStoreFactory.DBFCHARSET.key,
+                    Charset.forName(linkInfo.getCharset()));
 
             dataStore = DataStoreFinder.getDataStore(params);
             if (dataStore == null) {
@@ -90,9 +89,7 @@ public class ShpGeoFileReader implements GeoFileReader {
         }
     }
 
-    /**
-     * 懒初始化迭代器：首次调用时打开，后续复用
-     */
+    /** 懒初始化迭代器：首次调用时打开，后续复用 */
     private FeatureIterator<SimpleFeature> getOrCreateIterator() {
         if (featureIterator == null) {
             featureIterator = featureCollection.features();
@@ -101,9 +98,7 @@ public class ShpGeoFileReader implements GeoFileReader {
         return featureIterator;
     }
 
-    /**
-     * 关闭实例级迭代器并重置消费计数（不 dispose DataStore）
-     */
+    /** 关闭实例级迭代器并重置消费计数（不 dispose DataStore） */
     private void closeIterator() {
         if (featureIterator != null) {
             featureIterator.close();
@@ -223,9 +218,7 @@ public class ShpGeoFileReader implements GeoFileReader {
         return pager;
     }
 
-    /**
-     * 将 SimpleFeature 转换为 GirAdvOneRow
-     */
+    /** 将 SimpleFeature 转换为 GirAdvOneRow */
     private GirAdvOneRow featureToRow(SimpleFeature feature) {
         Map<String, Object> attributes = new HashMap<>();
         for (Property property : feature.getProperties()) {
@@ -243,9 +236,7 @@ public class ShpGeoFileReader implements GeoFileReader {
         return GirAdvOneRow.ofByMap(attributes);
     }
 
-    /**
-     * 关闭资源
-     */
+    /** 关闭资源 */
     @Override
     public void close() {
         closeIterator();

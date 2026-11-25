@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
- 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -24,14 +23,12 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * 基于 GeoTools 的 SRID 坐标转换实现。
  *
- * <p>实例持有 {@link MathTransform} 缓存，并按 {@link ToolsConfig} 对象身份复用。
- * {@link #getInstance()} 是保留的默认单例入口；新代码应通过
- * {@link #getInstance(ToolsConfig)} 取得与配置绑定的实例。</p>
+ * <p>实例持有 {@link MathTransform} 缓存，并按 {@link ToolsConfig} 对象身份复用。 {@link #getInstance()}
+ * 是保留的默认单例入口；新代码应通过 {@link #getInstance(ToolsConfig)} 取得与配置绑定的实例。
  *
  * @author 张逢吉
  * @date 2024/12/05
  */
- 
 public class GirSridConvertUtils implements GirSridConvertOpt {
     private static volatile GirSridConvertUtils INSTANCE;
     /** 按 ToolsConfig 对象身份复用 CRS 与坐标转换缓存。 */
@@ -69,7 +66,6 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
             return sridConvertUtils;
         }
     }
-
 
     /** 转换算子缓存，键格式为 {@code 源SRID_目标SRID}。 */
     private final Map<String, MathTransform> transformCache = new HashMap<>();
@@ -215,11 +211,11 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
     /**
      * 常用 SRID 的经验判断表。
      *
-     * <p>这些编码在业务中使用频率高，且坐标单位是确定的。先走该表可避免部分历史
-     * EPSG 别名在不同 Proj4J 数据版本中的解析差异；未命中的 SRID 仍必须完成 CRS
-     * 解析后才允许返回结果。</p>
+     * <p>这些编码在业务中使用频率高，且坐标单位是确定的。先走该表可避免部分历史 EPSG 别名在不同 Proj4J 数据版本中的解析差异；未命中的 SRID 仍必须完成 CRS
+     * 解析后才允许返回结果。
      */
-    private static final Map<Integer, Boolean> COMMON_CRS_GEOGRAPHIC_TYPES = createCommonCrsGeographicTypes();
+    private static final Map<Integer, Boolean> COMMON_CRS_GEOGRAPHIC_TYPES =
+            createCommonCrsGeographicTypes();
 
     private final Map<Integer, Boolean> CRS_GEOGRAPHIC_CACHE = new ConcurrentHashMap<>();
 
@@ -293,12 +289,10 @@ public class GirSridConvertUtils implements GirSridConvertOpt {
     /**
      * 判断常用投影坐标系号段。
      *
-     * <p>UTM 北/南半球和 CGCS2000 高斯—克吕格号段均以米作为平面坐标单位，
-     * 无需再进入 CRS 工厂解析。</p>
+     * <p>UTM 北/南半球和 CGCS2000 高斯—克吕格号段均以米作为平面坐标单位， 无需再进入 CRS 工厂解析。
      */
     private static boolean isCommonProjectedSrid(int srid) {
-        boolean isUtm = (srid >= 32601 && srid <= 32660)
-                || (srid >= 32701 && srid <= 32760);
+        boolean isUtm = (srid >= 32601 && srid <= 32660) || (srid >= 32701 && srid <= 32760);
         boolean isCgcs2000GaussKruger = srid >= 4491 && srid <= 4554;
         return isUtm || isCgcs2000GaussKruger;
     }

@@ -14,8 +14,6 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.io;
 
-
-
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -93,7 +91,7 @@ public class FileResource implements cn.geoair.map.tile.forge.core.bygwc.io.Reso
 
         byte[] data = new byte[(int) fileSize];
         try (FileInputStream fis = new FileInputStream(file);
-             BufferedInputStream bis = new BufferedInputStream(fis)) {
+                BufferedInputStream bis = new BufferedInputStream(fis)) {
 
             int offset = 0;
             int remaining = data.length;

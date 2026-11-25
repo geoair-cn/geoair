@@ -6,9 +6,8 @@ import org.locationtech.jts.geom.Envelope;
 /**
  * 单个瓦片层级的网格与显示参数。
  *
- * <p>数值单位取决于 {@link #gridSetName}：EPSG:3857 通常使用米，EPSG:4326 使用度。
- * 因而 {@link #tileSizeM}、{@link #groundResolution} 和 {@link #resolution} 的名称为
- * 历史 API，不能一律理解为米制值。</p>
+ * <p>数值单位取决于 {@link #gridSetName}：EPSG:3857 通常使用米，EPSG:4326 使用度。 因而 {@link #tileSizeM}、{@link
+ * #groundResolution} 和 {@link #resolution} 的名称为 历史 API，不能一律理解为米制值。
  *
  * @author 张逢吉
  */
@@ -18,10 +17,10 @@ public class TileLevelMetadata {
     /** 缩放级别（0~maxZoom） */
     private final int zoom;
 
-    /** 每行的瓦片数量（水平方向/X轴）  */
+    /** 每行的瓦片数量（水平方向/X轴） */
     private final int numTilesWide;
 
-    /** 每列的瓦片数量（垂直方向/Y轴）  */
+    /** 每列的瓦片数量（垂直方向/Y轴） */
     private final int numTilesHigh;
 
     /** 每个瓦片在当前网格坐标单位下的横向跨度。 */
@@ -54,7 +53,20 @@ public class TileLevelMetadata {
     /** 网格集标识（例如 {@code EPSG:4326} 或 {@code EPSG:3857}）。 */
     private final String gridSetName;
 
-    public TileLevelMetadata(int zoom, int numTilesWide, int numTilesHigh, double tileSizeM, double groundResolution, double resolution, double scale, long totalTiles, int tilePixelSize, double dpi, double mmPerPixel, Envelope extent, String gridSetName) {
+    public TileLevelMetadata(
+            int zoom,
+            int numTilesWide,
+            int numTilesHigh,
+            double tileSizeM,
+            double groundResolution,
+            double resolution,
+            double scale,
+            long totalTiles,
+            int tilePixelSize,
+            double dpi,
+            double mmPerPixel,
+            Envelope extent,
+            String gridSetName) {
         this.zoom = zoom;
         this.numTilesWide = numTilesWide;
         this.numTilesHigh = numTilesHigh;
@@ -81,6 +93,4 @@ public class TileLevelMetadata {
         }
         return String.format("1:%.0f", scale);
     }
-
-
 }

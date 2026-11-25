@@ -1,6 +1,5 @@
 package cn.geoair.map.dynamic.tools.grid.dto;
 
-
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import lombok.Getter;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -12,8 +11,8 @@ import org.opengis.geometry.MismatchedDimensionException;
 /**
  * 携带 SRID 的 JTS 包围盒。
  *
- * <p>构造时会根据 {@code thisSrid} 解析 CRS。该类型仅表示轴对齐范围；转换到其他 SRID
- * 时通过 {@link #getWktString(int)} 先转换包围盒，再将其构造成矩形几何对象。</p>
+ * <p>构造时会根据 {@code thisSrid} 解析 CRS。该类型仅表示轴对齐范围；转换到其他 SRID 时通过 {@link #getWktString(int)}
+ * 先转换包围盒，再将其构造成矩形几何对象。
  *
  * @author 张逢吉
  */
@@ -43,7 +42,10 @@ public class BoxReferencedEnvelope extends ReferencedEnvelope {
      * @return 转换后包围盒构成的多边形 WKT
      */
     public String getWktString(int targetSrid) {
-        Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(this, thisSrid, targetSrid);
+        Geometry geometry =
+                GirGeoTools.defaultInstance()
+                        .getSridOpt()
+                        .convertToGeom(this, thisSrid, targetSrid);
         return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
     }
 
@@ -67,6 +69,8 @@ public class BoxReferencedEnvelope extends ReferencedEnvelope {
         Geometry geometry = GirGeoTools.defaultInstance().getSridOpt().convertToGeom(this);
         return this.getThisSrid()
                 + ";"
-                + GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, true);
+                + GirGeoTools.defaultInstance()
+                        .getFormatOpt()
+                        .jtsGeometryToWktString(geometry, true);
     }
 }

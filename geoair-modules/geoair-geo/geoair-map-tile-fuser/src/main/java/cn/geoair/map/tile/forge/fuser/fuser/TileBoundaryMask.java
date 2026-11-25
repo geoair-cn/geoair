@@ -1,16 +1,15 @@
 package cn.geoair.map.tile.forge.fuser.fuser;
 
+import java.awt.geom.Path2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.index.strtree.STRtree;
-
-import java.awt.geom.Path2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /** 将经纬度边界按目标网格的像素中心转换成裁切路径。 */
 final class TileBoundaryMask {
@@ -43,7 +42,8 @@ final class TileBoundaryMask {
         double west = tile.getMinX(), right = tile.getMaxX();
         double scale = size / tile.getWidth();
         // 从选区右侧沿每行向左扫描，跨过外环或孔洞的边都翻转一次。
-        Envelope rayRange = new Envelope(west, Math.max(right, east), tile.getMinY(), tile.getMaxY());
+        Envelope rayRange =
+                new Envelope(west, Math.max(right, east), tile.getMinY(), tile.getMaxY());
         for (Object item : edges.query(rayRange)) {
             LineSegment edge = (LineSegment) item;
             Coordinate a = edge.p0, b = edge.p1;

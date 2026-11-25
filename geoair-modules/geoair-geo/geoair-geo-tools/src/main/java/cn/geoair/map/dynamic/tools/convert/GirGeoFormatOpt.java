@@ -174,7 +174,7 @@ public interface GirGeoFormatOpt {
     /**
      * EWKT 字符串转 JTS Geometry。
      *
-     * <p>EWKT 使用 {@code SRID=4326;POINT(...)} 形式，可在文本中同时携带坐标与 SRID。</p>
+     * <p>EWKT 使用 {@code SRID=4326;POINT(...)} 形式，可在文本中同时携带坐标与 SRID。
      *
      * @param ewktString EWKT 字符串
      * @param ifExceptionValueReturnNull 解析失败时是否返回 {@code null}

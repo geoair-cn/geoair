@@ -10,11 +10,9 @@ import cn.geoair.map.tile.forge.fuser.execution.TileOperationStatus;
 import cn.geoair.map.tile.forge.fuser.upstream.UpstreamRequestOptions;
 import cn.geoair.map.tile.forge.fuser.upstream.UpstreamTileRequest;
 import cn.geoair.web.mime.GiMimeType;
-
-import org.apache.http.client.utils.URIBuilder;
-
 import java.net.URI;
 import java.util.Map;
+import org.apache.http.client.utils.URIBuilder;
 
 /** 图层级参数、鉴权扩展、重试与总截止时间共用一条上游请求链。 */
 public final class LayerHttpTileClient {

@@ -14,15 +14,12 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.grid;
 
-
-
 import cn.hutool.core.builder.HashCodeBuilder;
-
 import java.util.Arrays;
 import java.util.Objects;
 
 /** A grid set configuration */
-public class GridSet   {
+public class GridSet {
 
     private String name;
 
@@ -248,7 +245,6 @@ public class GridSet   {
         return closestRectangle(bestLevel, rectangleBounds);
     }
 
-
     /**
      * 查找最接近给定矩形范围的瓦片矩形区域
      *
@@ -256,7 +252,6 @@ public class GridSet   {
      * @param rectangeBounds 需要匹配的矩形范围
      * @return 长整型数组，表示瓦片坐标系中的瓦片矩形区域: {minx, miny, maxx, maxy, level}
      */
-
     protected long[] closestRectangle(int level, BoundingBox rectangeBounds) {
         Grid grid = getGrid(level);
 
@@ -547,6 +542,4 @@ public class GridSet   {
         }
         return false;
     }
-
-
 }

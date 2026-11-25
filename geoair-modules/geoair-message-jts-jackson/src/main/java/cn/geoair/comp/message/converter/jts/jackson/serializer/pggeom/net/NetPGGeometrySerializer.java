@@ -5,9 +5,7 @@ import cn.geoair.map.dynamic.tools.convert.GirPostGisNetTran;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-
 import java.io.IOException;
-
 import net.postgis.jdbc.PGgeometry;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.spatial4j.io.jackson.GeometryAsGeoJSONSerializer;

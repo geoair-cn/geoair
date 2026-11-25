@@ -34,7 +34,6 @@ public class GirPostGisTran {
         return isOrgConvert;
     }
 
-
     private static Boolean isPostgis;
 
     public static boolean isPostGisAvailable() {
@@ -48,5 +47,4 @@ public class GirPostGisTran {
         }
         return isPostgis;
     }
-
 }

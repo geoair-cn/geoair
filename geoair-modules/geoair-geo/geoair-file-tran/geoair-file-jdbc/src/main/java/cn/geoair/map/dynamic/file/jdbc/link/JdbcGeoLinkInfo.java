@@ -1,12 +1,11 @@
 package cn.geoair.map.dynamic.file.jdbc.link;
 
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
 
 /**
  * JDBC 空间数据源的公共连接参数。

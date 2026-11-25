@@ -2,7 +2,6 @@ package cn.geoair.comp.knife4j.ext.springdoc.builder;
 
 import cn.geoair.base.data.model.annotation.GaModelField;
 import cn.geoair.base.data.result.GiResult;
-
 import cn.geoair.web.data.result.GirWebResult;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
@@ -20,7 +19,6 @@ import org.springframework.core.annotation.AnnotationUtils;
  * @author Administrator
  * @version $Id: $Id
  */
-
 public class GiResultModelConverter implements ModelConverter {
 
     /** {@inheritDoc} */

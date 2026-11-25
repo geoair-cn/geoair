@@ -10,7 +10,11 @@ import cn.geoair.map.dynamic.file.core.exception.ExceptionConsumer;
 import cn.geoair.map.dynamic.file.core.exception.GeoFileReadException;
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
 import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
-
+import cn.geoair.map.dynamic.file.geojson.geotools.GirGeoJSONReader;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,12 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import cn.geoair.map.dynamic.file.geojson.geotools.GirGeoJSONReader;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.ArrayUtil;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.locationtech.jts.geom.Geometry;
@@ -87,9 +85,7 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
         }
     }
 
-    /**
-     * 初始化 GeoJSON 读取器
-     */
+    /** 初始化 GeoJSON 读取器 */
     private void initGeoJsonReader() {
         FileInputStream fis = null;
         try {
@@ -103,7 +99,6 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
                 this.featureIterator = featureCollection.features();
             } catch (Exception e) {
                 log.error("获取全量featureCollection发生异常 {}", e.getMessage());
-
             }
             if (featureType == null) {
                 fis = new FileInputStream(linkInfo.getGeoJsonFilePath());
@@ -251,9 +246,7 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
         return pager;
     }
 
-    /**
-     * 重置迭代器
-     */
+    /** 重置迭代器 */
     private void resetIterator() {
         if (featureIterator != null) {
             featureIterator.close();
@@ -262,9 +255,7 @@ public class GeoJsonGeoFileReader implements GeoFileReader {
         currentRow.set(0);
     }
 
-    /**
-     * 关闭资源
-     */
+    /** 关闭资源 */
     @Override
     public void close() throws IOException {
         if (featureIterator != null) {

@@ -13,8 +13,12 @@ public class AdvTypeHandlerContext {
     private final Class<?> propertyType;
     private final java.sql.Connection connection;
 
-    private AdvTypeHandlerContext(Class<?> entityClass, String propertyName, String columnName,
-                                  Class<?> propertyType, java.sql.Connection connection) {
+    private AdvTypeHandlerContext(
+            Class<?> entityClass,
+            String propertyName,
+            String columnName,
+            Class<?> propertyType,
+            java.sql.Connection connection) {
         this.entityClass = entityClass;
         this.propertyName = propertyName;
         this.columnName = columnName;
@@ -31,7 +35,8 @@ public class AdvTypeHandlerContext {
         return new AdvTypeHandlerContext(null, null, columnName, null, null);
     }
 
-    public static AdvTypeHandlerContext withConnection(java.sql.Connection connection, String columnName) {
+    public static AdvTypeHandlerContext withConnection(
+            java.sql.Connection connection, String columnName) {
         return new AdvTypeHandlerContext(null, null, columnName, null, connection);
     }
 

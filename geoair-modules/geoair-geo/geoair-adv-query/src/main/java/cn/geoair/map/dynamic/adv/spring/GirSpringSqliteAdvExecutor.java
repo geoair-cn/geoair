@@ -3,7 +3,6 @@ package cn.geoair.map.dynamic.adv.spring;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.dialect.sqlite.AdvExecutorSqlite;
 import cn.hutool.extra.spring.SpringUtil;
-
 import javax.sql.DataSource;
 
 /** Spring 环境下的 SQLite Core 执行器。 */

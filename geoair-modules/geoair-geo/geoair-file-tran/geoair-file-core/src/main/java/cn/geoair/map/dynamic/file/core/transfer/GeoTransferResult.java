@@ -1,11 +1,10 @@
 package cn.geoair.map.dynamic.file.core.transfer;
 
 import cn.geoair.map.dynamic.file.core.enums.TranStatus;
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 无状态传输引擎的结果快照。

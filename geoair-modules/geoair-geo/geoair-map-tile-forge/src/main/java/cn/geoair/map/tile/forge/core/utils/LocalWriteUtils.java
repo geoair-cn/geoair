@@ -2,7 +2,6 @@ package cn.geoair.map.tile.forge.core.utils;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -12,14 +11,11 @@ import java.nio.file.StandardCopyOption;
 
 /**
  * 本地落盘工具
- * <p>
- * 瓦片、bundle 这类文件此前是直接往目标路径写的，而 FileOutputStream 一构造，
- * 目标路径就已经存在一个 0 字节的文件。并发的读请求会把它当成「已就绪的文件」，
- * 于是拿到半截数据；抽取过程中一旦出错，这份坏文件还会长期占着位置，
- * 之后所有落到同一个文件的请求全部读到坏数据。
- * <p>
- * 这里的做法是统一先写到临时文件，写完之后一次性替换成目标文件：
- * 要么目标文件不存在，要么就是完整内容，不存在中间状态。
+ *
+ * <p>瓦片、bundle 这类文件此前是直接往目标路径写的，而 FileOutputStream 一构造， 目标路径就已经存在一个 0 字节的文件。并发的读请求会把它当成「已就绪的文件」，
+ * 于是拿到半截数据；抽取过程中一旦出错，这份坏文件还会长期占着位置， 之后所有落到同一个文件的请求全部读到坏数据。
+ *
+ * <p>这里的做法是统一先写到临时文件，写完之后一次性替换成目标文件： 要么目标文件不存在，要么就是完整内容，不存在中间状态。
  *
  * @author 张俊
  */
@@ -27,13 +23,10 @@ public final class LocalWriteUtils {
 
     private static GiLogger log = GirLoggerFactory.getLogger();
 
-    /**
-     * 临时文件后缀，与目标文件同目录，替换完成后会被删掉
-     */
+    /** 临时文件后缀，与目标文件同目录，替换完成后会被删掉 */
     private static final String TEMP_WRITE_SUFFIX = ".geoair-tmp";
 
-    private LocalWriteUtils() {
-    }
+    private LocalWriteUtils() {}
 
     /**
      * 取目标文件对应的临时文件
@@ -54,7 +47,11 @@ public final class LocalWriteUtils {
      */
     public static void replaceAtomically(Path source, Path target) throws IOException {
         try {
-            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            Files.move(
+                    source,
+                    target,
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE);
         } catch (AtomicMoveNotSupportedException e) {
             // 个别文件系统不支持原子移动，退化为普通替换，至少不会再出现半截文件
             Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);

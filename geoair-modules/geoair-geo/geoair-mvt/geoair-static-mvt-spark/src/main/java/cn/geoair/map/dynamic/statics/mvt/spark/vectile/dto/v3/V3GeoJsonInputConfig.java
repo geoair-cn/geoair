@@ -1,19 +1,17 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * V3 GeoJSON 图层输入配置。
  *
- * <p>路径交给 Spark/Hadoop 文件系统解析，可使用 {@code file:///}、{@code hdfs://}、
- * {@code s3a://} 以及文件通配符。集群运行时，本地路径必须对所有 executor 可见；对象存储
- * 凭证应通过 Hadoop/Spark 配置提供，不应写入路径。</p>
+ * <p>路径交给 Spark/Hadoop 文件系统解析，可使用 {@code file:///}、{@code hdfs://}、 {@code s3a://}
+ * 以及文件通配符。集群运行时，本地路径必须对所有 executor 可见；对象存储 凭证应通过 Hadoop/Spark 配置提供，不应写入路径。
  *
  * @author 张逢吉
  */
@@ -42,7 +40,8 @@ public class V3GeoJsonInputConfig implements Serializable {
 
     /** 使用多个路径创建配置。 */
     public static V3GeoJsonInputConfig of(String... paths) {
-        return new V3GeoJsonInputConfig().setPaths(
-                paths == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(paths)));
+        return new V3GeoJsonInputConfig()
+                .setPaths(
+                        paths == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(paths)));
     }
 }

@@ -4,7 +4,6 @@ import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.sqlite.SqliteDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
-
 import java.util.function.Supplier;
 
 /** SQLite 删除操作。 */

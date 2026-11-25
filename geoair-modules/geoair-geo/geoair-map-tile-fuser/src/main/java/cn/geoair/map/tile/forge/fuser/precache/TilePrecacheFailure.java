@@ -19,7 +19,8 @@ public final class TilePrecacheFailure {
     }
 
     static boolean retryable(TileOperationStatus status) {
-        return status == TileOperationStatus.MISSING || status == TileOperationStatus.FAILED
+        return status == TileOperationStatus.MISSING
+                || status == TileOperationStatus.FAILED
                 || status == TileOperationStatus.TIMED_OUT;
     }
 }

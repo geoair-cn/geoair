@@ -1,7 +1,6 @@
 package cn.geoair.web.util;
 
 import cn.geoair.web.mime.*;
-
 import java.util.List;
 
 /**
@@ -12,8 +11,7 @@ import java.util.List;
 public class GutilMimeType {
 
     /**
-     * 根据格式字符串获取对应的MIME类型对象
-     * 依次检查图像、XML、文本、应用程序MIME类型
+     * 根据格式字符串获取对应的MIME类型对象 依次检查图像、XML、文本、应用程序MIME类型
      *
      * @param formatStr 格式字符串（可以是MIME类型或格式名称）
      * @return 对应的MimeType对象
@@ -34,8 +32,7 @@ public class GutilMimeType {
     }
 
     /**
-     * 根据文件扩展名获取对应的MIME类型对象
-     * 依次检查图像、XML、文本、应用程序MIME类型
+     * 根据文件扩展名获取对应的MIME类型对象 依次检查图像、XML、文本、应用程序MIME类型
      *
      * @param fileExtension 文件扩展名（如 ".png"）
      * @return 对应的MimeType对象，如果不支持则返回null
@@ -89,5 +86,4 @@ public class GutilMimeType {
         GiMimeType html = fromContentType("text/html; charset=utf-8");
         System.out.println(html);
     }
-
 }

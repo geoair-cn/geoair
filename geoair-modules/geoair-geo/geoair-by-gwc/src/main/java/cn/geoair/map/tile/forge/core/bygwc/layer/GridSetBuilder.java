@@ -14,15 +14,9 @@
  */
 package cn.geoair.map.tile.forge.core.bygwc.layer;
 
-
-
-
-
 import cn.geoair.map.tile.forge.core.bygwc.config.*;
-
 import cn.geoair.map.tile.forge.core.bygwc.grid.*;
 import cn.hutool.core.lang.Assert;
-
 import java.util.List;
 
 /**
@@ -30,11 +24,9 @@ import java.util.List;
  *
  * @author Gabriel Roldan
  */
-public  class GridSetBuilder {
+public class GridSetBuilder {
 
-    /**
-     * Creates a {@link GridSet} out of a ArcGIS tiling scheme
-     */
+    /** Creates a {@link GridSet} out of a ArcGIS tiling scheme */
     public GridSet buildGridset(
             final String layerName, final CacheInfo info, final BoundingBox layerBounds) {
 

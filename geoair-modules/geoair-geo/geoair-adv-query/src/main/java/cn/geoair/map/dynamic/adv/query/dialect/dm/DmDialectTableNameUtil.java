@@ -40,7 +40,8 @@ public class DmDialectTableNameUtil extends AbstractExecDialectTableUtil {
             return fieldName;
         }
         String identifier = fieldName;
-        if (identifier.startsWith(FIELD_QUOTE_PREFIX) && identifier.endsWith(FIELD_QUOTE_SUFFIX)
+        if (identifier.startsWith(FIELD_QUOTE_PREFIX)
+                && identifier.endsWith(FIELD_QUOTE_SUFFIX)
                 && identifier.length() >= 2) {
             identifier = identifier.substring(1, identifier.length() - 1).replace("\"\"", "\"");
         }
@@ -58,7 +59,9 @@ public class DmDialectTableNameUtil extends AbstractExecDialectTableUtil {
         long startRow = offset;
         return StrUtil.format(
                 "SELECT * FROM (SELECT t.*, ROWNUM rn FROM ({}) t WHERE ROWNUM <= {}) WHERE rn > {}",
-                noPageSql, endRow, startRow);
+                noPageSql,
+                endRow,
+                startRow);
     }
 
     @Override

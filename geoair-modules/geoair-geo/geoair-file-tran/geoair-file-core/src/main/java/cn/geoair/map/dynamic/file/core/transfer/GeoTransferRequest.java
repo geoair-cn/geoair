@@ -8,9 +8,8 @@ import lombok.experimental.Accessors;
 
 /**
  * 一次空间数据传输的完整输入。
- * <p>
- * 将旧 {@code GeoFileTran} 分散的 setter、上下文和回调收敛为单个请求对象，
- * 使 {@link GeoTransferEngine} 本身保持无状态、可复用。
+ *
+ * <p>将旧 {@code GeoFileTran} 分散的 setter、上下文和回调收敛为单个请求对象， 使 {@link GeoTransferEngine} 本身保持无状态、可复用。
  *
  * @author 张逢吉
  */

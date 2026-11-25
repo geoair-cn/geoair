@@ -1,9 +1,10 @@
 package cn.geoair.map.dynamic.statics.mvt.v4.group;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,22 +15,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * {@link V4IdentitySelector} 的性质测试。
  *
- * <p>这个算子承担两件事，都必须是"性质"而不是"实现细节"，所以测试也按性质写：</p>
+ * <p>这个算子承担两件事，都必须是"性质"而不是"实现细节"，所以测试也按性质写：
+ *
  * <ol>
- *   <li><b>保留的确实是最靠前的那一批</b>：任何被保留的行，优先序都不劣于任何被丢弃的行；</li>
- *   <li><b>与喂入方式无关</b>：分块喂（模拟溢写）与一次性喂、打乱顺序喂，结果相同 ——
- *       这条是"溢写不影响产物"的根据（见 {@code V4开发计划.md} 7.8）。</li>
+ *   <li><b>保留的确实是最靠前的那一批</b>：任何被保留的行，优先序都不劣于任何被丢弃的行；
+ *   <li><b>与喂入方式无关</b>：分块喂（模拟溢写）与一次性喂、打乱顺序喂，结果相同 —— 这条是"溢写不影响产物"的根据（见 {@code V4开发计划.md} 7.8）。
  * </ol>
  *
- * <p>之所以写这条测试：堆的比较方向写反过一次，症状是"同一配置两次跑结果一致、换溢写阈值结果就变"，
- * 非常容易误判成"溢写本来就会影响产物"。</p>
+ * <p>之所以写这条测试：堆的比较方向写反过一次，症状是"同一配置两次跑结果一致、换溢写阈值结果就变"， 非常容易误判成"溢写本来就会影响产物"。
  *
  * @author 张逢吉
  */
@@ -105,8 +103,9 @@ public class V4IdentitySelectorTest {
                 bestDropped = candidate;
             }
         }
-        assertTrue("保留的行比丢弃的行更靠后，说明取的不是最小的 N 个", bestDropped == null
-                || priority.compare(worstKept, bestDropped) <= 0);
+        assertTrue(
+                "保留的行比丢弃的行更靠后，说明取的不是最小的 N 个",
+                bestDropped == null || priority.compare(worstKept, bestDropped) <= 0);
     }
 
     @Test

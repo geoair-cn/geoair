@@ -20,5 +20,6 @@ public interface V3FeatureReader {
      * @return 延迟执行的 Spark RDD
      * @throws Exception 输入配置或读取准备失败
      */
-    JavaRDD<GirAdvOneRow> read(SparkSession sparkSession, MvtLayerSliceParameter layer) throws Exception;
+    JavaRDD<GirAdvOneRow> read(SparkSession sparkSession, MvtLayerSliceParameter layer)
+            throws Exception;
 }

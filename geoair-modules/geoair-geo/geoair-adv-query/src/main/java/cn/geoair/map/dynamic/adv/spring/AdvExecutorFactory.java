@@ -5,7 +5,6 @@ import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.db.dialect.DialectName;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -17,23 +16,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.sql.DataSource;
 
-
 /** 高级查询执行器工厂，根据数据源类型自动创建对应执行器 */
-
 public class AdvExecutorFactory {
     public static GiLogger log = GirLoggerFactory.getLogger();
 
     /** 以稳定方言标识索引的执行器提供者。 */
-    private static final Map<String, AdvDialectProvider> DIALECT_PROVIDERS = new ConcurrentHashMap<>();
+    private static final Map<String, AdvDialectProvider> DIALECT_PROVIDERS =
+            new ConcurrentHashMap<>();
 
     /** 兼容既有 Hutool DialectName API 的默认提供者索引。 */
-    private static final Map<DialectName, AdvDialectProvider> HUTOOL_DIALECT_PROVIDERS = new ConcurrentHashMap<>();
+    private static final Map<DialectName, AdvDialectProvider> HUTOOL_DIALECT_PROVIDERS =
+            new ConcurrentHashMap<>();
 
-    /**
-     * JDBC 产品名匹配顺序。ConcurrentHashMap 的 values() 没有稳定迭代顺序，不能直接用于
-     * 包含匹配；这里保留注册顺序，使出现关键字重叠时的结果可预测。
-     */
-    private static final CopyOnWriteArrayList<AdvDialectProvider> PRODUCT_NAME_PROVIDERS = new CopyOnWriteArrayList<>();
+    /** JDBC 产品名匹配顺序。ConcurrentHashMap 的 values() 没有稳定迭代顺序，不能直接用于 包含匹配；这里保留注册顺序，使出现关键字重叠时的结果可预测。 */
+    private static final CopyOnWriteArrayList<AdvDialectProvider> PRODUCT_NAME_PROVIDERS =
+            new CopyOnWriteArrayList<>();
 
     static {
         registerProvider(new MysqlAdvDialectProvider());
@@ -49,6 +46,7 @@ public class AdvExecutorFactory {
 
     /**
      * 注册一个数据库方言提供者。
+     *
      * <p>同一方言标识只能注册一次，避免某个扩展模块在运行期悄悄覆盖已有数据库实现。
      */
     public static void registerProvider(AdvDialectProvider provider) {
@@ -80,6 +78,7 @@ public class AdvExecutorFactory {
 
     /**
      * 将 JDBC 产品名称解析为已注册的方言标识。
+     *
      * <p>该方法不获取连接，适合在数据源初始化前做配置校验。
      */
     public static String resolveDialectIdByProductName(String databaseProductName) {
@@ -96,7 +95,6 @@ public class AdvExecutorFactory {
         }
         return provider.create(dataSource, dataSourceName);
     }
-
 
     public static IAdvExecutor getAdvExecutorByDataSource(DataSource dataSource) {
         return getAdvExecutorByDataSource(dataSource, null);
@@ -117,11 +115,11 @@ public class AdvExecutorFactory {
     /**
      * 根据方言名称直接创建执行器（跳过 JDBC 连接探测，性能更高）
      *
-     * <p>适用于调用方已经明确知道数据库类型的场景，避免 {@link #getAdvExecutorByDataSource(DataSource)}
-     * 中通过 {@code DatabaseMetaData.getDatabaseProductName()} 探测数据库类型带来的额外连接开销。</p>
+     * <p>适用于调用方已经明确知道数据库类型的场景，避免 {@link #getAdvExecutorByDataSource(DataSource)} 中通过 {@code
+     * DatabaseMetaData.getDatabaseProductName()} 探测数据库类型带来的额外连接开销。
      *
-     * @param dialectName    数据库方言
-     * @param dataSource     数据源对象
+     * @param dialectName 数据库方言
+     * @param dataSource 数据源对象
      * @param dataSourceName 数据源名称（可为 null）
      * @return 匹配的 IAdvExecutor 实现类
      */

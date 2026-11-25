@@ -17,7 +17,11 @@ public final class TileCompositionResult {
         this.failure = failure;
     }
 
-    public byte[] getPng() { return png == null ? null : png.clone(); }
+    public byte[] getPng() {
+        return png == null ? null : png.clone();
+    }
 
-    public boolean isCacheable() { return state == TileFusionState.COMPLETE || state == TileFusionState.NO_COVERAGE; }
+    public boolean isCacheable() {
+        return state == TileFusionState.COMPLETE || state == TileFusionState.NO_COVERAGE;
+    }
 }

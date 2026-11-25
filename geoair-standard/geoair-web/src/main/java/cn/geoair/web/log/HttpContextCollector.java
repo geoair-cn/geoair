@@ -2,20 +2,18 @@ package cn.geoair.web.log;
 
 import cn.geoair.base.Gir;
 import cn.geoair.base.data.result.GiResult;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * HTTP 上下文采集器。
- * <p>
- * 负责采集 HTTP 请求和响应过程中的各种信息，
- * 包括 IP、请求体、响应体、头信息、参数等。
- * <p>
- * 设计为接口而非抽象类，方便不同实现按需定制采集策略。
+ *
+ * <p>负责采集 HTTP 请求和响应过程中的各种信息， 包括 IP、请求体、响应体、头信息、参数等。
+ *
+ * <p>设计为接口而非抽象类，方便不同实现按需定制采集策略。
  *
  * @author GeoAir Team
  * @since 1.0
@@ -23,11 +21,10 @@ import java.util.function.Consumer;
 public interface HttpContextCollector {
     /**
      * 前置校验器。
-     * <p>
-     * 在请求处理之前执行，用于校验请求的合法性。
-     * 如果校验失败，请抛出异常
      *
-     * @param request  HTTP 请求对象
+     * <p>在请求处理之前执行，用于校验请求的合法性。 如果校验失败，请抛出异常
+     *
+     * @param request HTTP 请求对象
      * @param response HTTP 响应对象
      * @return 校验失败 请抛出异常
      */
@@ -63,14 +60,15 @@ public interface HttpContextCollector {
 
     /**
      * 采集请求体内容。
-     * <p>
-     * 实现者需要将请求包装为可重复读取的版本，并通过 Consumer 回调传递 body 字符串。
      *
-     * @param request             HTTP 请求对象
+     * <p>实现者需要将请求包装为可重复读取的版本，并通过 Consumer 回调传递 body 字符串。
+     *
+     * @param request HTTP 请求对象
      * @param requestBodyConsumer 请求体消费者
      * @return 可重复读取的 HttpServletRequest
      */
-    HttpServletRequest collectRequestBody(HttpServletRequest request, Consumer<String> requestBodyConsumer);
+    HttpServletRequest collectRequestBody(
+            HttpServletRequest request, Consumer<String> requestBodyConsumer);
 
     /**
      * 采集请求头信息。
@@ -119,6 +117,4 @@ public interface HttpContextCollector {
         }
         return exception.getMessage();
     }
-
-
 }

@@ -2,7 +2,6 @@ package cn.geoair.map.tile.forge.fuser.cache;
 
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
-
 import lombok.Getter;
 
 /** 分别展示输出网格和原始网格，避免只统计融合后的缓存。 */

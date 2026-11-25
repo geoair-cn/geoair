@@ -1,4 +1,3 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
 
 import lombok.Setter;
@@ -21,31 +20,21 @@ import lombok.Setter;
  * @author Gabriel Roldan
  */
 @Setter
-public class TileImageInfo   implements   java.io.Serializable{
+public class TileImageInfo implements java.io.Serializable {
 
-    /**
-     * 缓存瓦片格式
-     */
+    /** 缓存瓦片格式 */
     private String cacheTileFormat;
 
-    /**
-     * 压缩质量
-     */
+    /** 压缩质量 */
     private float compressionQuality;
 
-    /**
-     * 是否启用抗锯齿
-     */
+    /** 是否启用抗锯齿 */
     private boolean antialiasing;
 
-    /**
-     * 波段数量
-     */
+    /** 波段数量 */
     private int BandCount;
 
-    /**
-     * LERC误差值
-     */
+    /** LERC误差值 */
     private float LERCError;
 
     /**
@@ -94,7 +83,4 @@ public class TileImageInfo   implements   java.io.Serializable{
     public float getLERCError() {
         return LERCError;
     }
-
-
-
 }

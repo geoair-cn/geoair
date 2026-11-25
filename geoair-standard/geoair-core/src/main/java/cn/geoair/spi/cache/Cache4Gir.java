@@ -41,10 +41,9 @@ public class Cache4Gir {
     }
 
     @GaMethodHandImpl(
-        implClass = GirCacheHelper.class,
-        implMethod = "getCache",
-        type = ImplType.expectfirst
-    )
+            implClass = GirCacheHelper.class,
+            implMethod = "getCache",
+            type = ImplType.expectfirst)
     public static GiCache getCache(String name) {
         switch (cacheType) {
             case SPRING:
@@ -62,7 +61,8 @@ public class Cache4Gir {
         private org.springframework.cache.Cache springCache;
 
         private SpringCache(String name) {
-            org.springframework.cache.CacheManager cacheManager = SpringCacheManagerProvider.getCacheManager();
+            org.springframework.cache.CacheManager cacheManager =
+                    SpringCacheManagerProvider.getCacheManager();
             this.springCache = cacheManager.getCache(name);
         }
 

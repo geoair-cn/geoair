@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.adv.query.typehandler.impl;
 
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvBaseTypeHandler;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerContext;
-
 import cn.hutool.core.convert.Convert;
 
 /**
@@ -25,6 +24,5 @@ public class ObjectAdvTypeHandler extends AdvBaseTypeHandler<Object> {
         } catch (Exception e) {
             return value;
         }
-
     }
 }

@@ -10,19 +10,13 @@ import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.update.Update;
 
-
 /**
- * SQL解析工具类
- * 用于识别SQL语句的类型（读/写）
+ * SQL解析工具类 用于识别SQL语句的类型（读/写）
  *
  * @author 张俊
  * @date 2026/5/28
  */
 public class SQLParserUtil {
-
-
-
-
 
     /**
      * 获取SQL操作类型
@@ -46,7 +40,6 @@ public class SQLParserUtil {
         return parseWithJSqlParser(sql);
     }
 
-
     /**
      * 使用 JSqlParser 解析 SQL
      *
@@ -58,20 +51,18 @@ public class SQLParserUtil {
             Statement statement = CCJSqlParserUtil.parse(sql);
             SQLType type = getTypeFromStatement(statement);
 
-                RdLog.getInstance().debug("JSqlParser解析成功，SQL类型: {}, SQL: {}", type, sql);
+            RdLog.getInstance().debug("JSqlParser解析成功，SQL类型: {}, SQL: {}", type, sql);
 
             return type;
         } catch (JSQLParserException e) {
 
-                RdLog.getInstance().debug("JSqlParser解析失败，降级使用关键词匹配。SQL: {}", sql);
+            RdLog.getInstance().debug("JSqlParser解析失败，降级使用关键词匹配。SQL: {}", sql);
 
             return fastMatch(sql);
         }
     }
 
-    /**
-     * 快速关键词匹配
-     */
+    /** 快速关键词匹配 */
     private static SQLType fastMatch(String sql) {
         if (sql == null || sql.trim().isEmpty()) {
             return SQLType.UNKNOWN;
@@ -81,26 +72,26 @@ public class SQLParserUtil {
         String upperSql = trimmed.toUpperCase();
 
         // 读操作关键词
-        if (upperSql.startsWith("SELECT") ||
-                upperSql.startsWith("SHOW") ||
-                upperSql.startsWith("DESC") ||
-                upperSql.startsWith("DESCRIBE") ||
-                upperSql.startsWith("EXPLAIN")) {
+        if (upperSql.startsWith("SELECT")
+                || upperSql.startsWith("SHOW")
+                || upperSql.startsWith("DESC")
+                || upperSql.startsWith("DESCRIBE")
+                || upperSql.startsWith("EXPLAIN")) {
             return SQLType.READ;
         }
 
         // 写操作关键词
-        if (upperSql.startsWith("INSERT") ||
-                upperSql.startsWith("UPDATE") ||
-                upperSql.startsWith("DELETE") ||
-                upperSql.startsWith("REPLACE") ||
-                upperSql.startsWith("TRUNCATE") ||
-                upperSql.startsWith("CREATE") ||
-                upperSql.startsWith("ALTER") ||
-                upperSql.startsWith("DROP") ||
-                upperSql.startsWith("GRANT") ||
-                upperSql.startsWith("REVOKE") ||
-                upperSql.startsWith("DO")) {
+        if (upperSql.startsWith("INSERT")
+                || upperSql.startsWith("UPDATE")
+                || upperSql.startsWith("DELETE")
+                || upperSql.startsWith("REPLACE")
+                || upperSql.startsWith("TRUNCATE")
+                || upperSql.startsWith("CREATE")
+                || upperSql.startsWith("ALTER")
+                || upperSql.startsWith("DROP")
+                || upperSql.startsWith("GRANT")
+                || upperSql.startsWith("REVOKE")
+                || upperSql.startsWith("DO")) {
             return SQLType.WRITE;
         }
 
@@ -112,10 +103,7 @@ public class SQLParserUtil {
         return SQLType.UNKNOWN;
     }
 
-
-    /**
-     * 解析 WITH 语句的类型
-     */
+    /** 解析 WITH 语句的类型 */
     private static SQLType parseWithStatementType(String sql) {
         // 移除 WITH 关键字（支持 WITH RECURSIVE）
         String afterWith = sql.substring(4).trim();
@@ -137,11 +125,11 @@ public class SQLParserUtil {
                 if (upperMain.startsWith("SELECT")) {
                     return SQLType.READ;
                 }
-                if (upperMain.startsWith("INSERT") ||
-                        upperMain.startsWith("UPDATE") ||
-                        upperMain.startsWith("DELETE") ||
-                        upperMain.startsWith("REPLACE") ||
-                        upperMain.startsWith("TRUNCATE")) {
+                if (upperMain.startsWith("INSERT")
+                        || upperMain.startsWith("UPDATE")
+                        || upperMain.startsWith("DELETE")
+                        || upperMain.startsWith("REPLACE")
+                        || upperMain.startsWith("TRUNCATE")) {
                     return SQLType.WRITE;
                 }
             }
@@ -156,23 +144,21 @@ public class SQLParserUtil {
 
         } catch (Exception e) {
 
-                RdLog.getInstance().debug("WITH 语句解析异常: {}", e.getMessage());
+            RdLog.getInstance().debug("WITH 语句解析异常: {}", e.getMessage());
 
             // 降级：检查是否包含写操作关键词
             String upperSql = sql.toUpperCase();
-            if (upperSql.contains(" INSERT ") ||
-                    upperSql.contains(" UPDATE ") ||
-                    upperSql.contains(" DELETE ") ||
-                    upperSql.matches(".*\\b(INSERT|UPDATE|DELETE)\\b.*")) {
+            if (upperSql.contains(" INSERT ")
+                    || upperSql.contains(" UPDATE ")
+                    || upperSql.contains(" DELETE ")
+                    || upperSql.matches(".*\\b(INSERT|UPDATE|DELETE)\\b.*")) {
                 return SQLType.WRITE;
             }
             return SQLType.READ;
         }
     }
 
-    /**
-     * 提取主查询（所有 CTE 结束后的 SQL 部分）
-     */
+    /** 提取主查询（所有 CTE 结束后的 SQL 部分） */
     private static String extractMainQuery(String sql) {
         // 移除 WITH 关键字
         String remaining = sql.substring(4).trim();
@@ -189,9 +175,7 @@ public class SQLParserUtil {
         return null;
     }
 
-    /**
-     * 找到所有 CTE 定义结束的位置
-     */
+    /** 找到所有 CTE 定义结束的位置 */
     private static int findEndOfCTEs(String sql) {
         int index = 0;
         int length = sql.length();
@@ -235,9 +219,7 @@ public class SQLParserUtil {
         return -1;
     }
 
-    /**
-     * 查找匹配的括号位置
-     */
+    /** 查找匹配的括号位置 */
     private static int findMatchingParen(String str, int startPos) {
         int count = 1;
         for (int i = startPos + 1; i < str.length(); i++) {
@@ -254,9 +236,7 @@ public class SQLParserUtil {
         return -1;
     }
 
-    /**
-     * 查找 AS ( 或 AS( 的位置
-     */
+    /** 查找 AS ( 或 AS( 的位置 */
     private static int findASIndex(String sql, int start) {
         int index = start;
         while (index < sql.length()) {
@@ -280,9 +260,7 @@ public class SQLParserUtil {
         return -1;
     }
 
-    /**
-     * 检查 CTE 之后是否包含写操作
-     */
+    /** 检查 CTE 之后是否包含写操作 */
     private static boolean containsWriteAfterCTE(String sql) {
         String remaining = sql.substring(4).trim();
         if (remaining.toUpperCase().startsWith("RECURSIVE")) {
@@ -292,11 +270,11 @@ public class SQLParserUtil {
         int endOfCTEs = findEndOfCTEs(remaining);
         if (endOfCTEs > 0 && endOfCTEs < remaining.length()) {
             String afterCTE = remaining.substring(endOfCTEs).trim().toUpperCase();
-            if (afterCTE.startsWith("INSERT") ||
-                    afterCTE.startsWith("UPDATE") ||
-                    afterCTE.startsWith("DELETE") ||
-                    afterCTE.startsWith("REPLACE") ||
-                    afterCTE.startsWith("TRUNCATE")) {
+            if (afterCTE.startsWith("INSERT")
+                    || afterCTE.startsWith("UPDATE")
+                    || afterCTE.startsWith("DELETE")
+                    || afterCTE.startsWith("REPLACE")
+                    || afterCTE.startsWith("TRUNCATE")) {
                 return true;
             }
         }
@@ -304,9 +282,7 @@ public class SQLParserUtil {
         return false;
     }
 
-    /**
-     * 检查 CTE 中是否包含写操作
-     */
+    /** 检查 CTE 中是否包含写操作 */
     private static boolean containsWriteInCTE(String sql) {
         // 移除 WITH 关键字
         String afterWith = sql.substring(4).trim();
@@ -336,9 +312,9 @@ public class SQLParserUtil {
 
             // 检查 CTE 内容
             String cteContent = afterWith.substring(startParen + 1, endParen).trim().toUpperCase();
-            if (cteContent.startsWith("INSERT") ||
-                    cteContent.startsWith("UPDATE") ||
-                    cteContent.startsWith("DELETE")) {
+            if (cteContent.startsWith("INSERT")
+                    || cteContent.startsWith("UPDATE")
+                    || cteContent.startsWith("DELETE")) {
                 return true;
             }
 
@@ -363,7 +339,6 @@ public class SQLParserUtil {
         return false;
     }
 
-
     /**
      * 从 Statement 对象获取 SQL 类型
      *
@@ -375,16 +350,15 @@ public class SQLParserUtil {
             return SQLType.READ;
         }
 
-        if (statement instanceof Insert ||
-                statement instanceof Update ||
-                statement instanceof Delete) {
+        if (statement instanceof Insert
+                || statement instanceof Update
+                || statement instanceof Delete) {
             return SQLType.WRITE;
         }
 
         // 其他类型（DDL、DCL等）也归类为写操作
         return SQLType.WRITE;
     }
-
 
     /**
      * 判断是否是读操作
@@ -406,6 +380,4 @@ public class SQLParserUtil {
         SQLType type = getSQLType(sql);
         return type == SQLType.WRITE;
     }
-
-
 }

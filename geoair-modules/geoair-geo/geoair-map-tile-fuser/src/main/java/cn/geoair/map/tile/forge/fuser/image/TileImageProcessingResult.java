@@ -12,16 +12,27 @@ public final class TileImageProcessingResult {
     private final byte[] bytes;
     private final String reason;
 
-    public TileImageProcessingResult(TileImageProcessingState state, String ruleVersion, double score,
-                                     int regions, byte[] bytes, String reason) {
+    public TileImageProcessingResult(
+            TileImageProcessingState state,
+            String ruleVersion,
+            double score,
+            int regions,
+            byte[] bytes,
+            String reason) {
         if (state == null || ruleVersion == null || ruleVersion.trim().isEmpty())
             throw new IllegalArgumentException("处理状态和规则版本不能为空");
         if (state == TileImageProcessingState.PROCESSED && (bytes == null || bytes.length == 0)
                 || state != TileImageProcessingState.PROCESSED && bytes != null)
             throw new IllegalArgumentException("仅处理成功时允许携带非空结果图片");
-        this.state = state; this.ruleVersion = ruleVersion; this.score = score;
-        this.regions = regions; this.bytes = bytes == null ? null : bytes.clone(); this.reason = reason;
+        this.state = state;
+        this.ruleVersion = ruleVersion;
+        this.score = score;
+        this.regions = regions;
+        this.bytes = bytes == null ? null : bytes.clone();
+        this.reason = reason;
     }
 
-    public byte[] getBytes() { return bytes == null ? null : bytes.clone(); }
+    public byte[] getBytes() {
+        return bytes == null ? null : bytes.clone();
+    }
 }

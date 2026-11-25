@@ -2,9 +2,7 @@ package cn.geoair.base.test;
 
 import cn.geoair.base.bean.GirBeanHelper;
 
-/**
- * GirBeanHelper 入口示例
- */
+/** GirBeanHelper 入口示例 */
 public class GirBeanHelperExample {
 
     public static void main(String[] args) {

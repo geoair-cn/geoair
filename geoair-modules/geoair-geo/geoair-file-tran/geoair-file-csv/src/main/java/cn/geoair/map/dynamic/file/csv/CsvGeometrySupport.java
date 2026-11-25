@@ -23,7 +23,8 @@ final class CsvGeometrySupport {
             if (wkt == null || wkt.trim().isEmpty()) {
                 return null;
             }
-            Geometry geometry = GirGeoTools.defaultInstance().getFormatOpt().wktToJtsGeometry(wkt, false);
+            Geometry geometry =
+                    GirGeoTools.defaultInstance().getFormatOpt().wktToJtsGeometry(wkt, false);
             if (geometry != null) {
                 geometry.setSRID(linkInfo.getSrid());
             }
@@ -32,17 +33,30 @@ final class CsvGeometrySupport {
 
         int lonIndex = CsvSchemaSupport.findColumnIndex(headers, linkInfo.getLongitudeColumnName());
         int latIndex = CsvSchemaSupport.findColumnIndex(headers, linkInfo.getLatitudeColumnName());
-        if (lonIndex < 0 || latIndex < 0 || lonIndex >= values.length || latIndex >= values.length) {
-            throw new IllegalArgumentException("未找到经纬度列：" + linkInfo.getLongitudeColumnName() + "/" + linkInfo.getLatitudeColumnName());
+        if (lonIndex < 0
+                || latIndex < 0
+                || lonIndex >= values.length
+                || latIndex >= values.length) {
+            throw new IllegalArgumentException(
+                    "未找到经纬度列："
+                            + linkInfo.getLongitudeColumnName()
+                            + "/"
+                            + linkInfo.getLatitudeColumnName());
         }
         String lonValue = values[lonIndex];
         String latValue = values[latIndex];
-        if (lonValue == null || lonValue.trim().isEmpty() || latValue == null || latValue.trim().isEmpty()) {
+        if (lonValue == null
+                || lonValue.trim().isEmpty()
+                || latValue == null
+                || latValue.trim().isEmpty()) {
             return null;
         }
         double lon = Double.parseDouble(lonValue.trim());
         double lat = Double.parseDouble(latValue.trim());
-        Point point = GirGeoTools.defaultInstance().getGeom2ArrayOpt().doubleArrayToPoint(new double[]{lon, lat});
+        Point point =
+                GirGeoTools.defaultInstance()
+                        .getGeom2ArrayOpt()
+                        .doubleArrayToPoint(new double[] {lon, lat});
         point.setSRID(linkInfo.getSrid());
         return point;
     }
@@ -52,7 +66,9 @@ final class CsvGeometrySupport {
             return "";
         }
         if (linkInfo.getGeometryMode() == CsvGeometryMode.WKT) {
-            return GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(geometry, false);
+            return GirGeoTools.defaultInstance()
+                    .getFormatOpt()
+                    .jtsGeometryToWktString(geometry, false);
         }
         if (!(geometry instanceof Point)) {
             throw new IllegalArgumentException("经纬度模式仅支持 Point 几何导出");

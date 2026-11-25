@@ -2,30 +2,24 @@ package cn.geoair.map.tile.forge.fuser.utils;
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
-
 import java.awt.image.BufferedImage;
 
-/**
- * 瓦片空白检测工具类
- * 用于检测瓦片图像中是否存在大面积空白矩形区域
- */
-
+/** 瓦片空白检测工具类 用于检测瓦片图像中是否存在大面积空白矩形区域 */
 public class TileBlankDetector {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     // 配置参数
-    private static int MIN_TILE_SIZE = 50;              // 最小瓦片尺寸
-    private static int SAMPLE_DIVISOR = 10;             // 采样步长除数（调小以提高精度）
-    private static double MIN_BLANK_RECT_RATIO = 0.15;  // 最小空白矩形占比（15%）
-    private static double ROW_BLANK_THRESHOLD = 0.3;    // 行空白率阈值（放宽到70%）
-    private static double COL_BLANK_THRESHOLD = 0.3;    // 列空白率阈值（放宽到70%）
+    private static int MIN_TILE_SIZE = 50; // 最小瓦片尺寸
+    private static int SAMPLE_DIVISOR = 10; // 采样步长除数（调小以提高精度）
+    private static double MIN_BLANK_RECT_RATIO = 0.15; // 最小空白矩形占比（15%）
+    private static double ROW_BLANK_THRESHOLD = 0.3; // 行空白率阈值（放宽到70%）
+    private static double COL_BLANK_THRESHOLD = 0.3; // 列空白率阈值（放宽到70%）
     private static double WINDOW_BLANK_THRESHOLD = 0.75; // 窗口空白率阈值
-
 
     /**
      * 快速检测瓦片是否存在大面积空白矩形区域（推荐使用）
      *
      * @param imageBytes 图片字节数组
-     * @param format     图片格式
+     * @param format 图片格式
      * @return true表示存在大面积空白矩形区域
      */
     public static LargeBlankCheck hasLargeBlankRect(byte[] imageBytes, String format) {
@@ -36,11 +30,12 @@ public class TileBlankDetector {
      * 检测瓦片是否存在大面积空白矩形区域（带日志记录）
      *
      * @param imageBytes 图片字节数组
-     * @param format     图片格式
-     * @param tileInfo   瓦片信息（用于日志记录）
+     * @param format 图片格式
+     * @param tileInfo 瓦片信息（用于日志记录）
      * @return true表示存在大面积空白矩形区域
      */
-    public static LargeBlankCheck hasLargeBlankRect(byte[] imageBytes, String format, String tileInfo) {
+    public static LargeBlankCheck hasLargeBlankRect(
+            byte[] imageBytes, String format, String tileInfo) {
         if (imageBytes == null || imageBytes.length == 0) {
             if (tileInfo != null) {
                 log.debug("瓦片数据为空: {}", tileInfo);
@@ -86,16 +81,13 @@ public class TileBlankDetector {
             }
             return LargeBlankCheck.of().setBlankIs(result).setImage(image);
 
-
         } catch (Exception e) {
             log.warn("检测空白矩形失败: {}", e.getMessage());
             return LargeBlankCheck.of().setBlankIs(false);
         }
     }
 
-    /**
-     * 快速检测瓦片是否完全空白
-     */
+    /** 快速检测瓦片是否完全空白 */
     private static boolean isCompletelyBlank(BufferedImage image, String format) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -117,10 +109,9 @@ public class TileBlankDetector {
         return totalSamples > 0 && (double) blankSamples / totalSamples >= 0.90;
     }
 
-    /**
-     * 通过采样检测空白矩形区域（优化版）
-     */
-    private static boolean detectBlankRectBySampling(BufferedImage image, int width, int height, String format) {
+    /** 通过采样检测空白矩形区域（优化版） */
+    private static boolean detectBlankRectBySampling(
+            BufferedImage image, int width, int height, String format) {
         // 采样检测，步长根据瓦片大小动态调整（调小步长提高精度）
         int step = Math.max(1, Math.min(width, height) / SAMPLE_DIVISOR);
 
@@ -184,11 +175,9 @@ public class TileBlankDetector {
         return detectBlankWindow(rowBlankRatio, colBlankRatio, totalRows, totalCols);
     }
 
-    /**
-     * 方法1：检测连续空白行和列
-     */
-    private static boolean detectByRowCol(double[] rowBlankRatio, double[] colBlankRatio,
-                                          int totalRows, int totalCols) {
+    /** 方法1：检测连续空白行和列 */
+    private static boolean detectByRowCol(
+            double[] rowBlankRatio, double[] colBlankRatio, int totalRows, int totalCols) {
         // 查找连续的空白行（空白率 >= 阈值）
         int maxBlankRows = findMaxConsecutive(rowBlankRatio, ROW_BLANK_THRESHOLD);
         int maxBlankCols = findMaxConsecutive(colBlankRatio, COL_BLANK_THRESHOLD);
@@ -212,11 +201,9 @@ public class TileBlankDetector {
         return false;
     }
 
-    /**
-     * 方法2：检测大块矩形区域（专门针对下半部分空白、右上角空白等情况）
-     */
-    private static boolean detectLargeRectRegion(double[] rowBlankRatio, double[] colBlankRatio,
-                                                 int totalRows, int totalCols) {
+    /** 方法2：检测大块矩形区域（专门针对下半部分空白、右上角空白等情况） */
+    private static boolean detectLargeRectRegion(
+            double[] rowBlankRatio, double[] colBlankRatio, int totalRows, int totalCols) {
         // 检测是否存在一个矩形区域，其空白率很高
 
         // 1. 检测底部大块空白（下半部分空白）
@@ -311,11 +298,9 @@ public class TileBlankDetector {
         return detectLargeWindow(rowBlankRatio, colBlankRatio, totalRows, totalCols);
     }
 
-    /**
-     * 检测大窗口空白区域（针对大面积矩形）
-     */
-    private static boolean detectLargeWindow(double[] rowBlankRatio, double[] colBlankRatio,
-                                             int totalRows, int totalCols) {
+    /** 检测大窗口空白区域（针对大面积矩形） */
+    private static boolean detectLargeWindow(
+            double[] rowBlankRatio, double[] colBlankRatio, int totalRows, int totalCols) {
         // 窗口大小：至少20%的尺寸
         int windowRows = Math.max(2, (int) (totalRows * 0.2));
         int windowCols = Math.max(2, (int) (totalCols * 0.2));
@@ -358,10 +343,10 @@ public class TileBlankDetector {
                 windowColAvg /= windowCols;
 
                 // 判断条件：行和列的平均空白率都达标，且大部分行列都满足条件
-                if (windowRowAvg >= WINDOW_BLANK_THRESHOLD &&
-                        windowColAvg >= WINDOW_BLANK_THRESHOLD &&
-                        highBlankRows >= windowRows * 0.6 &&
-                        highBlankCols >= windowCols * 0.6) {
+                if (windowRowAvg >= WINDOW_BLANK_THRESHOLD
+                        && windowColAvg >= WINDOW_BLANK_THRESHOLD
+                        && highBlankRows >= windowRows * 0.6
+                        && highBlankCols >= windowCols * 0.6) {
                     return true;
                 }
             }
@@ -369,9 +354,7 @@ public class TileBlankDetector {
         return false;
     }
 
-    /**
-     * 查找连续超过阈值的最大长度
-     */
+    /** 查找连续超过阈值的最大长度 */
     private static int findMaxConsecutive(double[] ratios, double threshold) {
         int maxLength = 0;
         int currentLength = 0;
@@ -387,11 +370,9 @@ public class TileBlankDetector {
         return maxLength;
     }
 
-    /**
-     * 使用滑动窗口检测空白矩形区域（保留原方法）
-     */
-    private static boolean detectBlankWindow(double[] rowBlankRatio, double[] colBlankRatio,
-                                             int totalRows, int totalCols) {
+    /** 使用滑动窗口检测空白矩形区域（保留原方法） */
+    private static boolean detectBlankWindow(
+            double[] rowBlankRatio, double[] colBlankRatio, int totalRows, int totalCols) {
         int windowRows = Math.max(2, (int) (totalRows * 0.15));
         int windowCols = Math.max(2, (int) (totalCols * 0.15));
 
@@ -425,9 +406,9 @@ public class TileBlankDetector {
                     }
                 }
 
-                if (windowBlankRatio >= WINDOW_BLANK_THRESHOLD &&
-                        rowCount >= windowRows * 0.6 &&
-                        colCount >= windowCols * 0.6) {
+                if (windowBlankRatio >= WINDOW_BLANK_THRESHOLD
+                        && rowCount >= windowRows * 0.6
+                        && colCount >= windowCols * 0.6) {
                     return true;
                 }
             }
@@ -435,35 +416,34 @@ public class TileBlankDetector {
         return false;
     }
 
-//    /**
-//     * 检测像素是否为空白
-//     */
-//    private static boolean isBlankPixel(int rgb, String format) {
-//        int alpha = (rgb >> 24) & 0xFF;
-//
-//        // 完全透明
-//        if (alpha == 0) {
-//            return true;
-//        }
-//
-//        int red = (rgb >> 16) & 0xFF;
-//        int green = (rgb >> 8) & 0xFF;
-//        int blue = rgb & 0xFF;
-//
-//        // 检测是否为纯白色或接近白色
-//        boolean isWhite = red >= WHITE_THRESHOLD && green >= WHITE_THRESHOLD && blue >= WHITE_THRESHOLD;
-//
-//        // PNG格式：透明或半透明也算空白
-//        if (format != null && format.toLowerCase().contains("png")) {
-//            return isWhite || alpha < 50;
-//        }
-//
-//        return isWhite;
-//    }
+    //    /**
+    //     * 检测像素是否为空白
+    //     */
+    //    private static boolean isBlankPixel(int rgb, String format) {
+    //        int alpha = (rgb >> 24) & 0xFF;
+    //
+    //        // 完全透明
+    //        if (alpha == 0) {
+    //            return true;
+    //        }
+    //
+    //        int red = (rgb >> 16) & 0xFF;
+    //        int green = (rgb >> 8) & 0xFF;
+    //        int blue = rgb & 0xFF;
+    //
+    //        // 检测是否为纯白色或接近白色
+    //        boolean isWhite = red >= WHITE_THRESHOLD && green >= WHITE_THRESHOLD && blue >=
+    // WHITE_THRESHOLD;
+    //
+    //        // PNG格式：透明或半透明也算空白
+    //        if (format != null && format.toLowerCase().contains("png")) {
+    //            return isWhite || alpha < 50;
+    //        }
+    //
+    //        return isWhite;
+    //    }
 
-    /**
-     * 检测像素是否为空白（只检测透明像素）
-     */
+    /** 检测像素是否为空白（只检测透明像素） */
     private static boolean isBlankPixel(int rgb, String format) {
         int alpha = (rgb >> 24) & 0xFF;
 
@@ -480,6 +460,4 @@ public class TileBlankDetector {
         // 非PNG格式，只有完全透明才算空白
         return false;
     }
-
-
 }

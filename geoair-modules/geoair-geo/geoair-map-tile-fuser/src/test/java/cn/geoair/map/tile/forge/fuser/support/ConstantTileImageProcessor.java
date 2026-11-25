@@ -9,9 +9,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class ConstantTileImageProcessor implements TileImageProcessor {
     private final TileImageProcessingResult result;
     public final AtomicInteger calls = new AtomicInteger();
-    public ConstantTileImageProcessor(TileImageProcessingResult result) { this.result = result; }
-    @Override public String getRuleVersion() { return "test-v1"; }
-    @Override public TileImageProcessingResult process(byte[] bytes, TileImageProcessingContext context) {
+
+    public ConstantTileImageProcessor(TileImageProcessingResult result) {
+        this.result = result;
+    }
+
+    @Override
+    public String getRuleVersion() {
+        return "test-v1";
+    }
+
+    @Override
+    public TileImageProcessingResult process(byte[] bytes, TileImageProcessingContext context) {
         calls.incrementAndGet();
         return result;
     }

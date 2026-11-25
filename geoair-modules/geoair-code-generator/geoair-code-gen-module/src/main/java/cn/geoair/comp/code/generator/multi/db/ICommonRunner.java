@@ -2,7 +2,6 @@ package cn.geoair.comp.code.generator.multi.db;
 
 import cn.geoair.comp.code.generator.multi.domian.GenTable;
 import cn.geoair.comp.code.generator.multi.domian.GenTableColumn;
-
 import java.util.List;
 
 /**
@@ -11,9 +10,7 @@ import java.util.List;
  */
 public interface ICommonRunner {
 
-
     List<GenTableColumn> getTableColumnsByTableName(String tableName);
-
 
     List<GenTable> selectDbTableListByNames(String[] tableNames);
 }

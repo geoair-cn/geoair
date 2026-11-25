@@ -17,7 +17,8 @@ public class BingMapQuadKeyUtilsTest {
         Assert.assertEquals(0, root.getZ());
         Assert.assertEquals(0, root.getX());
         Assert.assertEquals(0, root.getY());
-        Assert.assertArrayEquals(new String[]{"0", "1", "2", "3"}, quadKeyUtils.getChildQuadKeys(""));
+        Assert.assertArrayEquals(
+                new String[] {"0", "1", "2", "3"}, quadKeyUtils.getChildQuadKeys(""));
     }
 
     @Test

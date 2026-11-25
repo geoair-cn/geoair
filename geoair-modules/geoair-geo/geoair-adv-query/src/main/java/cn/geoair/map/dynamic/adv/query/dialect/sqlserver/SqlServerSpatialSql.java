@@ -4,14 +4,14 @@ import cn.hutool.core.util.StrUtil;
 
 /**
  * SQL Server {@code geometry} 空间 SQL 片段构建器。
- * <p>本类只生成不依赖表元数据的原生空间表达式，供后续 SQL Server 执行器复用。</p>
+ *
+ * <p>本类只生成不依赖表元数据的原生空间表达式，供后续 SQL Server 执行器复用。
  *
  * @author 张逢吉
  */
 public final class SqlServerSpatialSql {
 
-    private SqlServerSpatialSql() {
-    }
+    private SqlServerSpatialSql() {}
 
     public static String geometryFromText(String wkt, int srid) {
         if (StrUtil.isBlank(wkt)) {
@@ -21,11 +21,17 @@ public final class SqlServerSpatialSql {
     }
 
     public static String intersects(String geometryColumn, String wkt, int srid) {
-        return quoteField(geometryColumn) + ".STIntersects(" + geometryFromText(wkt, srid) + ") = 1";
+        return quoteField(geometryColumn)
+                + ".STIntersects("
+                + geometryFromText(wkt, srid)
+                + ") = 1";
     }
 
     public static String within(String geometryColumn, String bboxWkt, int srid) {
-        return quoteField(geometryColumn) + ".STWithin(" + geometryFromText(bboxWkt, srid) + ") = 1";
+        return quoteField(geometryColumn)
+                + ".STWithin("
+                + geometryFromText(bboxWkt, srid)
+                + ") = 1";
     }
 
     public static String distance(String geometryColumn, String wkt, int srid) {

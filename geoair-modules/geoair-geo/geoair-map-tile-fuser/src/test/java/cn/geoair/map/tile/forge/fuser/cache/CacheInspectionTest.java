@@ -5,13 +5,11 @@ import static org.junit.Assert.*;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.fuser.execution.*;
 import cn.geoair.web.mime.GirImageMime;
-
-import org.junit.*;
-import org.junit.rules.TemporaryFolder;
-
 import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 
 public class CacheInspectionTest {
     @Rule public TemporaryFolder folder = new TemporaryFolder();

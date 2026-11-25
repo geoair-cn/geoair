@@ -23,9 +23,7 @@ public class TileParseResult {
     }
 
     // 构造函数
-    public TileParseResult() {
-    }
-
+    public TileParseResult() {}
 
     // 辅助方法：判断是否为瓦片
     public boolean isTile() {
@@ -38,7 +36,8 @@ public class TileParseResult {
 
     @Override
     public String toString() {
-        return String.format("TileParseResult{fileId='%s', fileName='%s', serviceName='%s', z='%s', x='%s', y='%s', format='%s'}",
+        return String.format(
+                "TileParseResult{fileId='%s', fileName='%s', serviceName='%s', z='%s', x='%s', y='%s', format='%s'}",
                 fileId, fileName, serviceName, z, x, y, format);
     }
 }

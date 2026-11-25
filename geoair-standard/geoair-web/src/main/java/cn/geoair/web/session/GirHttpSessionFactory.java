@@ -8,7 +8,9 @@ final class GirHttpSessionFactory {
     private GirHttpSessionFactory() {}
 
     static HttpSession create(
-            Class<? extends HttpSession> sessionClass, String code, GirSessionConfig sessionConfig) {
+            Class<? extends HttpSession> sessionClass,
+            String code,
+            GirSessionConfig sessionConfig) {
         HttpSession session = null;
         try {
             Constructor<? extends HttpSession> cont =

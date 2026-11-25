@@ -2,11 +2,9 @@ package cn.geoair.map.tile.forge.fuser.cache;
 
 import cn.geoair.base.data.model.annotation.GaModel;
 import cn.geoair.base.data.model.annotation.GaModelField;
-
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
 /** 存储大小与各级瓦片数据大小分开，未支持的驱动不会伪装成空缓存。 */
 @Data

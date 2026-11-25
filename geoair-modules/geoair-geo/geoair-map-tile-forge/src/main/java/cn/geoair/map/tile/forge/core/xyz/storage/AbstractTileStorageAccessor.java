@@ -2,58 +2,47 @@ package cn.geoair.map.tile.forge.core.xyz.storage;
 
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.map.MapUtil;
-
 import java.util.*;
 
-/**
- * 瓦片存储访问器抽象基类
- */
+/** 瓦片存储访问器抽象基类 */
 public abstract class AbstractTileStorageAccessor implements TileStorageAccessor {
 
     // 缓存结果
     protected Integer maxZ;
     protected Integer minZ;
-    protected final Map<String, Map<Integer, Pair<Integer, Integer>>> xExtremesCache = new HashMap<>();
-    protected final Map<String, Map<String, Pair<Integer, Integer>>> yExtremesCache = new HashMap<>();
+    protected final Map<String, Map<Integer, Pair<Integer, Integer>>> xExtremesCache =
+            new HashMap<>();
+    protected final Map<String, Map<String, Pair<Integer, Integer>>> yExtremesCache =
+            new HashMap<>();
 
     // 默认最大层级
     protected static final int MAX_LEVEL = 30;
 
     // Z层级参数（固定）
-    protected static final int Z_STEP = 5;         // Z层级检查步长
-    protected static final int Z_BATCH_SIZE = 5;   // Z层级批量检查数量
+    protected static final int Z_STEP = 5; // Z层级检查步长
+    protected static final int Z_BATCH_SIZE = 5; // Z层级批量检查数量
 
     // XY坐标基础参数（动态计算）
-    protected static final int XY_BASE_STEP = 8;    // XY基础步长
+    protected static final int XY_BASE_STEP = 8; // XY基础步长
     protected static final int XY_BASE_BATCH_SIZE = 10; // XY基础批量大小
     protected static final int MAX_BATCH_SIZE = 50; // 最大批量大小限制
 
-    /**
-     * 检查Z层级是否存在
-     */
+    /** 检查Z层级是否存在 */
     protected abstract boolean zLevelExists(String basePath, int z);
 
-
-    /**
-     * 检查X层级是否存在
-     */
+    /** 检查X层级是否存在 */
     protected abstract boolean xLevelExists(String basePath, int z, int x);
 
-    /**
-     * 检查Y瓦片是否存在
-     */
+    /** 检查Y瓦片是否存在 */
     protected abstract boolean yTileExists(String basePath, int z, int x, int y, String format);
 
-
-    /**
-     * 计算XY坐标的动态步长
-     */
+    /** 计算XY坐标的动态步长 */
     protected int calculateXYStep(int z) {
         int maxRange = (int) Math.pow(2, z) - 1;
 
         // 根据范围大小动态调整步长
         if (maxRange <= 100) {
-            return 2;  // 小范围，小步长
+            return 2; // 小范围，小步长
         } else if (maxRange <= 1000) {
             return 10; // 中等范围，中等步长
         } else if (maxRange <= 10000) {
@@ -63,9 +52,7 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
         }
     }
 
-    /**
-     * 计算XY坐标的动态批量大小
-     */
+    /** 计算XY坐标的动态批量大小 */
     protected int calculateXYBatchSize(int z) {
         int maxRange = (int) Math.pow(2, z) - 1;
 
@@ -84,16 +71,21 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
     /**
      * 批量二分查找最小值（完整逻辑）
      *
-     * @param basePath  基础路径
-     * @param minRange  最小值范围
-     * @param maxRange  最大值范围
-     * @param step      检查步长（间隔）
+     * @param basePath 基础路径
+     * @param minRange 最小值范围
+     * @param maxRange 最大值范围
+     * @param step 检查步长（间隔）
      * @param batchSize 批量检查数量
-     * @param checker   批量检查器
+     * @param checker 批量检查器
      * @return 找到的最小值，-1表示未找到
      */
-    protected int findMinValue(String basePath, int minRange, int maxRange, int step, int batchSize,
-                               BatchValueChecker checker) {
+    protected int findMinValue(
+            String basePath,
+            int minRange,
+            int maxRange,
+            int step,
+            int batchSize,
+            BatchValueChecker checker) {
         if (minRange > maxRange) {
             return -1;
         }
@@ -135,16 +127,21 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
     /**
      * 批量二分查找最大值（完整逻辑）
      *
-     * @param basePath  基础路径
-     * @param minRange  最小值范围
-     * @param maxRange  最大值范围
-     * @param step      检查步长（间隔）
+     * @param basePath 基础路径
+     * @param minRange 最小值范围
+     * @param maxRange 最大值范围
+     * @param step 检查步长（间隔）
      * @param batchSize 批量检查数量
-     * @param checker   批量检查器
+     * @param checker 批量检查器
      * @return 找到的最大值，-1表示未找到
      */
-    protected int findMaxValue(String basePath, int minRange, int maxRange, int step, int batchSize,
-                               BatchValueChecker checker) {
+    protected int findMaxValue(
+            String basePath,
+            int minRange,
+            int maxRange,
+            int step,
+            int batchSize,
+            BatchValueChecker checker) {
         if (minRange > maxRange) {
             return -1;
         }
@@ -183,10 +180,9 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
         return findMaxInRange(basePath, searchStart, searchEnd, batchSize, checker);
     }
 
-    /**
-     * 在指定范围内精确查找最小值
-     */
-    private int findMinInRange(String basePath, int start, int end, int batchSize, BatchValueChecker checker) {
+    /** 在指定范围内精确查找最小值 */
+    private int findMinInRange(
+            String basePath, int start, int end, int batchSize, BatchValueChecker checker) {
         List<Integer> allValues = new ArrayList<>();
         for (int i = start; i <= end; i++) {
             allValues.add(i);
@@ -206,10 +202,9 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
         return -1;
     }
 
-    /**
-     * 在指定范围内精确查找最大值
-     */
-    private int findMaxInRange(String basePath, int start, int end, int batchSize, BatchValueChecker checker) {
+    /** 在指定范围内精确查找最大值 */
+    private int findMaxInRange(
+            String basePath, int start, int end, int batchSize, BatchValueChecker checker) {
         List<Integer> allValues = new ArrayList<>();
         for (int i = start; i <= end; i++) {
             allValues.add(i);
@@ -232,53 +227,63 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
         return maxFound;
     }
 
-    /**
-     * 优化的批量二分查找最小Z层级
-     */
+    /** 优化的批量二分查找最小Z层级 */
     protected int findMinZ(String basePath) {
         if (minZ != null) {
             return minZ;
         }
 
-        int result = findMinValue(basePath, 0, MAX_LEVEL, Z_STEP, Z_BATCH_SIZE,
-                (path, values) -> batchCheckZLevels(path, values));
+        int result =
+                findMinValue(
+                        basePath,
+                        0,
+                        MAX_LEVEL,
+                        Z_STEP,
+                        Z_BATCH_SIZE,
+                        (path, values) -> batchCheckZLevels(path, values));
 
         minZ = result == -1 ? 0 : result;
         return minZ;
     }
 
-    /**
-     * 优化的批量二分查找最大Z层级
-     */
+    /** 优化的批量二分查找最大Z层级 */
     protected int findMaxZ(String basePath) {
         if (maxZ != null) {
             return maxZ;
         }
 
-        int result = findMaxValue(basePath, 0, MAX_LEVEL, Z_STEP, Z_BATCH_SIZE,
-                (path, values) -> batchCheckZLevels(path, values));
+        int result =
+                findMaxValue(
+                        basePath,
+                        0,
+                        MAX_LEVEL,
+                        Z_STEP,
+                        Z_BATCH_SIZE,
+                        (path, values) -> batchCheckZLevels(path, values));
 
         maxZ = result == -1 ? 0 : result;
         return maxZ;
     }
 
-    /**
-     * 优化的批量二分查找最小X层级
-     */
+    /** 优化的批量二分查找最小X层级 */
     protected int findMinX(String basePath, int z) {
         int maxPossibleX = (int) Math.pow(2, z) - 1;
         int step = calculateXYStep(z);
         int batchSize = calculateXYBatchSize(z);
 
-        int result = findMinValue(basePath, 0, maxPossibleX, step, batchSize,
-                (path, values) -> batchCheckXLevels(path, z, values));
+        int result =
+                findMinValue(
+                        basePath,
+                        0,
+                        maxPossibleX,
+                        step,
+                        batchSize,
+                        (path, values) -> batchCheckXLevels(path, z, values));
 
         return result == -1 ? 0 : result;
     }
 
-    /**
-     * 优化的批量二分查找最大X层级
-     */
+    /** 优化的批量二分查找最大X层级 */
     protected int findMaxX(String basePath, int z) {
         if (xExtremesCache.containsKey(basePath) && xExtremesCache.get(basePath).containsKey(z)) {
             return xExtremesCache.get(basePath).get(z).getValue();
@@ -288,34 +293,43 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
         int step = calculateXYStep(z);
         int batchSize = calculateXYBatchSize(z);
 
-        int result = findMaxValue(basePath, 0, maxPossibleX, step, batchSize,
-                (path, values) -> batchCheckXLevels(path, z, values));
+        int result =
+                findMaxValue(
+                        basePath,
+                        0,
+                        maxPossibleX,
+                        step,
+                        batchSize,
+                        (path, values) -> batchCheckXLevels(path, z, values));
 
         int minX = findMinX(basePath, z);
         xExtremesCache.put(basePath, MapUtil.of(z, new Pair<>(minX, result == -1 ? 0 : result)));
         return result == -1 ? 0 : result;
     }
 
-    /**
-     * 优化的批量二分查找最小Y层级
-     */
+    /** 优化的批量二分查找最小Y层级 */
     protected int findMinY(String basePath, int z, int x, String format) {
         int maxPossibleY = (int) Math.pow(2, z) - 1;
         int step = calculateXYStep(z);
         int batchSize = calculateXYBatchSize(z);
 
-        int result = findMinValue(basePath, 0, maxPossibleY, step, batchSize,
-                (path, values) -> batchCheckYLevels(path, z, x, format, values));
+        int result =
+                findMinValue(
+                        basePath,
+                        0,
+                        maxPossibleY,
+                        step,
+                        batchSize,
+                        (path, values) -> batchCheckYLevels(path, z, x, format, values));
 
         return result == -1 ? 0 : result;
     }
 
-    /**
-     * 优化的批量二分查找最大Y层级
-     */
+    /** 优化的批量二分查找最大Y层级 */
     protected int findMaxY(String basePath, int z, int x, String format) {
         String cacheKey = getCacheKey(z, x, format);
-        if (yExtremesCache.containsKey(basePath)&& yExtremesCache.get(basePath).containsKey(cacheKey)) {
+        if (yExtremesCache.containsKey(basePath)
+                && yExtremesCache.get(basePath).containsKey(cacheKey)) {
             return yExtremesCache.get(basePath).get(cacheKey).getValue();
         }
 
@@ -323,32 +337,33 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
         int step = calculateXYStep(z);
         int batchSize = calculateXYBatchSize(z);
 
-        int result = findMaxValue(basePath, 0, maxPossibleY, step, batchSize,
-                (path, values) -> batchCheckYLevels(path, z, x, format, values));
+        int result =
+                findMaxValue(
+                        basePath,
+                        0,
+                        maxPossibleY,
+                        step,
+                        batchSize,
+                        (path, values) -> batchCheckYLevels(path, z, x, format, values));
 
         int minY = findMinY(basePath, z, x, format);
-        yExtremesCache.put(basePath, MapUtil.of(cacheKey, new Pair<>(minY, result == -1 ? 0 : result)));
+        yExtremesCache.put(
+                basePath, MapUtil.of(cacheKey, new Pair<>(minY, result == -1 ? 0 : result)));
         return result == -1 ? 0 : result;
     }
 
-    /**
-     * 批量值检查器接口
-     */
+    /** 批量值检查器接口 */
     @FunctionalInterface
     protected interface BatchValueChecker {
         Set<Integer> batchExists(String basePath, List<Integer> values);
     }
 
-    /**
-     * 获取缓存键
-     */
+    /** 获取缓存键 */
     protected String getCacheKey(int z, int x, String format) {
         return z + "/" + x + "/" + format;
     }
 
-    /**
-     * 重置缓存
-     */
+    /** 重置缓存 */
     protected void resetCache() {
         maxZ = null;
         minZ = null;
@@ -358,7 +373,7 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
 
     @Override
     public Pair<Integer, Integer> getZExtremes(String basePath) {
-//        resetCache();
+        //        resetCache();
         return new Pair<>(findMinZ(basePath), findMaxZ(basePath));
     }
 
@@ -374,9 +389,7 @@ public abstract class AbstractTileStorageAccessor implements TileStorageAccessor
         return yExtremesCache.get(basePath).get(getCacheKey(z, x, format));
     }
 
-    /**
-     * 判断字符串是否为数字
-     */
+    /** 判断字符串是否为数字 */
     protected boolean isNumeric(String str) {
         try {
             Integer.parseInt(str);

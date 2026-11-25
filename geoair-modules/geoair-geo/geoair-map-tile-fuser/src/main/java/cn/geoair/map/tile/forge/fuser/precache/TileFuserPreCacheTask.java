@@ -1,10 +1,9 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
 import cn.geoair.web.mime.GirImageMime;
-import org.locationtech.jts.geom.Geometry;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * 单层级融合预缓存任务（简化版）
@@ -15,37 +14,55 @@ public class TileFuserPreCacheTask implements Runnable {
 
     private final TileTaskExecutor executor;
 
-    public TileFuserPreCacheTask(String layerName, int zoom, Geometry geometry4326,
-                                  CountDownLatch latch, AtomicLong totalCount,
-                                  AtomicLong successCount, AtomicLong failCount,
-                                 GirImageMime format) {
-        this(layerName, zoom, geometry4326, latch, totalCount, successCount, failCount, format,
+    public TileFuserPreCacheTask(
+            String layerName,
+            int zoom,
+            Geometry geometry4326,
+            CountDownLatch latch,
+            AtomicLong totalCount,
+            AtomicLong successCount,
+            AtomicLong failCount,
+            GirImageMime format) {
+        this(
+                layerName,
+                zoom,
+                geometry4326,
+                latch,
+                totalCount,
+                successCount,
+                failCount,
+                format,
                 Math.max(1, Runtime.getRuntime().availableProcessors()));
     }
 
-    public TileFuserPreCacheTask(String layerName, int zoom, Geometry geometry4326,
-                                  CountDownLatch latch, AtomicLong totalCount,
-                                  AtomicLong successCount, AtomicLong failCount,
-                                  GirImageMime format, int maxConsumerThreads) {
-        TileTaskConfig config = TileTaskConfig.forPreCache(layerName, zoom, geometry4326, format)
-                .setLatch(latch)
-                .setTotalCount(totalCount)
-                .setSuccessCount(successCount)
-                .setFailCount(failCount)
-                .setMaxConsumerThreads(Math.max(1, maxConsumerThreads));
+    public TileFuserPreCacheTask(
+            String layerName,
+            int zoom,
+            Geometry geometry4326,
+            CountDownLatch latch,
+            AtomicLong totalCount,
+            AtomicLong successCount,
+            AtomicLong failCount,
+            GirImageMime format,
+            int maxConsumerThreads) {
+        TileTaskConfig config =
+                TileTaskConfig.forPreCache(layerName, zoom, geometry4326, format)
+                        .setLatch(latch)
+                        .setTotalCount(totalCount)
+                        .setSuccessCount(successCount)
+                        .setFailCount(failCount)
+                        .setMaxConsumerThreads(Math.max(1, maxConsumerThreads));
         this.executor = TileTaskExecutor.forPreCache(config);
     }
 
-    /**
-     * 便捷创建方法
-     */
-    public static TileFuserPreCacheTask of(String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
-        return new TileFuserPreCacheTask(layerName, zoom, geometry4326, null, null, null, null, format);
+    /** 便捷创建方法 */
+    public static TileFuserPreCacheTask of(
+            String layerName, int zoom, Geometry geometry4326, GirImageMime format) {
+        return new TileFuserPreCacheTask(
+                layerName, zoom, geometry4326, null, null, null, null, format);
     }
 
-    /**
-     * 链式构建
-     */
+    /** 链式构建 */
     public static Builder builder() {
         return new Builder();
     }
@@ -106,7 +123,15 @@ public class TileFuserPreCacheTask implements Runnable {
         }
 
         public TileFuserPreCacheTask build() {
-            return new TileFuserPreCacheTask(layerName, zoom, geometry4326, latch, totalCount, successCount, failCount, format);
+            return new TileFuserPreCacheTask(
+                    layerName,
+                    zoom,
+                    geometry4326,
+                    latch,
+                    totalCount,
+                    successCount,
+                    failCount,
+                    format);
         }
     }
 }

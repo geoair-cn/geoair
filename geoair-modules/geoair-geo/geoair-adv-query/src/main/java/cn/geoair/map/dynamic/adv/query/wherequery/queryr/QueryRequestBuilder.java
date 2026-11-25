@@ -1,34 +1,35 @@
 package cn.geoair.map.dynamic.adv.query.wherequery.queryr;
 
+import static cn.geoair.map.dynamic.adv.query.utils.LambdaUtils.getColumnName;
+
 import cn.geoair.map.dynamic.adv.query.apo.OrderApo;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsKeyTran;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsOrder;
 import cn.geoair.map.dynamic.adv.query.enums.AdvNullHandling;
-
 import cn.geoair.map.dynamic.adv.query.utils.LambdaUtils;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereLambdaFilter;
+import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.Getter;
-import cn.geoair.map.dynamic.adv.query.wherequery.SFunction;
-
 import java.util.*;
 import java.util.function.Consumer;
-
-
-import static cn.geoair.map.dynamic.adv.query.utils.LambdaUtils.getColumnName;
+import lombok.Getter;
 
 /**
  * QueryRequest 的 Lambda 风格 Builder 对象
- * <p>支持两种构建模式：</p>
+ *
+ * <p>支持两种构建模式：
+ *
  * <ul>
- *   <li>模式一：对象组装SQL（通过表名、字段、条件等自动生成SQL）</li>
- *   <li>模式二：自定义SQL（完全自定义SQL语句）</li>
+ *   <li>模式一：对象组装SQL（通过表名、字段、条件等自动生成SQL）
+ *   <li>模式二：自定义SQL（完全自定义SQL语句）
  * </ul>
- * <p>使用示例：</p>
+ *
+ * <p>使用示例：
+ *
  * <pre>
  * // 模式一：Lambda风格对象组装
  * GirAdvQueryRequest request = QueryRequestBuilder.&lt;User&gt;create(User.class)
@@ -54,131 +55,70 @@ public class QueryRequestBuilder<T> {
 
     // ==================== 模式一参数 ====================
 
-    /**
-     * 实体类型
-     */
-    @Getter
-    private final Class<T> entityClass;
+    /** 实体类型 */
+    @Getter private final Class<T> entityClass;
 
-    /**
-     * 是否驼峰转下划线
-     */
+    /** 是否驼峰转下划线 */
     boolean isToUnderlineCase;
 
-    /**
-     * 表名或一个完整带结果的SQL
-     */
-    @Getter
-    private String tableOrSqlView;
+    /** 表名或一个完整带结果的SQL */
+    @Getter private String tableOrSqlView;
 
-    /**
-     * SQL视图别名
-     */
-    @Getter
-    private String sqlViewTableNameAlias;
+    /** SQL视图别名 */
+    @Getter private String sqlViewTableNameAlias;
 
-    /**
-     * 查询字段名列表
-     */
+    /** 查询字段名列表 */
     private List<String> columnNames;
 
-
     /**
-     * 表达式字段名称
-     * 类似于这样的函数表达式
-     * "COUNT", "SUM", "AVG", "MAX", "MIN", "CONCAT", "SUBSTR",
-     * "LENGTH", "NOW", "DATE", "YEAR", "MONTH", "DAY", "TRIM"
+     * 表达式字段名称 类似于这样的函数表达式 "COUNT", "SUM", "AVG", "MAX", "MIN", "CONCAT", "SUBSTR", "LENGTH", "NOW",
+     * "DATE", "YEAR", "MONTH", "DAY", "TRIM"
      */
     private List<String> exprColumnNames;
 
-    /**
-     * WHERE条件参数映射
-     */
-    @Getter
-    private GirAdvWhereFilter whereOption;
+    /** WHERE条件参数映射 */
+    @Getter private GirAdvWhereFilter whereOption;
 
-    /**
-     * NULL值处理策略（默认INCLUDE）
-     */
-    @Getter
-    private AdvNullHandling nullHandling = AdvNullHandling.INCLUDE;
+    /** NULL值处理策略（默认INCLUDE） */
+    @Getter private AdvNullHandling nullHandling = AdvNullHandling.INCLUDE;
 
-    /**
-     * 排序参数列表
-     */
-    @Getter
-    private final List<OrderApo> orders = new ArrayList<>();
+    /** 排序参数列表 */
+    @Getter private final List<OrderApo> orders = new ArrayList<>();
 
-    /**
-     * 页码
-     */
-    @Getter
-    private Integer pageNum;
+    /** 页码 */
+    @Getter private Integer pageNum;
 
-    /**
-     * 每页条数
-     */
-    @Getter
-    private Integer pageSize;
+    /** 每页条数 */
+    @Getter private Integer pageSize;
 
-    /**
-     * 页码起始规则（默认false，从1开始）
-     */
-    @Getter
-    private Boolean pageNumStartZero = false;
-
+    /** 页码起始规则（默认false，从1开始） */
+    @Getter private Boolean pageNumStartZero = false;
 
     // ==================== 模式二参数 ====================
 
-    /**
-     * 自定义SQL语句
-     */
-    @Getter
-    private String customSql;
+    /** 自定义SQL语句 */
+    @Getter private String customSql;
 
-    /**
-     * 空间操作规则
-     */
-    @Getter
-    private AdvEnumsGeomOpt advEnumsGeomOpt;
+    /** 空间操作规则 */
+    @Getter private AdvEnumsGeomOpt advEnumsGeomOpt;
 
-    /**
-     * 是否返回字段元数据（默认false）
-     */
-    @Getter
-    private Boolean hasFieldsInfo = false;
+    /** 是否返回字段元数据（默认false） */
+    @Getter private Boolean hasFieldsInfo = false;
 
-    /**
-     * key的转换策略
-     */
-    @Getter
-    private AdvEnumsKeyTran advEnumsKeyTran = AdvEnumsKeyTran.不转换;
+    /** key的转换策略 */
+    @Getter private AdvEnumsKeyTran advEnumsKeyTran = AdvEnumsKeyTran.不转换;
 
-    /**
-     * 字段映射（数据库字段名 -> 返回字段名）
-     */
-    @Getter
-    private Map<String, String> fieldMapping;
+    /** 字段映射（数据库字段名 -> 返回字段名） */
+    @Getter private Map<String, String> fieldMapping;
 
+    /** 是否去重查询 */
+    @Getter private Boolean distinct;
 
-    /**
-     * 是否去重查询
-     */
-    @Getter
-    private Boolean distinct;
+    /** GROUP BY字段列表 */
+    @Getter private List<String> groupByFields;
 
-    /**
-     * GROUP BY字段列表
-     */
-    @Getter
-    private List<String> groupByFields;
-
-    /**
-     * HAVING条件过滤器
-     */
-    @Getter
-    private GirAdvWhereFilter havingFilter;
-
+    /** HAVING条件过滤器 */
+    @Getter private GirAdvWhereFilter havingFilter;
 
     // ==================== 构造函数 ====================
 
@@ -190,7 +130,6 @@ public class QueryRequestBuilder<T> {
         this.entityClass = entityClass;
         this.isToUnderlineCase = isToUnderlineCase;
     }
-
 
     // ==================== 模式一：对象组装SQL方法（Lambda风格） ====================
 
@@ -213,7 +152,7 @@ public class QueryRequestBuilder<T> {
     /**
      * 设置表名或SQL视图（带别名）
      *
-     * @param tableOrSqlView        表名或SQL视图
+     * @param tableOrSqlView 表名或SQL视图
      * @param sqlViewTableNameAlias SQL视图别名
      * @return Builder实例
      */
@@ -249,7 +188,6 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
-
     /**
      * 设置查询字段名（可变参数）
      *
@@ -275,12 +213,11 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
-
     /**
      * 设置查询字段（带别名）
      *
      * @param column 字段Lambda表达式
-     * @param alias  字段别名
+     * @param alias 字段别名
      * @return Builder实例
      */
     public QueryRequestBuilder<T> field(SFunction<T, ?> column, String alias) {
@@ -297,7 +234,6 @@ public class QueryRequestBuilder<T> {
         this.fieldMapping.put(columnName, alias);
         return this;
     }
-
 
     /**
      * 批量添加查询字段
@@ -320,7 +256,7 @@ public class QueryRequestBuilder<T> {
      * 添加SQL表达式字段
      *
      * @param sqlExpression SQL表达式（如 "COUNT(*)", "SUM(amount)"）
-     * @param alias         别名
+     * @param alias 别名
      * @return Builder实例
      */
     public QueryRequestBuilder<T> fieldExprAs(String sqlExpression, String alias) {
@@ -358,7 +294,8 @@ public class QueryRequestBuilder<T> {
      * @return Builder实例
      */
     public QueryRequestBuilder<T> whereLambda(Consumer<GirAdvWhereLambdaFilter<T>> consumer) {
-        GirAdvWhereLambdaFilter<T> lambdaFilter = GirAdvWhereLambdaFilter.of(entityClass, isToUnderlineCase);
+        GirAdvWhereLambdaFilter<T> lambdaFilter =
+                GirAdvWhereLambdaFilter.of(entityClass, isToUnderlineCase);
         consumer.accept(lambdaFilter);
         this.whereOption = lambdaFilter.toWhereFilter();
         return this;
@@ -388,17 +325,13 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
-    /**
-     * 设置忽略NULL值
-     */
+    /** 设置忽略NULL值 */
     public QueryRequestBuilder<T> ignoreNull() {
         this.nullHandling = AdvNullHandling.IGNORE;
         return this;
     }
 
-    /**
-     * 设置NULL值处理策略
-     */
+    /** 设置NULL值处理策略 */
     public QueryRequestBuilder<T> nullHandling(AdvNullHandling nullHandling) {
         this.nullHandling = nullHandling;
         return this;
@@ -430,7 +363,7 @@ public class QueryRequestBuilder<T> {
      * 添加字段排序（自定义方向）
      *
      * @param columnName 字段名
-     * @param direction  排序方向枚举
+     * @param direction 排序方向枚举
      * @return Builder实例
      */
     public QueryRequestBuilder<T> orderByField(String columnName, AdvEnumsOrder direction) {
@@ -451,7 +384,8 @@ public class QueryRequestBuilder<T> {
 
     /**
      * 批量添加排序条件
-     * <p>会清空之前设置的排序条件</p>
+     *
+     * <p>会清空之前设置的排序条件
      *
      * @param orders 排序参数列表
      * @return Builder实例
@@ -461,7 +395,6 @@ public class QueryRequestBuilder<T> {
         this.orders.addAll(orders);
         return this;
     }
-
 
     /**
      * 升序排序
@@ -488,7 +421,7 @@ public class QueryRequestBuilder<T> {
     /**
      * 自定义排序
      *
-     * @param column    排序字段Lambda表达式
+     * @param column 排序字段Lambda表达式
      * @param direction 排序方向
      * @return Builder实例
      */
@@ -499,7 +432,8 @@ public class QueryRequestBuilder<T> {
 
     /**
      * 添加函数排序（升序）
-     * <p>示例：orderByAscSFunction("CAST(gtc_id AS numeric)")</p>
+     *
+     * <p>示例：orderByAscSFunction("CAST(gtc_id AS numeric)")
      *
      * @param function 排序函数表达式
      * @return Builder实例
@@ -523,7 +457,7 @@ public class QueryRequestBuilder<T> {
     /**
      * 添加函数排序（自定义方向）
      *
-     * @param function  排序函数表达式
+     * @param function 排序函数表达式
      * @param direction 排序方向
      * @return Builder实例
      */
@@ -532,9 +466,7 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
-    /**
-     * 清空排序条件
-     */
+    /** 清空排序条件 */
     public QueryRequestBuilder<T> clearOrders() {
         this.orders.clear();
         return this;
@@ -545,7 +477,7 @@ public class QueryRequestBuilder<T> {
     /**
      * 设置分页参数（页码从1开始）
      *
-     * @param pageNum  页码（从1开始）
+     * @param pageNum 页码（从1开始）
      * @param pageSize 每页条数
      * @return Builder实例
      */
@@ -556,7 +488,6 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
-
     public QueryRequestBuilder<T> pageNumStartZero(boolean pageNumStartZero) {
         this.pageNumStartZero = pageNumStartZero;
         return this;
@@ -565,8 +496,8 @@ public class QueryRequestBuilder<T> {
     /**
      * 设置分页参数（自定义起始页码）
      *
-     * @param pageNum          页码
-     * @param pageSize         每页条数
+     * @param pageNum 页码
+     * @param pageSize 每页条数
      * @param pageNumStartZero 页码起始规则（true=从0开始，false=从1开始）
      * @return Builder实例
      */
@@ -577,25 +508,19 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
-    /**
-     * 设置每页条数
-     */
+    /** 设置每页条数 */
     public QueryRequestBuilder<T> pageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
     }
 
-    /**
-     * 设置页码
-     */
+    /** 设置页码 */
     public QueryRequestBuilder<T> pageNum(int pageNum) {
         this.pageNum = pageNum;
         return this;
     }
 
-    /**
-     * 不进行分页（查询所有）
-     */
+    /** 不进行分页（查询所有） */
     public QueryRequestBuilder<T> noPage() {
         this.pageNum = null;
         this.pageSize = null;
@@ -604,67 +529,51 @@ public class QueryRequestBuilder<T> {
 
     // ==================== 模式二：自定义SQL方法 ====================
 
-    /**
-     * 设置自定义SQL语句
-     */
+    /** 设置自定义SQL语句 */
     public QueryRequestBuilder<T> customSql(String customSql) {
         this.customSql = customSql;
         return this;
     }
 
-    /**
-     * 设置空间操作规则
-     */
+    /** 设置空间操作规则 */
     public QueryRequestBuilder<T> geomOpt(AdvEnumsGeomOpt advEnumsGeomOpt) {
         this.advEnumsGeomOpt = advEnumsGeomOpt;
         return this;
     }
 
-    /**
-     * 设置空间操作规则
-     */
+    /** 设置空间操作规则 */
     @Deprecated
     public QueryRequestBuilder<T> advEnumsGeomOpt(AdvEnumsGeomOpt advEnumsGeomOpt) {
         this.advEnumsGeomOpt = advEnumsGeomOpt;
         return this;
     }
 
-    /**
-     * 设置是否返回字段元数据
-     */
+    /** 设置是否返回字段元数据 */
     public QueryRequestBuilder<T> hasFieldsInfo(boolean hasFieldsInfo) {
         this.hasFieldsInfo = hasFieldsInfo;
         return this;
     }
 
-    /**
-     * 设置key的转换策略
-     */
+    /** 设置key的转换策略 */
     public QueryRequestBuilder<T> keyTran(AdvEnumsKeyTran advEnumsKeyTran) {
         this.advEnumsKeyTran = advEnumsKeyTran;
         return this;
     }
 
-    /**
-     * 设置key的转换策略
-     */
+    /** 设置key的转换策略 */
     @Deprecated
     public QueryRequestBuilder<T> advEnumsKeyTran(AdvEnumsKeyTran advEnumsKeyTran) {
         this.advEnumsKeyTran = advEnumsKeyTran;
         return this;
     }
 
-    /**
-     * 设置字段映射
-     */
+    /** 设置字段映射 */
     public QueryRequestBuilder<T> fieldMapping(Map<String, String> fieldMapping) {
         this.fieldMapping = fieldMapping;
         return this;
     }
 
-    /**
-     * 添加字段映射
-     */
+    /** 添加字段映射 */
     public QueryRequestBuilder<T> addFieldMapping(String dbField, String returnField) {
         if (this.fieldMapping == null) {
             this.fieldMapping = new HashMap<>();
@@ -684,9 +593,7 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
-    /**
-     * 启用去重查询
-     */
+    /** 启用去重查询 */
     public QueryRequestBuilder<T> distinct() {
         this.distinct = true;
         return this;
@@ -764,9 +671,7 @@ public class QueryRequestBuilder<T> {
         return this;
     }
 
-    /**
-     * 构建GirAdvQueryRequest对象
-     */
+    /** 构建GirAdvQueryRequest对象 */
     public GirAdvQueryRequest build() {
         // 校验：两种模式至少选一种
         boolean hasObjectMode = tableOrSqlView != null || entityClass != null;
@@ -774,10 +679,8 @@ public class QueryRequestBuilder<T> {
 
         if (!hasObjectMode && !hasCustomSqlMode) {
             throw new IllegalArgumentException(
-                    "Either (table + fields + where) or customSql must be provided"
-            );
+                    "Either (table + fields + where) or customSql must be provided");
         }
-
 
         // 分页参数校验
         if (pageNum != null && pageSize != null && pageSize <= 0) {
@@ -787,7 +690,6 @@ public class QueryRequestBuilder<T> {
         return new GirAdvQueryRequest(this);
     }
 
-
     public List<String> getFieldNames() {
         return columnNames;
     }
@@ -795,6 +697,4 @@ public class QueryRequestBuilder<T> {
     public List<String> getExprFieldNames() {
         return exprColumnNames;
     }
-
-
 }

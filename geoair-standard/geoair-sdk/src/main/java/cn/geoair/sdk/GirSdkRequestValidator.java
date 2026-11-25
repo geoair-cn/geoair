@@ -1,11 +1,9 @@
 package cn.geoair.sdk;
 
-import java.util.Objects;
-
-import javax.servlet.http.HttpServletRequest;
-
 import cn.geoair.base.cache.support.GirMemoryCache;
 import cn.geoair.sdk.GirSdkProfileConfig.ProfileEnum;
+import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 
 final class GirSdkRequestValidator {
 
@@ -16,7 +14,8 @@ final class GirSdkRequestValidator {
     static void validate(HttpServletRequest request) throws Exception {
         ProfileEnum pe = GirSdkProfileResolver.resolveRequestProfile(request.getHeader("Profile"));
 
-        validateClient(request,
+        validateClient(
+                request,
                 GirSdkProfileResolver.getClientId(pe),
                 GirSdkProfileResolver.getClientSecret(pe));
     }
@@ -45,11 +44,11 @@ final class GirSdkRequestValidator {
                 && GirSdkUtil.hasText(curTime)
                 && GirSdkUtil.hasText(checkSum)) {
             if (GirSdkUtil.hasText(clientSecret)) {
-                String myCheckSum = CheckSumBuilder.getCheckSum(clientSecret, nonce, curTime.toString());
+                String myCheckSum =
+                        CheckSumBuilder.getCheckSum(clientSecret, nonce, curTime.toString());
                 if (Objects.equals(checkSum, myCheckSum)) {
                     return;
-                }
-                else {
+                } else {
                     throw new GirSdkException("非法访问,clientId:" + clientId + "验证密钥不正确");
                 }
             }

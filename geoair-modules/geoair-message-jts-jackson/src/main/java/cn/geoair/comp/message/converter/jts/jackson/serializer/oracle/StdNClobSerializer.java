@@ -3,7 +3,6 @@ package cn.geoair.comp.message.converter.jts.jackson.serializer.oracle;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.NClob;
@@ -11,7 +10,8 @@ import java.sql.SQLException;
 
 public class StdNClobSerializer extends JsonSerializer<NClob> {
     @Override
-    public void serialize(NClob nclob, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(NClob nclob, JsonGenerator gen, SerializerProvider serializers)
+            throws IOException {
         if (nclob == null) {
             gen.writeNull();
             return;

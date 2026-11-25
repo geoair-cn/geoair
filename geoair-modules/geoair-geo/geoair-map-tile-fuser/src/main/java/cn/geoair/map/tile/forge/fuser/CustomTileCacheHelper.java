@@ -19,6 +19,5 @@ public interface CustomTileCacheHelper {
         }
     }
 
-
     TileCache getTileCache(String layerName);
 }

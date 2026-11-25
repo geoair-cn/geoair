@@ -2,9 +2,7 @@ package cn.geoair.map.tile.forge.fuser.execution;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * 单张处理使用单调时钟总截止时间，重试不能重新获得完整超时预算。
- */
+/** 单张处理使用单调时钟总截止时间，重试不能重新获得完整超时预算。 */
 public class TileOperationContext {
     private static final ThreadLocal<TileOperationContext> CURRENT = new ThreadLocal<>();
     private final TileCancellationToken cancellation;
@@ -59,7 +57,7 @@ public class TileOperationContext {
     public void sleep(long millis) {
         long until =
                 System.nanoTime()
-                + TimeUnit.MILLISECONDS.toNanos(Math.min(millis, remainingMillis()));
+                        + TimeUnit.MILLISECONDS.toNanos(Math.min(millis, remainingMillis()));
         while (System.nanoTime() < until) {
             check();
             try {

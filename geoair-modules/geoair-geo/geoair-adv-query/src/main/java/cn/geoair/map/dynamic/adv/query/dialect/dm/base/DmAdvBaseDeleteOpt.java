@@ -16,7 +16,8 @@ public class DmAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
 
     private static final int DM_MAX_IN_PARAMS = 1000;
 
-    public DmAdvBaseDeleteOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+    public DmAdvBaseDeleteOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         super(configAdvQueryGetter, registry);
         this.dialectTableNameProcessor = DmDialectTableNameUtil.getInstance();
     }
@@ -27,7 +28,8 @@ public class DmAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
     }
 
     @Override
-    protected String buildDeleteBatchByConditionSql(String tableName, String whereClause, int batchSize) {
+    protected String buildDeleteBatchByConditionSql(
+            String tableName, String whereClause, int batchSize) {
         return StrUtil.format("DELETE FROM {} WHERE {} AND ROWNUM <= ?", tableName, whereClause);
     }
 }

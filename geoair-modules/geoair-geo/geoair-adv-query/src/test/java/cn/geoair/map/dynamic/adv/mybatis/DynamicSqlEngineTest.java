@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -14,9 +13,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
-/**
- * {@link DynamicSqlEngine} 的单元测试。
- */
+/** {@link DynamicSqlEngine} 的单元测试。 */
 public class DynamicSqlEngineTest {
 
     private final DynamicSqlEngine engine = new DynamicSqlEngine();
@@ -35,7 +32,8 @@ public class DynamicSqlEngineTest {
 
     @Test
     public void testParse_nestedIf() {
-        String sql = "<if test='minId != null'>id > #{minId} <if test='maxId != null'> and id &lt; #{maxId}</if></if>";
+        String sql =
+                "<if test='minId != null'>id > #{minId} <if test='maxId != null'> and id &lt; #{maxId}</if></if>";
         Map<String, Object> params = new HashMap<>();
         params.put("minId", 100);
         params.put("maxId", 500);
@@ -73,9 +71,10 @@ public class DynamicSqlEngineTest {
 
     @Test
     public void testParse_foreach() {
-        String sql = "SELECT * FROM user WHERE id IN <foreach collection='ids' open='(' close=')' separator=',' item='item'>#{item}</foreach>";
+        String sql =
+                "SELECT * FROM user WHERE id IN <foreach collection='ids' open='(' close=')' separator=',' item='item'>#{item}</foreach>";
         Map<String, Object> params = new HashMap<>();
-        params.put("ids", new int[]{1, 2, 3});
+        params.put("ids", new int[] {1, 2, 3});
 
         SqlMeta result = engine.parse(sql, params);
         assertTrue(result.getSql().contains("(?,?,?)"));
@@ -84,9 +83,10 @@ public class DynamicSqlEngineTest {
 
     @Test
     public void testParse_foreachDoesNotModifyCallerParams() {
-        String sql = "SELECT * FROM user WHERE id IN <foreach collection='ids' open='(' close=')' separator=',' item='item'>#{item}</foreach>";
+        String sql =
+                "SELECT * FROM user WHERE id IN <foreach collection='ids' open='(' close=')' separator=',' item='item'>#{item}</foreach>";
         Map<String, Object> sourceParams = new HashMap<>();
-        sourceParams.put("ids", new int[]{1, 2, 3});
+        sourceParams.put("ids", new int[] {1, 2, 3});
 
         SqlMeta result = engine.parse(sql, Collections.unmodifiableMap(sourceParams));
 
@@ -97,7 +97,8 @@ public class DynamicSqlEngineTest {
 
     @Test
     public void testParse_whereTrim() {
-        String sql = "<where><if test='name != null'>AND name = #{name}</if><if test='age != null'>AND age = #{age}</if></where>";
+        String sql =
+                "<where><if test='name != null'>AND name = #{name}</if><if test='age != null'>AND age = #{age}</if></where>";
         Map<String, Object> params = new HashMap<>();
         params.put("name", "test");
         // age not set
@@ -110,7 +111,8 @@ public class DynamicSqlEngineTest {
 
     @Test
     public void testParse_setTrim() {
-        String sql = "UPDATE user <set><if test='name != null'>name = #{name},</if><if test='age != null'>age = #{age},</if></set> WHERE id = #{id}";
+        String sql =
+                "UPDATE user <set><if test='name != null'>name = #{name},</if><if test='age != null'>age = #{age},</if></set> WHERE id = #{id}";
         Map<String, Object> params = new HashMap<>();
         params.put("name", "test");
         params.put("id", 1);
@@ -135,7 +137,8 @@ public class DynamicSqlEngineTest {
 
     @Test
     public void testExtractParameterNames() {
-        String sql = "<if test='minId != null'>id > #{minId} <if test='maxId != null'> and id &lt; #{maxId}</if></if>";
+        String sql =
+                "<if test='minId != null'>id > #{minId} <if test='maxId != null'> and id &lt; #{maxId}</if></if>";
         Set<String> params = engine.extractParameterNames(sql);
         assertTrue(params.contains("minId"));
         assertTrue(params.contains("maxId"));
@@ -178,19 +181,29 @@ public class DynamicSqlEngineTest {
             Future<?>[] futures = new Future<?>[threadCount];
             for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
                 final int currentThreadIndex = threadIndex;
-                futures[threadIndex] = executorService.submit(() -> {
-                    startSignal.await();
-                    for (int index = 0; index < parseCountPerThread; index++) {
-                        int id = currentThreadIndex * parseCountPerThread + index;
-                        Map<String, Object> params = new HashMap<>();
-                        params.put("id", id);
-                        SqlMeta result = concurrentEngine.parse(
-                                "SELECT * FROM user WHERE id = #{id} /* " + id + " */", params);
-                        assertEquals("SELECT * FROM user WHERE id = ? /* " + id + " */", result.getSql());
-                        assertEquals(Collections.singletonList(id), result.getJdbcParamValues());
-                    }
-                    return null;
-                });
+                futures[threadIndex] =
+                        executorService.submit(
+                                () -> {
+                                    startSignal.await();
+                                    for (int index = 0; index < parseCountPerThread; index++) {
+                                        int id = currentThreadIndex * parseCountPerThread + index;
+                                        Map<String, Object> params = new HashMap<>();
+                                        params.put("id", id);
+                                        SqlMeta result =
+                                                concurrentEngine.parse(
+                                                        "SELECT * FROM user WHERE id = #{id} /* "
+                                                                + id
+                                                                + " */",
+                                                        params);
+                                        assertEquals(
+                                                "SELECT * FROM user WHERE id = ? /* " + id + " */",
+                                                result.getSql());
+                                        assertEquals(
+                                                Collections.singletonList(id),
+                                                result.getJdbcParamValues());
+                                    }
+                                    return null;
+                                });
             }
 
             startSignal.countDown();

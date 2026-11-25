@@ -1,6 +1,5 @@
 package cn.geoair.comp.dynamic.ds.datasource;
 
-
 import cn.geoair.base.data.GiVisualValuable;
 import cn.geoair.base.data.model.annotation.GaModelField;
 

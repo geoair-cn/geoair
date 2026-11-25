@@ -45,14 +45,19 @@ public final class TileImageCodec {
     }
 
     /** 仅转换响应；JPEG 用指定的不透明底色合成，现有瓦片和缓存编码策略不参与。 */
-    public static byte[] encodeForResponse(byte[] bytes, String requested, int jpegQuality, Color jpegBackground)
+    public static byte[] encodeForResponse(
+            byte[] bytes, String requested, int jpegQuality, Color jpegBackground)
             throws IOException {
-        if (jpegQuality < 1 || jpegQuality > 100 || jpegBackground == null || jpegBackground.getAlpha() != 255)
+        if (jpegQuality < 1
+                || jpegQuality > 100
+                || jpegBackground == null
+                || jpegBackground.getAlpha() != 255)
             throw new IllegalArgumentException("JPEG 质量应为 1 到 100，底色必须不透明");
         return normalize(bytes, requested, jpegQuality, jpegBackground);
     }
 
-    private static byte[] normalize(byte[] bytes, String requested, int quality, Color background) throws IOException {
+    private static byte[] normalize(byte[] bytes, String requested, int quality, Color background)
+            throws IOException {
         if (bytes == null || bytes.length == 0) return bytes;
         String target = canonical(requested);
         if (detect(bytes).equals(target)) return bytes;
@@ -80,7 +85,8 @@ public final class TileImageCodec {
             String target = mode == TileEncodingMode.PNG || alpha ? "png" : "jpeg";
             if ("png".equals(target) && "png".equals(actual))
                 return new EncodedTile(bytes, actual, alpha);
-            return new EncodedTile(encodeImage(image, target, policy.getQuality(), null), target, alpha);
+            return new EncodedTile(
+                    encodeImage(image, target, policy.getQuality(), null), target, alpha);
         } finally {
             image.flush();
         }
@@ -94,8 +100,8 @@ public final class TileImageCodec {
         return false;
     }
 
-    private static byte[] encodeImage(BufferedImage image, String format, int quality, Color background)
-            throws IOException {
+    private static byte[] encodeImage(
+            BufferedImage image, String format, int quality, Color background) throws IOException {
         if (!"jpeg".equals(format)) return TileImageUtils.writeImage(image, format);
         ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
         BufferedImage rgb = image;

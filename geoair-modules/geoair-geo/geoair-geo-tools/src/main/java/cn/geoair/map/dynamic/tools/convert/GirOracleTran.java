@@ -2,7 +2,8 @@ package cn.geoair.map.dynamic.tools.convert;
 
 /**
  * Oracle 环境判断工具类
- * <p>负责判断当前 Java 环境是否支持 Oracle 相关功能</p>
+ *
+ * <p>负责判断当前 Java 环境是否支持 Oracle 相关功能
  *
  * @author zhangjun
  */
@@ -126,7 +127,9 @@ public class GirOracleTran {
         StringBuilder sb = new StringBuilder();
         sb.append("Oracle 环境信息:\n");
         sb.append("  - STRUCT 类: ").append(isStructClassAvailable() ? "可用" : "不可用").append("\n");
-        sb.append("  - JGeometry 类: ").append(isJGeometryClassAvailable() ? "可用" : "不可用").append("\n");
+        sb.append("  - JGeometry 类: ")
+                .append(isJGeometryClassAvailable() ? "可用" : "不可用")
+                .append("\n");
         sb.append("  - Oracle Spatial: ").append(isOracleSpatialAvailable() ? "可用" : "不可用");
         return sb.toString();
     }

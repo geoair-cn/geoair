@@ -1,6 +1,4 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.core;
-
 
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -8,21 +6,16 @@ import cn.geoair.map.tile.forge.core.bygwc.grid.BoundingBox;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSet;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSetFactory;
 import cn.geoair.map.tile.forge.core.bygwc.grid.SRS;
-
 import java.util.Arrays;
 
-/**
- * <p>Includes preconfigured EPSG:4326 and EPSG:3857 (or EPSG:900913) gridsets
- */
+/** Includes preconfigured EPSG:4326 and EPSG:3857 (or EPSG:900913) gridsets */
 public class DefaultGridsets {
 
     private static GiLogger log = GirLoggerFactory.getLogger(DefaultGridsets.class);
 
     private final GridSet WORLD_EPSG4326;
 
-    /**
-     * 天地图的切片方案
-     */
+    /** 天地图的切片方案 */
     //    private final GridSet TIANDITU;
 
     private final GridSet WORLD_EPSG4326x2;
@@ -68,10 +61,10 @@ public class DefaultGridsets {
     /**
      * Construct the default gridsets bean
      *
-     * @param useEPSG900913  Whether or not to use "EPSG:900913" as the name of the default web
-     *                       mercator instead if "EPSG:3857". Only used if useGWC11xNames is true
+     * @param useEPSG900913 Whether or not to use "EPSG:900913" as the name of the default web
+     *     mercator instead if "EPSG:3857". Only used if useGWC11xNames is true
      * @param useGWC11xNames Whether to use the legacy GeoWebCache 1.1.x naming scheme (EPSG codes)
-     *                       for the default gridset names. Otherwise
+     *     for the default gridset names. Otherwise
      */
     public DefaultGridsets(boolean useEPSG900913, boolean useGWC11xNames) {
 
@@ -101,10 +94,10 @@ public class DefaultGridsets {
                         true);
         WORLD_EPSG4326.setDescription(
                 "A default WGS84 tile matrix set where the first zoom level "
-                + "covers the world with two tiles on the horizontal axis and one tile "
-                + "over the vertical axis and each subsequent zoom level is calculated by half "
-                + "the resolution of its previous one. Tiles are 256px wide.");
-//        addInternal(WORLD_EPSG4326);
+                        + "covers the world with two tiles on the horizontal axis and one tile "
+                        + "over the vertical axis and each subsequent zoom level is calculated by half "
+                        + "the resolution of its previous one. Tiles are 256px wide.");
+        //        addInternal(WORLD_EPSG4326);
 
         //        TIANDITU =
         //                GridSetFactory.createGridSet(
@@ -162,16 +155,16 @@ public class DefaultGridsets {
                         true);
         WORLD_EPSG4326x2.setDescription(
                 "A default WGS84 tile matrix set where the first zoom level "
-                + "covers the world with two tiles on the horizontal axis and one tile "
-                + "over the vertical axis and each subsequent zoom level is calculated by half "
-                + "the resolution of its previous one. Tiles are 512px wide.");
-//        addInternal(WORLD_EPSG4326x2);
+                        + "covers the world with two tiles on the horizontal axis and one tile "
+                        + "over the vertical axis and each subsequent zoom level is calculated by half "
+                        + "the resolution of its previous one. Tiles are 512px wide.");
+        //        addInternal(WORLD_EPSG4326x2);
 
         final SRS googleMapsCompatibleSRS = useEPSG900913 ? SRS.getEPSG900913() : SRS.getEPSG3857();
         log.debug(
                 "Adding "
-                + googleMapsCompatibleSRS
-                + " grid set for Spherical Mercator / GoogleMapsCompatible");
+                        + googleMapsCompatibleSRS
+                        + " grid set for Spherical Mercator / GoogleMapsCompatible");
 
         WORLD_EPSG3857 =
                 GridSetFactory.createGridSet(
@@ -189,11 +182,11 @@ public class DefaultGridsets {
                         false);
         WORLD_EPSG3857.setDescription(
                 "This well-known scale set has been defined to be compatible with Google Maps and"
-                + " Microsoft Live Map projections and zoom levels. Level 0 allows representing the whole "
-                + "world in a single 256x256 pixels. The next level represents the whole world in 2x2 tiles "
-                + "of 256x256 pixels and so on in powers of 2. Scale denominator is only accurate near the equator.");
+                        + " Microsoft Live Map projections and zoom levels. Level 0 allows representing the whole "
+                        + "world in a single 256x256 pixels. The next level represents the whole world in 2x2 tiles "
+                        + "of 256x256 pixels and so on in powers of 2. Scale denominator is only accurate near the equator.");
 
-//        addInternal(WORLD_EPSG3857);
+        //        addInternal(WORLD_EPSG3857);
 
         WORLD_EPSG3857x2 =
                 GridSetFactory.createGridSet(
@@ -211,10 +204,10 @@ public class DefaultGridsets {
                         false);
         WORLD_EPSG3857x2.setDescription(
                 "This well-known scale set has been defined to be compatible with Google Maps and"
-                + " Microsoft Live Map projections and zoom levels. Level 0 allows representing the whole "
-                + "world in a single 512x512 pixels. The next level represents the whole world in 2x2 tiles "
-                + "of 512x512 pixels and so on in powers of 2. Scale denominator is only accurate near the equator.");
-//        addInternal(WORLD_EPSG3857x2);
+                        + " Microsoft Live Map projections and zoom levels. Level 0 allows representing the whole "
+                        + "world in a single 512x512 pixels. The next level represents the whole world in 2x2 tiles "
+                        + "of 512x512 pixels and so on in powers of 2. Scale denominator is only accurate near the equator.");
+        //        addInternal(WORLD_EPSG3857x2);
 
         log.debug("Adding GlobalCRS84Pixel");
         GridSet GlobalCRS84Pixel =
@@ -233,11 +226,11 @@ public class DefaultGridsets {
                         true);
         GlobalCRS84Pixel.setDescription(
                 "This well-known scale set has been defined for global cartographic products. "
-                + "Rounded pixel sizes have been chosen for intuitive cartographic representation of raster data. "
-                + "Some values have been chosen to coincide with original pixel size of commonly used global"
-                + "products like STRM (1\" and 3\"), GTOPO (30\") or ETOPO (2' and 5'). Scale denominator"
-                + "and approximated pixel size in meters are only accurate near the equator.");
-//        addInternal(GlobalCRS84Pixel);
+                        + "Rounded pixel sizes have been chosen for intuitive cartographic representation of raster data. "
+                        + "Some values have been chosen to coincide with original pixel size of commonly used global"
+                        + "products like STRM (1\" and 3\"), GTOPO (30\") or ETOPO (2' and 5'). Scale denominator"
+                        + "and approximated pixel size in meters are only accurate near the equator.");
+        //        addInternal(GlobalCRS84Pixel);
 
         log.debug("Adding GlobalCRS84Scale");
         GridSet GlobalCRS84Scale =
@@ -256,10 +249,10 @@ public class DefaultGridsets {
                         true);
         GlobalCRS84Scale.setDescription(
                 "This well-known scale set has been defined for global cartographic products. "
-                + "Rounded scales have been chosen for intuitive cartographic representation of vector data. "
-                + "Scale denominator is only accurate near the equator.");
+                        + "Rounded scales have been chosen for intuitive cartographic representation of vector data. "
+                        + "Scale denominator is only accurate near the equator.");
 
-//        addInternal(GlobalCRS84Scale);
+        //        addInternal(GlobalCRS84Scale);
 
         log.debug("Adding GoogleCRS84Quad");
         GridSet GoogleCRS84Quad =
@@ -278,12 +271,12 @@ public class DefaultGridsets {
                         true);
         GoogleCRS84Quad.setDescription(
                 "This well-known scale set has been defined to allow quadtree "
-                + "pyramids in CRS84. Level 0 allows representing the whole world "
-                + "in a single 256x256 pixels (where the first 64 and last 64 lines "
-                + "of the tile are left blank). The next level represents the whole world in 2x2"
-                + " tiles of 256x256 pixels and so on in powers of 2. Scale denominator is only accurate near the equator.");
+                        + "pyramids in CRS84. Level 0 allows representing the whole world "
+                        + "in a single 256x256 pixels (where the first 64 and last 64 lines "
+                        + "of the tile are left blank). The next level represents the whole world in 2x2"
+                        + " tiles of 256x256 pixels and so on in powers of 2. Scale denominator is only accurate near the equator.");
 
-//        addInternal(GoogleCRS84Quad);
+        //        addInternal(GoogleCRS84Quad);
 
         log.debug("Adding OGC TMS WebMercatorQuad");
         WEB_MERCATOR_QUAD =
@@ -293,38 +286,38 @@ public class DefaultGridsets {
                         BoundingBox.WORLD3857,
                         true,
                         null,
-                        new double[]{
-                                559082264.028717,
-                                279541132.014358,
-                                139770566.007179,
-                                69885283.0035897,
-                                34942641.5017948,
-                                17471320.7508974,
-                                8735660.37544871,
-                                4367830.18772435,
-                                2183915.09386217,
-                                1091957.54693108,
-                                545978.773465544,
-                                272989.386732772,
-                                136494.693366386,
-                                68247.346683193,
-                                34123.6733415964,
-                                17061.8366707982,
-                                8530.91833539913,
-                                4265.45916769956,
-                                2132.72958384978,
-                                1066.36479192489,
-                                533.182395962445,
-                                266.591197981222,
-                                133.295598990611,
-                                66.6477994953056,
-                                33.3238997476528
+                        new double[] {
+                            559082264.028717,
+                            279541132.014358,
+                            139770566.007179,
+                            69885283.0035897,
+                            34942641.5017948,
+                            17471320.7508974,
+                            8735660.37544871,
+                            4367830.18772435,
+                            2183915.09386217,
+                            1091957.54693108,
+                            545978.773465544,
+                            272989.386732772,
+                            136494.693366386,
+                            68247.346683193,
+                            34123.6733415964,
+                            17061.8366707982,
+                            8530.91833539913,
+                            4265.45916769956,
+                            2132.72958384978,
+                            1066.36479192489,
+                            533.182395962445,
+                            266.591197981222,
+                            133.295598990611,
+                            66.6477994953056,
+                            33.3238997476528
                         },
                         1d,
                         GridSetFactory.DEFAULT_PIXEL_SIZE_METER,
-                        new String[]{
-                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                                "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
+                        new String[] {
+                            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                            "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
                         },
                         256,
                         256,
@@ -332,7 +325,7 @@ public class DefaultGridsets {
         // copied from the OGC TMS spec
         WEB_MERCATOR_QUAD.setDescription(
                 "This tile matrix set is the most used tile matrix set in the mass market: for example, by Google Maps, Microsoft Bing Maps and Open Street Map tiles. Nevertheless, it has been long criticized because it is a based on a spherical Mercator instead of an ellipsoid. The use of WebMercatorQuad should be limited to visualization. Any additional use (including distance measurements, routing etc.) needs to use the Mercator spherical expressions to transform the coordinate to an appropriate CRS first. The risks caused by imprecision in the use of Web Mercator is also emphasized by the US National Geospatial Agency (NGA). NGA has issued an Advisory Notice on web Mercator (http://earth-info.nga.mil/GandG/wgs84/web_mercator/index.html) that says that “it may cause geo-location / geo-coordinate errors up to 40,000 meters. This erroneous geospatial positioning information poses an unacceptable risk to global safety of navigation activities, and department of defense, intelligence community, and allied partner systems, missions, and operations that require accurate and precise positioning and navigation information.” The use of WorldMercatorWGS84Quad is recommended.");
-//        addInternal(WEB_MERCATOR_QUAD);
+        //        addInternal(WEB_MERCATOR_QUAD);
         addx2Gridset(WEB_MERCATOR_QUAD);
 
         log.debug("Adding OGC TMS WorldCRS84Quad");
@@ -343,31 +336,31 @@ public class DefaultGridsets {
                         BoundingBox.WORLD4326,
                         true,
                         null,
-                        new double[]{
-                                279541132.0143589,
-                                139770566.0071794,
-                                69885283.00358972,
-                                34942641.50179486,
-                                17471320.75089743,
-                                8735660.375448715,
-                                4367830.187724357,
-                                2183915.093862179,
-                                1091957.546931089,
-                                545978.7734655447,
-                                272989.3867327723,
-                                136494.6933663862,
-                                68247.34668319309,
-                                34123.67334159654,
-                                17061.83667079827,
-                                8530.918335399136,
-                                4265.459167699568,
-                                2132.729583849784,
+                        new double[] {
+                            279541132.0143589,
+                            139770566.0071794,
+                            69885283.00358972,
+                            34942641.50179486,
+                            17471320.75089743,
+                            8735660.375448715,
+                            4367830.187724357,
+                            2183915.093862179,
+                            1091957.546931089,
+                            545978.7734655447,
+                            272989.3867327723,
+                            136494.6933663862,
+                            68247.34668319309,
+                            34123.67334159654,
+                            17061.83667079827,
+                            8530.918335399136,
+                            4265.459167699568,
+                            2132.729583849784,
                         },
                         null,
                         GridSetFactory.DEFAULT_PIXEL_SIZE_METER,
-                        new String[]{
-                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                                "13", "14", "15", "16", "17", "18"
+                        new String[] {
+                            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                            "13", "14", "15", "16", "17", "18"
                         },
                         256,
                         256,
@@ -375,7 +368,7 @@ public class DefaultGridsets {
         // copied from the OGC TMS spec
         WORLD_CRS84_QUAD.setDescription(
                 "This Tile Matrix Set defines tiles in the Equirectangular Plate Carrée projection in the CRS84 CRS for the whole world.");
-//        addInternal(WORLD_CRS84_QUAD);
+        //        addInternal(WORLD_CRS84_QUAD);
         addx2Gridset(WORLD_CRS84_QUAD);
 
         log.debug("Adding OGC TMS WorldMercatorWGS84Quad");
@@ -390,38 +383,38 @@ public class DefaultGridsets {
                                 20037508.3427892),
                         true,
                         null,
-                        new double[]{
-                                559082264.028717,
-                                279541132.014358,
-                                139770566.007179,
-                                69885283.0035897,
-                                34942641.5017948,
-                                17471320.7508974,
-                                8735660.37544871,
-                                4367830.18772435,
-                                2183915.09386217,
-                                1091957.54693108,
-                                545978.773465544,
-                                272989.386732772,
-                                136494.693366386,
-                                68247.346683193,
-                                34123.6733415964,
-                                17061.8366707982,
-                                8530.91833539913,
-                                4265.45916769956,
-                                2132.72958384978,
-                                1066.36479192489,
-                                533.182395962445,
-                                266.591197981222,
-                                133.295598990611,
-                                66.6477994953056,
-                                33.3238997476528,
+                        new double[] {
+                            559082264.028717,
+                            279541132.014358,
+                            139770566.007179,
+                            69885283.0035897,
+                            34942641.5017948,
+                            17471320.7508974,
+                            8735660.37544871,
+                            4367830.18772435,
+                            2183915.09386217,
+                            1091957.54693108,
+                            545978.773465544,
+                            272989.386732772,
+                            136494.693366386,
+                            68247.346683193,
+                            34123.6733415964,
+                            17061.8366707982,
+                            8530.91833539913,
+                            4265.45916769956,
+                            2132.72958384978,
+                            1066.36479192489,
+                            533.182395962445,
+                            266.591197981222,
+                            133.295598990611,
+                            66.6477994953056,
+                            33.3238997476528,
                         },
                         1d,
                         GridSetFactory.DEFAULT_PIXEL_SIZE_METER,
-                        new String[]{
-                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                                "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
+                        new String[] {
+                            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                            "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
                         },
                         256,
                         256,
@@ -429,35 +422,35 @@ public class DefaultGridsets {
         // not from the spec, it does not have one
         WORLD_MERCATOR_WGS84_QUAD.setDescription(
                 "This Tile Matrix Set defines tiles in the Mercator projection in the WGS84 CRS for the whole world.");
-//        addInternal(WORLD_MERCATOR_WGS84_QUAD);
+        //        addInternal(WORLD_MERCATOR_WGS84_QUAD);
         addx2Gridset(WORLD_MERCATOR_WGS84_QUAD);
 
         // family of UTM WGS84 quads from OGC TMS spec. Covers 60 zones, refers to the north CRSs
         double[] UTM_SCALES = {
-                279072704.500914,
-                139536352.250457,
-                69768176.1252285,
-                34884088.0626143,
-                17442044.0313071,
-                8721022.01565356,
-                4360511.00782678,
-                2180255.50391339,
-                1090127.7519567,
-                545063.875978348,
-                272531.937989174,
-                136265.968994587,
-                68132.9844972935,
-                34066.4922486467,
-                17033.2461243234,
-                8516.62306216168,
-                4258.31153108084,
-                2129.15576554042,
-                1064.57788277021,
-                532.288941385105,
-                266.144470692553,
-                133.072235346276,
-                66.5361176731382,
-                33.2680588365691,
+            279072704.500914,
+            139536352.250457,
+            69768176.1252285,
+            34884088.0626143,
+            17442044.0313071,
+            8721022.01565356,
+            4360511.00782678,
+            2180255.50391339,
+            1090127.7519567,
+            545063.875978348,
+            272531.937989174,
+            136265.968994587,
+            68132.9844972935,
+            34066.4922486467,
+            17033.2461243234,
+            8516.62306216168,
+            4258.31153108084,
+            2129.15576554042,
+            1064.57788277021,
+            532.288941385105,
+            266.144470692553,
+            133.072235346276,
+            66.5361176731382,
+            33.2680588365691,
         };
 
         // the 60 UTM zones from the OGC TMS specification
@@ -474,38 +467,38 @@ public class DefaultGridsets {
                                     20003931.4586255),
                             true,
                             null,
-                            new double[]{
-                                    279072704.500914,
-                                    139536352.250457,
-                                    69768176.1252285,
-                                    34884088.0626143,
-                                    17442044.0313071,
-                                    8721022.01565356,
-                                    4360511.00782678,
-                                    2180255.50391339,
-                                    1090127.7519567,
-                                    545063.875978348,
-                                    272531.937989174,
-                                    136265.968994587,
-                                    68132.9844972935,
-                                    34066.4922486467,
-                                    17033.2461243234,
-                                    8516.62306216168,
-                                    4258.31153108084,
-                                    2129.15576554042,
-                                    1064.57788277021,
-                                    532.288941385105,
-                                    266.144470692553,
-                                    133.072235346276,
-                                    66.5361176731382,
-                                    33.2680588365691
+                            new double[] {
+                                279072704.500914,
+                                139536352.250457,
+                                69768176.1252285,
+                                34884088.0626143,
+                                17442044.0313071,
+                                8721022.01565356,
+                                4360511.00782678,
+                                2180255.50391339,
+                                1090127.7519567,
+                                545063.875978348,
+                                272531.937989174,
+                                136265.968994587,
+                                68132.9844972935,
+                                34066.4922486467,
+                                17033.2461243234,
+                                8516.62306216168,
+                                4258.31153108084,
+                                2129.15576554042,
+                                1064.57788277021,
+                                532.288941385105,
+                                266.144470692553,
+                                133.072235346276,
+                                66.5361176731382,
+                                33.2680588365691
                             },
                             1d,
                             GridSetFactory.DEFAULT_PIXEL_SIZE_METER,
-                            new String[]{
-                                    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                                    "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
-                                    "24"
+                            new String[] {
+                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                                "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
+                                "24"
                             },
                             256,
                             256,
@@ -513,39 +506,39 @@ public class DefaultGridsets {
             // not from the spec, it does not have one
             utmGridset.setDescription(
                     "This Tile Matrix Set defines tiles in the Universal Transverse Mercator, zone "
-                    + i);
-//            addInternal(utmGridset);
+                            + i);
+            //            addInternal(utmGridset);
             addx2Gridset(utmGridset);
         }
 
         // UPS Artic
         log.debug("Adding OGC TMS UPSArcticWGS84Quad");
         double[] upsScales = {
-                458726544.4,
-                229363272.2,
-                114681636.1,
-                57340818.05,
-                28670409.02,
-                14335204.51,
-                7167602.256,
-                3583801.128,
-                1791900.564,
-                895950.282,
-                447975.141,
-                223987.5705,
-                111993.7852,
-                55996.89262,
-                27998.44631,
-                13999.22316,
-                6999.611578,
-                3499.805789,
-                1749.902894,
-                874.9514472,
-                437.4757236,
-                218.7378618,
-                109.3689309,
-                54.68446545,
-                27.34223273
+            458726544.4,
+            229363272.2,
+            114681636.1,
+            57340818.05,
+            28670409.02,
+            14335204.51,
+            7167602.256,
+            3583801.128,
+            1791900.564,
+            895950.282,
+            447975.141,
+            223987.5705,
+            111993.7852,
+            55996.89262,
+            27998.44631,
+            13999.22316,
+            6999.611578,
+            3499.805789,
+            1749.902894,
+            874.9514472,
+            437.4757236,
+            218.7378618,
+            109.3689309,
+            54.68446545,
+            27.34223273
         };
         BoundingBox upsBounds =
                 new BoundingBox(
@@ -560,9 +553,9 @@ public class DefaultGridsets {
                         upsScales,
                         1d,
                         GridSetFactory.DEFAULT_PIXEL_SIZE_METER,
-                        new String[]{
-                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                                "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
+                        new String[] {
+                            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                            "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
                         },
                         256,
                         256,
@@ -570,7 +563,7 @@ public class DefaultGridsets {
         // not from the spec, it does not have one
         upsArctic.setDescription(
                 "This Tile Matrix Set defines tiles in the Universal Polar Stereographics for the arctic");
-//        addInternal(upsArctic);
+        //        addInternal(upsArctic);
         addx2Gridset(upsArctic);
 
         // UPS antarctic
@@ -585,9 +578,9 @@ public class DefaultGridsets {
                         upsScales,
                         1d,
                         GridSetFactory.DEFAULT_PIXEL_SIZE_METER,
-                        new String[]{
-                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                                "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
+                        new String[] {
+                            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                            "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24"
                         },
                         256,
                         256,
@@ -595,7 +588,7 @@ public class DefaultGridsets {
         // not from the spec, it does not have one
         upsAntarctic.setDescription(
                 "This Tile Matrix Set defines tiles in the Universal Polar Stereographics for the Antarctic");
-//        addInternal(upsAntarctic);
+        //        addInternal(upsAntarctic);
         addx2Gridset(upsAntarctic);
 
         log.debug("Adding OGC TMS EuropeanETRS89_LAEAQuad");
@@ -606,36 +599,36 @@ public class DefaultGridsets {
                         new BoundingBox(2000000.0, 1000000.0, 6500000, 5500000.0),
                         true,
                         null,
-                        new double[]{
-                                62779017.857142866,
-                                31389508.928571433,
-                                15694754.464285716,
-                                7847377.232142858,
-                                3923688.616071429,
-                                1961844.3080357146,
-                                980922.1540178573,
-                                490461.07700892864,
-                                245230.53850446432,
-                                122615.26925223216,
-                                61307.63462611608,
-                                30653.81731305804,
-                                15326.90865652902,
-                                7663.45432826451,
-                                3831.727164132255,
-                                1915.8635820661275,
+                        new double[] {
+                            62779017.857142866,
+                            31389508.928571433,
+                            15694754.464285716,
+                            7847377.232142858,
+                            3923688.616071429,
+                            1961844.3080357146,
+                            980922.1540178573,
+                            490461.07700892864,
+                            245230.53850446432,
+                            122615.26925223216,
+                            61307.63462611608,
+                            30653.81731305804,
+                            15326.90865652902,
+                            7663.45432826451,
+                            3831.727164132255,
+                            1915.8635820661275,
                         },
                         1d,
                         GridSetFactory.DEFAULT_PIXEL_SIZE_METER,
-                        new String[]{
-                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                                "13", "14", "15"
+                        new String[] {
+                            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                            "13", "14", "15"
                         },
                         256,
                         256,
                         true);
         // not from the spec, it does not have one
         euETRS89LaeaQuad.setDescription("Lambert Azimuthal Equal Area ETRS89 for Europe");
-//        addInternal(euETRS89LaeaQuad);
+        //        addInternal(euETRS89LaeaQuad);
         addx2Gridset(euETRS89LaeaQuad);
 
         log.debug("Adding OGC TMS CanadianNAD83_LCC");
@@ -650,47 +643,47 @@ public class DefaultGridsets {
                                 7928343.534071138),
                         true,
                         null,
-                        new double[]{
-                                137016643.080905,
-                                80320101.1163925,
-                                47247118.3037603,
-                                28348270.9822562,
-                                16536491.4063161,
-                                9449423.66075207,
-                                5669654.19645125,
-                                3307298.28126323,
-                                1889884.73215041,
-                                1133930.83929025,
-                                661459.656252643,
-                                396875.793751586,
-                                236235.591518802,
-                                137016.643080905,
-                                80320.1011163925,
-                                47247.1183037603,
-                                28348.2709822562,
-                                16536.4914063161,
-                                9449.42366075207,
-                                5669.65419645125,
-                                3307.29828126323,
-                                1889.88473215041,
-                                1133.93083929025,
-                                661.459656252643,
-                                396.875793751586,
-                                236.235591518802
+                        new double[] {
+                            137016643.080905,
+                            80320101.1163925,
+                            47247118.3037603,
+                            28348270.9822562,
+                            16536491.4063161,
+                            9449423.66075207,
+                            5669654.19645125,
+                            3307298.28126323,
+                            1889884.73215041,
+                            1133930.83929025,
+                            661459.656252643,
+                            396875.793751586,
+                            236235.591518802,
+                            137016.643080905,
+                            80320.1011163925,
+                            47247.1183037603,
+                            28348.2709822562,
+                            16536.4914063161,
+                            9449.42366075207,
+                            5669.65419645125,
+                            3307.29828126323,
+                            1889.88473215041,
+                            1133.93083929025,
+                            661.459656252643,
+                            396.875793751586,
+                            236.235591518802
                         },
                         1d,
                         GridSetFactory.DEFAULT_PIXEL_SIZE_METER,
-                        new String[]{
-                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
-                                "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24",
-                                "25"
+                        new String[] {
+                            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+                            "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24",
+                            "25"
                         },
                         256,
                         256,
                         true);
         // not from the spec, it does not have one
         canadianNAD83Lcc.setDescription("Lambert Conformal Conic for Canada");
-//        addInternal(canadianNAD83Lcc);
+        //        addInternal(canadianNAD83Lcc);
         addx2Gridset(canadianNAD83Lcc);
     }
 
@@ -720,72 +713,71 @@ public class DefaultGridsets {
                         512,
                         512,
                         base.isyCoordinateFirst());
-//        addInternal(x2);
+        //        addInternal(x2);
     }
 
     private double[] halveResolutions(double[] resolutions) {
         return Arrays.stream(resolutions).map(r -> r / 2).toArray();
     }
 
-
     private double[] scalesCRS84QuadScaleDenominators() {
         double[] scalesCRS84QuadScaleResolutions = {
-                559082264.0287178,
-                279541132.0143589,
-                139770566.0071794,
-                69885283.00358972,
-                34942641.50179486,
-                17471320.75089743,
-                8735660.375448715,
-                4367830.187724357,
-                2183915.093862179,
-                1091957.546931089,
-                545978.7734655447,
-                272989.3867327723,
-                136494.6933663862,
-                68247.34668319309,
-                34123.67334159654,
-                17061.83667079827,
-                8530.918335399136,
-                4265.459167699568,
-                2132.729583849784
+            559082264.0287178,
+            279541132.0143589,
+            139770566.0071794,
+            69885283.00358972,
+            34942641.50179486,
+            17471320.75089743,
+            8735660.375448715,
+            4367830.187724357,
+            2183915.093862179,
+            1091957.546931089,
+            545978.7734655447,
+            272989.3867327723,
+            136494.6933663862,
+            68247.34668319309,
+            34123.67334159654,
+            17061.83667079827,
+            8530.918335399136,
+            4265.459167699568,
+            2132.729583849784
         };
         return scalesCRS84QuadScaleResolutions;
     }
 
     private double[] commonPractice900913Resolutions() {
-        return new double[]{ //
-                156543.03390625,
-                78271.516953125,
-                39135.7584765625,
-                19567.87923828125,
-                9783.939619140625,
-                4891.9698095703125,
-                2445.9849047851562,
-                1222.9924523925781,
-                611.4962261962891,
-                305.74811309814453,
-                152.87405654907226,
-                76.43702827453613,
-                38.218514137268066,
-                19.109257068634033,
-                9.554628534317017,
-                4.777314267158508,
-                2.388657133579254,
-                1.194328566789627,
-                0.5971642833948135,
-                0.29858214169740677,
-                0.14929107084870338,
-                0.07464553542435169,
-                0.037322767712175846,
-                0.018661383856087923,
-                0.009330691928043961,
-                0.004665345964021981,
-                0.0023326729820109904,
-                0.0011663364910054952,
-                5.831682455027476E-4,
-                2.915841227513738E-4,
-                1.457920613756869E-4
+        return new double[] { //
+            156543.03390625,
+            78271.516953125,
+            39135.7584765625,
+            19567.87923828125,
+            9783.939619140625,
+            4891.9698095703125,
+            2445.9849047851562,
+            1222.9924523925781,
+            611.4962261962891,
+            305.74811309814453,
+            152.87405654907226,
+            76.43702827453613,
+            38.218514137268066,
+            19.109257068634033,
+            9.554628534317017,
+            4.777314267158508,
+            2.388657133579254,
+            1.194328566789627,
+            0.5971642833948135,
+            0.29858214169740677,
+            0.14929107084870338,
+            0.07464553542435169,
+            0.037322767712175846,
+            0.018661383856087923,
+            0.009330691928043961,
+            0.004665345964021981,
+            0.0023326729820109904,
+            0.0011663364910054952,
+            5.831682455027476E-4,
+            2.915841227513738E-4,
+            1.457920613756869E-4
         };
     }
 
@@ -823,12 +815,10 @@ public class DefaultGridsets {
         //
         // return scalesCRS84Pixel;
         double[] scalesCRS84Pixel = {
-                500E6, 250E6, 100E6, 50E6, 25E6, 10E6, 5E6, 2.5E6, 1E6, 500E3, 250E3, 100E3, 50E3, 25E3,
-                10E3, 5E3, 2.5E3, 1000, 500, 250, 100
+            500E6, 250E6, 100E6, 50E6, 25E6, 10E6, 5E6, 2.5E6, 1E6, 500E3, 250E3, 100E3, 50E3, 25E3,
+            10E3, 5E3, 2.5E3, 1000, 500, 250, 100
         };
 
         return scalesCRS84Pixel;
     }
-
-
 }

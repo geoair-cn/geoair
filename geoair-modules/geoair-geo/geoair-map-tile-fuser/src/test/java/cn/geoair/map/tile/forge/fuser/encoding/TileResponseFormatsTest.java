@@ -1,19 +1,18 @@
 package cn.geoair.map.tile.forge.fuser.encoding;
 
+import static org.junit.Assert.*;
+
 import cn.geoair.map.tile.forge.core.bygwc.wmts.WmtsTileFormats;
 import cn.geoair.map.tile.forge.fuser.utils.TileImageUtils;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class TileResponseFormatsTest {
     @Test
@@ -26,8 +25,11 @@ public class TileResponseFormatsTest {
         byte[] jpeg = TileImageCodec.encodeForResponse(png, "jpg", 95, Color.WHITE);
         assertEquals("jpeg", TileImageCodec.detect(jpeg));
         BufferedImage flattened = TileImageUtils.readImage(jpeg);
-        try { assertEquals(Color.WHITE.getRGB(), flattened.getRGB(16, 16)); }
-        finally { flattened.flush(); }
+        try {
+            assertEquals(Color.WHITE.getRGB(), flattened.getRGB(16, 16));
+        } finally {
+            flattened.flush();
+        }
         assertSame(jpeg, TileImageCodec.encodeForResponse(jpeg, "jpeg", 95, Color.WHITE));
     }
 

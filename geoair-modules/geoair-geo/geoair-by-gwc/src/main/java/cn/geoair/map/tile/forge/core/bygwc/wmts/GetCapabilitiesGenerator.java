@@ -2,13 +2,13 @@ package cn.geoair.map.tile.forge.core.bygwc.wmts;
 
 import cn.geoair.map.tile.forge.core.bygwc.ProviderConfig;
 import cn.geoair.map.tile.forge.core.bygwc.config.*;
-
 import cn.geoair.map.tile.forge.core.bygwc.grid.*;
 import cn.geoair.map.tile.forge.core.bygwc.layer.*;
 import cn.hutool.core.util.StrUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -16,20 +16,16 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-/**
- * 生成GetCapabilities XML文档的工具类
- * 用于描述ArcGIS瓦片缓存图层的能力信息
- */
+/** 生成GetCapabilities XML文档的工具类 用于描述ArcGIS瓦片缓存图层的能力信息 */
 public class GetCapabilitiesGenerator {
 
     private static final String XMLNS = "http://www.opengis.net/wmts/1.0";
     private static final String XMLNS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
-    private static final String XSI_SCHEMA_LOCATION = "http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd";
+    private static final String XSI_SCHEMA_LOCATION =
+            "http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd";
     private static final String XMLNS_OWS = "http://www.opengis.net/ows/1.1";
     private static final String XMLNS_XLINK = "http://www.w3.org/1999/xlink";
 
@@ -85,9 +81,7 @@ public class GetCapabilitiesGenerator {
         return convertDocumentToString(doc);
     }
 
-    /**
-     * 添加服务标识信息
-     */
+    /** 添加服务标识信息 */
     private void addServiceIdentification(Document doc, Element parent, ArcGISCacheLayer layer) {
         Element serviceIdentification = doc.createElementNS(XMLNS_OWS, "ows:ServiceIdentification");
 
@@ -118,9 +112,7 @@ public class GetCapabilitiesGenerator {
         parent.appendChild(serviceIdentification);
     }
 
-    /**
-     * 添加服务提供者信息
-     */
+    /** 添加服务提供者信息 */
     private void addServiceProvider(Document doc, Element parent) {
         Element serviceProvider = doc.createElementNS(XMLNS_OWS, "ows:ServiceProvider");
 
@@ -141,27 +133,35 @@ public class GetCapabilitiesGenerator {
         parent.appendChild(serviceProvider);
     }
 
-    /**
-     * 添加操作元数据信息
-     */
+    /** 添加操作元数据信息 */
     private void addOperationsMetadata(Document doc, Element parent) {
         Element operationsMetadata = doc.createElementNS(XMLNS_OWS, "ows:OperationsMetadata");
 
         // 添加GetCapabilities操作
-        addOperation(doc, operationsMetadata, "GetCapabilities", "http://localhost:8080/wmts?service=WMTS&request=GetCapabilities");
+        addOperation(
+                doc,
+                operationsMetadata,
+                "GetCapabilities",
+                "http://localhost:8080/wmts?service=WMTS&request=GetCapabilities");
 
         // 添加GetTile操作
-        addOperation(doc, operationsMetadata, "GetTile", "http://localhost:8080/wmts?service=WMTS&request=GetTile");
+        addOperation(
+                doc,
+                operationsMetadata,
+                "GetTile",
+                "http://localhost:8080/wmts?service=WMTS&request=GetTile");
 
         // 添加GetFeatureInfo操作（如果支持）
-        addOperation(doc, operationsMetadata, "GetFeatureInfo", "http://localhost:8080/wmts?service=WMTS&request=GetFeatureInfo");
+        addOperation(
+                doc,
+                operationsMetadata,
+                "GetFeatureInfo",
+                "http://localhost:8080/wmts?service=WMTS&request=GetFeatureInfo");
 
         parent.appendChild(operationsMetadata);
     }
 
-    /**
-     * 添加单个操作信息
-     */
+    /** 添加单个操作信息 */
     private void addOperation(Document doc, Element parent, String operationName, String href) {
         Element operation = doc.createElementNS(XMLNS_OWS, "ows:Operation");
         operation.setAttribute("name", operationName);
@@ -177,10 +177,9 @@ public class GetCapabilitiesGenerator {
         parent.appendChild(operation);
     }
 
-    /**
-     * 添加内容信息（图层、样式等）
-     */
-    private void addContents(Document doc, Element parent, ArcGISCacheLayer layer, Map<String, String> formats) {
+    /** 添加内容信息（图层、样式等） */
+    private void addContents(
+            Document doc, Element parent, ArcGISCacheLayer layer, Map<String, String> formats) {
         Element contents = doc.createElement("Contents");
         parent.appendChild(contents);
 
@@ -191,10 +190,9 @@ public class GetCapabilitiesGenerator {
         addStyle(doc, contents);
     }
 
-    /**
-     * 添加图层信息
-     */
-    private void addLayer(Document doc, Element parent, ArcGISCacheLayer layer, Map<String, String> formats) {
+    /** 添加图层信息 */
+    private void addLayer(
+            Document doc, Element parent, ArcGISCacheLayer layer, Map<String, String> formats) {
         CacheInfo cacheInfo = layer.getCacheInfo();
         TileCacheInfo tileCacheInfo = cacheInfo.getTileCacheInfo();
         BoundingBox layerBounds = layer.getLayerBounds();
@@ -240,16 +238,22 @@ public class GetCapabilitiesGenerator {
         TileImageInfo info = layer.getCacheInfo().getTileImageInfo();
         if (info == null || info.getCacheTileFormat() == null) return Collections.emptyMap();
         String mime = getMimeType(info.getCacheTileFormat());
-        String template = StrUtil.format("/wmts?layer={}&tilematrixset={}",
-                layer.getLayerName(), "EPSG:" + layer.getGridSet().getSrs().getNumber());
-        return Collections.singletonMap(mime, template + "&Service=WMTS&Request=GetTile&Version=1.0.0&Format="
-                + mime + "&TileMatrix={TileMatrix}&TileCol={TileCol}&TileRow={TileRow}");
+        String template =
+                StrUtil.format(
+                        "/wmts?layer={}&tilematrixset={}",
+                        layer.getLayerName(),
+                        "EPSG:" + layer.getGridSet().getSrs().getNumber());
+        return Collections.singletonMap(
+                mime,
+                template
+                        + "&Service=WMTS&Request=GetTile&Version=1.0.0&Format="
+                        + mime
+                        + "&TileMatrix={TileMatrix}&TileCol={TileCol}&TileRow={TileRow}");
     }
 
-    /**
-     * 添加瓦片矩阵集信息（包含所有层级）
-     */
-    private void addTileMatrixSet(Document doc, Element parent, TileCacheInfo tileCacheInfo, GridSet gridSet) {
+    /** 添加瓦片矩阵集信息（包含所有层级） */
+    private void addTileMatrixSet(
+            Document doc, Element parent, TileCacheInfo tileCacheInfo, GridSet gridSet) {
         Element tileMatrixSet = doc.createElement("TileMatrixSet");
 
         Element identifier = doc.createElement("Identifier");
@@ -278,10 +282,14 @@ public class GetCapabilitiesGenerator {
         parent.appendChild(tileMatrixSet);
     }
 
-    /**
-     * 添加单个层级的瓦片矩阵信息
-     */
-    private void addTileMatrix(Document doc, Element tileMatrixSet, TileCacheInfo tileCacheInfo, LODInfo lod, Grid grid, double[] tlCoordinates) {
+    /** 添加单个层级的瓦片矩阵信息 */
+    private void addTileMatrix(
+            Document doc,
+            Element tileMatrixSet,
+            TileCacheInfo tileCacheInfo,
+            LODInfo lod,
+            Grid grid,
+            double[] tlCoordinates) {
         Element tileMatrix = doc.createElement("TileMatrix");
 
         Element identifier = doc.createElement("Identifier");
@@ -302,7 +310,6 @@ public class GetCapabilitiesGenerator {
         tileHeight.setTextContent(String.valueOf(tileCacheInfo.getTileRows()));
         tileMatrix.appendChild(tileHeight);
 
-
         Element matrixWidth = doc.createElement("MatrixWidth");
         matrixWidth.setTextContent(grid.getNumTilesWide() + "");
 
@@ -314,15 +321,17 @@ public class GetCapabilitiesGenerator {
 
         // 左上角点坐标
         Element topLeftCorner = doc.createElement("TopLeftCorner");
-        topLeftCorner.setTextContent(StrUtil.format("{} {}", Double.toString(tlCoordinates[0]), Double.toString(tlCoordinates[1])));
+        topLeftCorner.setTextContent(
+                StrUtil.format(
+                        "{} {}",
+                        Double.toString(tlCoordinates[0]),
+                        Double.toString(tlCoordinates[1])));
         tileMatrix.appendChild(topLeftCorner);
 
         tileMatrixSet.appendChild(tileMatrix);
     }
 
-    /**
-     * 添加样式信息
-     */
+    /** 添加样式信息 */
     private void addStyle(Document doc, Element parent) {
         Element style = doc.createElement("Style");
 
@@ -341,9 +350,7 @@ public class GetCapabilitiesGenerator {
         parent.appendChild(style);
     }
 
-    /**
-     * 添加边界框坐标信息
-     */
+    /** 添加边界框坐标信息 */
     private void addBoundingBoxCoordinates(Document doc, Element boundingBox, BoundingBox bbox) {
         Element lowerCorner = doc.createElementNS(XMLNS_OWS, "ows:LowerCorner");
         lowerCorner.setTextContent(bbox.getMinX() + " " + bbox.getMinY());
@@ -354,9 +361,7 @@ public class GetCapabilitiesGenerator {
         boundingBox.appendChild(upperCorner);
     }
 
-    /**
-     * 将文档转换为XML字符串
-     */
+    /** 将文档转换为XML字符串 */
     private String convertDocumentToString(Document doc) throws Exception {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
@@ -371,9 +376,7 @@ public class GetCapabilitiesGenerator {
         return writer.toString();
     }
 
-    /**
-     * 根据瓦片格式获取对应的MIME类型
-     */
+    /** 根据瓦片格式获取对应的MIME类型 */
     private String getMimeType(String tileFormat) {
         switch (tileFormat.toUpperCase()) {
             case "JPEG":

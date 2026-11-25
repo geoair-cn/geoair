@@ -2,7 +2,6 @@ package cn.geoair.map.dynamic.adv.query;
 
 import cn.geoair.map.dynamic.adv.query.apo.FieldBySchemaApo;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
-import cn.geoair.map.dynamic.adv.query.apo.SqlParamMap;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsGeomOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -37,8 +36,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：仅需处理结果中某一个特定空间字段的场景（如仅提取单条记录的几何中心点字段）。
      *
-     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @param geomFieldName 指定的空间字段名称（如 "geom"、"shape"），若字段不存在则仅处理普通字段
      * @return GirAdvOneRow 封装后的单行查询结果；无结果时返回null
@@ -55,8 +53,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：需要精准处理结果中多个指定空间字段的场景（如同时提取点坐标字段和面边界字段）。
      *
-     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @param geomFieldNameList 指定的空间字段名称列表，若列表为空则等效于自动识别所有空间字段
      * @return GirAdvOneRow 封装后的单行查询结果；无结果时返回null
@@ -73,8 +70,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：查询多条空间记录，需要批量处理所有空间字段的场景（如查询某区域内的所有点位记录）。
      *
-     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
      * @throws RuntimeException SQL执行失败、MyBatis参数绑定异常、空间字段解析异常时抛出运行时异常
@@ -87,8 +83,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：批量查询记录，仅需处理某一个特定空间字段的场景（如批量提取多条记录的面边界字段）。
      *
-     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @param geomFieldName 指定的空间字段名称，若字段不存在则仅处理普通字段
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
@@ -105,8 +100,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：批量查询记录，需要精准处理多个指定空间字段的场景（如批量提取点坐标和所属面边界字段）。
      *
-     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待执行的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @param advEnumsGeomOpt 空间字段处理策略枚举
      * @param geomFieldNameList 指定的空间字段名称列表，若列表为空则等效于自动识别所有空间字段
      * @return List<GirAdvOneRow> 封装后的多行查询结果列表；无结果时返回空列表（非null）
@@ -123,8 +117,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：快速判断SQL查询结果是否包含空间字段，以及该字段的类型（无需指定字段名）。
      *
-     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @return AdvEnumsTypeGeom 自动识别的首个空间字段类型；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -135,8 +128,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：精准校验SQL查询结果中某一个空间字段的类型。
      *
-     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @param geomFieldName 指定的空间字段名称
      * @return AdvEnumsTypeGeom 指定空间字段的类型；字段非空间字段/不存在时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
@@ -149,8 +141,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：批量校验SQL查询结果中多个空间字段的类型。
      *
-     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @param geomFieldNames 指定的空间字段名称列表
      * @return Map<String, AdvEnumsTypeGeom> key为空间字段名称，value为对应的空间类型枚举；
      *     非空间字段/不存在的字段不会出现在返回Map中；无匹配字段时返回空Map（非null）
@@ -164,8 +155,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：前置校验SQL是否返回空间数据，避免后续空间处理逻辑空跑。
      *
-     * @param dynamicSql 待校验的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待校验的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @return boolean 包含空间字段返回true，否则返回false
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -176,8 +166,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：快速获取SQL返回的空间字段名称（仅需单个字段时）。
      *
-     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @return String 首个空间字段名称；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -188,8 +177,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：需要批量处理所有空间字段时，先获取完整的空间字段名称列表。
      *
-     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @return List<String> 所有空间字段名称列表；无空间字段时返回空列表（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -200,8 +188,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：需要空间字段的完整元数据，而非仅名称时。
      *
-     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @return List<FieldBySchemaApo> 所有空间字段的元数据列表；无空间字段时返回空列表（非null）
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */
@@ -212,8 +199,7 @@ public interface IAdvGeoPreOpt extends IAdvGeoOpt {
      *
      * <p>适用场景：仅需首个空间字段的完整元数据时。
      *
-     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam
-     *     SQL语句的参数映射表，无参数时传空Map或null
+     * @param dynamicSql 待解析的SQL查询语句，使用MyBatis风格占位符（#{参数名}）传递参数 sqlParam SQL语句的参数映射表，无参数时传空Map或null
      * @return FieldBySchemaApo 首个空间字段的元数据；无空间字段时返回null
      * @throws RuntimeException SQL语法错误、MyBatis参数绑定异常、数据库连接异常时抛出运行时异常
      */

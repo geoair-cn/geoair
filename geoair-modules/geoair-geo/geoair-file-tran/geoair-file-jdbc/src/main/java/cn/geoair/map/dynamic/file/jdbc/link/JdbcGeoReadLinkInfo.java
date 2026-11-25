@@ -15,7 +15,8 @@ public abstract class JdbcGeoReadLinkInfo extends JdbcGeoLinkInfo {
 
     /**
      * 稳定分页排序字段或完整排序表达式。
-     * <p>需要分页读取时应保证结果唯一且稳定，避免并发或重复执行时出现漏读、重读。</p>
+     *
+     * <p>需要分页读取时应保证结果唯一且稳定，避免并发或重复执行时出现漏读、重读。
      */
     protected String orderBy;
 

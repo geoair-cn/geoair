@@ -6,13 +6,11 @@ import cn.geoair.map.dynamic.tools.GirAdvTools;
 import cn.geoair.map.dynamic.tools.grid.dto.BoxReferencedEnvelope;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
-
+import java.util.BitSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTReader;
-
-import java.util.BitSet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TileRegionMaskTest {
     @Test

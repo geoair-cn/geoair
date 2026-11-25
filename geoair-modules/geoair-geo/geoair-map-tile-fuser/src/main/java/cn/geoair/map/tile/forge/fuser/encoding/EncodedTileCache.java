@@ -62,15 +62,24 @@ public final class EncodedTileCache implements TileCache {
     }
 
     /** 已编码结果只落盘一次；显式结果策略优先，不能再被外层装饰器重复有损编码。 */
-    public static boolean putEncoded(TileCache cache, String layer, int z, int x, int y,
-                                     EncodedTile encoded, GiMimeType fallback) {
+    public static boolean putEncoded(
+            TileCache cache,
+            String layer,
+            int z,
+            int x,
+            int y,
+            EncodedTile encoded,
+            GiMimeType fallback) {
         if (cache == null || encoded == null) throw new IllegalArgumentException("缓存和编码结果不能为空");
         while (cache instanceof EncodedTileCache) cache = ((EncodedTileCache) cache).getDelegate();
-        GiMimeType actual = "jpeg".equals(encoded.getFormat()) ? ImageMime.jpeg
-                : "png".equals(encoded.getFormat()) ? ImageMime.png : fallback;
+        GiMimeType actual =
+                "jpeg".equals(encoded.getFormat())
+                        ? ImageMime.jpeg
+                        : "png".equals(encoded.getFormat()) ? ImageMime.png : fallback;
         TileOperationContext.checkCurrent();
         // MBTiles没有扩展名维度，不能删除所谓另一格式而误删同坐标记录。
-        return cache instanceof FileTileCache ? ((FileTileCache) cache).putRaster(layer, z, x, y, encoded.getBytes(), actual)
+        return cache instanceof FileTileCache
+                ? ((FileTileCache) cache).putRaster(layer, z, x, y, encoded.getBytes(), actual)
                 : cache.put(layer, z, x, y, encoded.getBytes(), actual);
     }
 

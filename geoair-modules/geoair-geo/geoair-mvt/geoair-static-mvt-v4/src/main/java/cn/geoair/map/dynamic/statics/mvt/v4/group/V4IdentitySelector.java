@@ -2,9 +2,7 @@ package cn.geoair.map.dynamic.statics.mvt.v4.group;
 
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
-
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -13,25 +11,21 @@ import java.util.PriorityQueue;
  * V4 的「一个瓦片里保留哪些要素」算子：按 <b>(身份排名, 输入序号, 批内下标)</b> 取最小的 N 个。
  *
  * <p>这是 V4 与 V3 在聚合阶段最本质的一处不同。V3 把削减放在 Spark 的 {@code reduceByKey} 里，
- * 同一块瓦片每来一批记录就削一次，于是"最终留下多少"取决于<b>削了多少次</b>
- * （实测不溢写时触发 1,373 次、每瓦片停在 N~2N；V4 溢写时只触发 648 次、每瓦片被压到恰好 N，
- * 同一份数据产出差 18%）。那是 V3 的结构决定的，V4 没有这个包袱，就不该继承这个毛病。</p>
+ * 同一块瓦片每来一批记录就削一次，于是"最终留下多少"取决于<b>削了多少次</b> （实测不溢写时触发 1,373 次、每瓦片停在 N~2N；V4 溢写时只触发 648 次、每瓦片被压到恰好
+ * N， 同一份数据产出差 18%）。那是 V3 的结构决定的，V4 没有这个包袱，就不该继承这个毛病。
  *
- * <p>V4 的做法是把它定义成一个<b>与顺序、次数、溢写位置都无关</b>的算子：</p>
+ * <p>V4 的做法是把它定义成一个<b>与顺序、次数、溢写位置都无关</b>的算子：
+ *
  * <ul>
- *   <li><b>全序而不是偏序</b>：先比身份排名，再比输入序号，最后比"同一要素落在这块瓦片上的第几行"。
- *       三元组唯一确定一个行，所以没有并列、没有平局。</li>
- *   <li><b>可结合、可交换、幂等</b>：{@code 取最小 N 个} 满足这三条，
- *       因此"削 N 次"和"削一次"结果相同，"先溢写再削"和"直接削"结果也相同 ——
- *       溢写对产物完全透明，这是 V4 要的性质（见 {@code V4开发计划.md} 7.8）。</li>
- *   <li><b>有界</b>：选取用容量为 N 的最大堆，流式喂入，内存只有 N 行。
- *       归并时不再需要"先把整块瓦片的并集堆起来再削"（实测 62 个 run 时那样会把堆撑爆）。</li>
+ *   <li><b>全序而不是偏序</b>：先比身份排名，再比输入序号，最后比"同一要素落在这块瓦片上的第几行"。 三元组唯一确定一个行，所以没有并列、没有平局。
+ *   <li><b>可结合、可交换、幂等</b>：{@code 取最小 N 个} 满足这三条， 因此"削 N 次"和"削一次"结果相同，"先溢写再削"和"直接削"结果也相同 ——
+ *       溢写对产物完全透明，这是 V4 要的性质（见 {@code V4开发计划.md} 7.8）。
+ *   <li><b>有界</b>：选取用容量为 N 的最大堆，流式喂入，内存只有 N 行。 归并时不再需要"先把整块瓦片的并集堆起来再削"（实测 62 个 run 时那样会把堆撑爆）。
  * </ul>
  *
  * <p>身份取值规则与 V3 的 {@code V3FeatureUtils.resolveIdentity} 对齐（{@code idFieldName} 优先，
- * 否则取行内第一个非几何字段），排名同样做一次雪崩混合 —— 数据源的 id 常常是连号
- * （GeoJSON 的 {@code gid} 就是 805022、805023 连着编的），不混合的话"取最小的 N 个"
- * 会退化成"取一段连续的 id"。V3 那份是包级私有的，V4 按第五节"共用类只读"的原则自己写一份。</p>
+ * 否则取行内第一个非几何字段），排名同样做一次雪崩混合 —— 数据源的 id 常常是连号 （GeoJSON 的 {@code gid} 就是 805022、805023
+ * 连着编的），不混合的话"取最小的 N 个" 会退化成"取一段连续的 id"。V3 那份是包级私有的，V4 按第五节"共用类只读"的原则自己写一份。
  *
  * @author 张逢吉
  */
@@ -40,8 +34,7 @@ public final class V4IdentitySelector {
     /** 取不到身份值时的排名：排到最后，优先被削掉。 */
     public static final int MISSING_RANK = Integer.MAX_VALUE;
 
-    private V4IdentitySelector() {
-    }
+    private V4IdentitySelector() {}
 
     /** 计算一行的身份排名。同一次任务内对同一行恒定（纯函数）。 */
     public static int rankOf(GirAdvOneRow row, MvtLayerSliceParameter layer) {
@@ -70,8 +63,9 @@ public final class V4IdentitySelector {
 
     /**
      * 把身份哈希做一次雪崩混合（Murmur3 finalizer）。
+     *
      * <p>不能直接用 {@code hashCode()}：连号 id 直接取模会得到"一段一段"的区间，
-     * 配上按位置顺序编号的数据，抽出来照样是连片的要素，等于没削。混合之后连续输入才会落到互不相邻的位置。</p>
+     * 配上按位置顺序编号的数据，抽出来照样是连片的要素，等于没削。混合之后连续输入才会落到互不相邻的位置。
      */
     static int spread(int hash) {
         int h = hash;
@@ -86,7 +80,7 @@ public final class V4IdentitySelector {
     /**
      * 一次性选取：保留优先序最小的 {@code keep} 行。
      *
-     * <p>不足 {@code keep} 行时原样返回（不复制），这是最常见的分支 —— 高层级每块瓦片通常远远不到上限。</p>
+     * <p>不足 {@code keep} 行时原样返回（不复制），这是最常见的分支 —— 高层级每块瓦片通常远远不到上限。
      */
     public static List<V4OrderedRow> keepSmallest(
             List<V4OrderedRow> rows, int keep, MvtLayerSliceParameter layer) {
@@ -107,9 +101,8 @@ public final class V4IdentitySelector {
     /**
      * 有界选择器：容量 N，流式喂入，始终只持有优先序最小的 N 行。
      *
-     * <p>堆里存的是"当前最差的排在最前"，来一行比堆顶更好就换掉堆顶，比堆顶更差就直接丢 ——
-     * 单行成本 O(log N)，内存 O(N)。这样"归并一路 tile 的所有 run"与"只归并一个 run"
-     * 在内存上没有区别，差别只在 CPU。</p>
+     * <p>堆里存的是"当前最差的排在最前"，来一行比堆顶更好就换掉堆顶，比堆顶更差就直接丢 —— 单行成本 O(log N)，内存 O(N)。这样"归并一路 tile 的所有
+     * run"与"只归并一个 run" 在内存上没有区别，差别只在 CPU。
      */
     public static final class Bounded {
 
@@ -131,7 +124,8 @@ public final class V4IdentitySelector {
 
         /**
          * 优先序升序：排名 → 输入序号 → 批内下标。三元组唯一，所以这是全序，没有并列。
-         * <p>越小越该被保留 —— {@link Bounded} 的堆是它的<b>倒序</b>（堆顶 = 当前最差的一行）。</p>
+         *
+         * <p>越小越该被保留 —— {@link Bounded} 的堆是它的<b>倒序</b>（堆顶 = 当前最差的一行）。
          */
         private static int compareByPriority(Entry left, Entry right) {
             if (left.rank != right.rank) {
@@ -159,8 +153,12 @@ public final class V4IdentitySelector {
         }
 
         public void offer(V4OrderedRow ordered) {
-            Entry candidate = new Entry(
-                    rankOf(ordered.getRow(), layer), ordered.getSequence(), ordered.getRowIndex(), ordered.getRow());
+            Entry candidate =
+                    new Entry(
+                            rankOf(ordered.getRow(), layer),
+                            ordered.getSequence(),
+                            ordered.getRowIndex(),
+                            ordered.getRow());
             if (worstFirst.size() < capacity) {
                 worstFirst.add(candidate);
                 return;

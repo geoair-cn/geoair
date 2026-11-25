@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
  */
 public class DmAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
 
-    public DmAdvBaseUpdateOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+    public DmAdvBaseUpdateOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         super(configAdvQueryGetter, registry);
         this.dialectTableNameProcessor = DmDialectTableNameUtil.getInstance();
     }
@@ -27,11 +28,12 @@ public class DmAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
     }
 
     @Override
-    protected String buildUpdateOrInsertSql(String tableName,
-                                            String fields,
-                                            String placeholders,
-                                            String conflictFields,
-                                            String updateClause) {
+    protected String buildUpdateOrInsertSql(
+            String tableName,
+            String fields,
+            String placeholders,
+            String conflictFields,
+            String updateClause) {
         String[] fieldArray = fields.split(",");
         StringBuilder usingBuilder = new StringBuilder("SELECT ");
         StringBuilder insertValueBuilder = new StringBuilder();
@@ -48,22 +50,32 @@ public class DmAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
         String usingClause = usingBuilder.toString();
         String insertValues = insertValueBuilder.toString();
         String[] conflictFieldArray = conflictFields.split(",");
-        String onCondition = java.util.Arrays.stream(conflictFieldArray)
-                .map(field -> StrUtil.format("target.{} = source.{}", field.trim(), field.trim()))
-                .collect(Collectors.joining(" AND "));
+        String onCondition =
+                java.util.Arrays.stream(conflictFieldArray)
+                        .map(
+                                field ->
+                                        StrUtil.format(
+                                                "target.{} = source.{}",
+                                                field.trim(),
+                                                field.trim()))
+                        .collect(Collectors.joining(" AND "));
         if (StrUtil.isBlank(updateClause)) {
             String firstConflictField = conflictFieldArray[0].trim();
-            updateClause = StrUtil.format("target.{} = source.{}", firstConflictField, firstConflictField);
+            updateClause =
+                    StrUtil.format("target.{} = source.{}", firstConflictField, firstConflictField);
         }
         return StrUtil.format(
                 "MERGE INTO {} target USING ({}) source ON ({}) WHEN MATCHED THEN UPDATE SET {} WHEN NOT MATCHED THEN INSERT ({}) VALUES ({})",
-                tableName, usingClause, onCondition, updateClause, fields, insertValues);
+                tableName,
+                usingClause,
+                onCondition,
+                updateClause,
+                fields,
+                insertValues);
     }
 
-    public String buildBatchUpdateWithForall(String tableName,
-                                             String idKey,
-                                             Set<String> updateFields,
-                                             int batchSize) {
+    public String buildBatchUpdateWithForall(
+            String tableName, String idKey, Set<String> updateFields, int batchSize) {
         throw new UnsupportedOperationException("DM 暂未实现 buildBatchUpdateWithForall 的可执行批量更新语句");
     }
 }

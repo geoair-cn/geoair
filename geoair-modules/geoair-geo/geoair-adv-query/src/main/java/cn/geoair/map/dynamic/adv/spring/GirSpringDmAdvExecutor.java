@@ -23,8 +23,7 @@ public class GirSpringDmAdvExecutor extends AdvExecutorDm implements IAdvExecuto
         return advExecutor;
     }
 
-    public static GirSpringDmAdvExecutor newInstance(
-            DataSource dataSource, String dataSourceName) {
+    public static GirSpringDmAdvExecutor newInstance(DataSource dataSource, String dataSourceName) {
         GirSpringDmAdvExecutor advExecutor = new GirSpringDmAdvExecutor();
         advExecutor.initByDataSource(dataSource, dataSourceName);
         return advExecutor;

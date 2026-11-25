@@ -1,20 +1,16 @@
 package cn.geoair.map.tile.forge.core.servlet;
 
-
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.simple.response.TileResponse;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
+import cn.geoair.map.tile.forge.core.TileRequest;
 import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
-import cn.geoair.map.tile.forge.core.TileRequest;
-
 import cn.geoair.map.tile.forge.core.service.GirMapTileService;
 import cn.hutool.core.util.URLUtil;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public class D3TerrainServlet extends D3TilesServlet {
 
@@ -25,9 +21,9 @@ public class D3TerrainServlet extends D3TilesServlet {
     }
 
     public Pattern getPattern() {
-        return Pattern.compile("/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
+        return Pattern.compile(
+                "/3dTerrainService/([^/]+)/([^/]+)/([^/]+)/([^/]+(?:/[^/]+/[^/]+)?\\.\\w+)");
     }
-
 
     @Override
     public TileResponse getTileResponse(String requestUri, String requestHost) {
@@ -47,15 +43,18 @@ public class D3TerrainServlet extends D3TilesServlet {
         }
         parseResult.setRequestURI(requestUri);
         try {
-            GirLayerConfigContext layerConfigContext = getGirLayerConfigContext(
-                    parseResult.getFileId(), parseResult.getFileName(), parseResult.getServiceName());
+            GirLayerConfigContext layerConfigContext =
+                    getGirLayerConfigContext(
+                            parseResult.getFileId(),
+                            parseResult.getFileName(),
+                            parseResult.getServiceName());
             layerConfigContext.setFormat(parseResult.getFormat());
-            TileRequest layerTile = mapTileService.getLayerTile(
-                    layerConfigContext,
-                    parseResult.getZ(),
-                    parseResult.getY(),
-                    parseResult.getX()
-            );
+            TileRequest layerTile =
+                    mapTileService.getLayerTile(
+                            layerConfigContext,
+                            parseResult.getZ(),
+                            parseResult.getY(),
+                            parseResult.getX());
             return createTileResponse(layerTile, parseResult, requestUri);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -63,16 +62,15 @@ public class D3TerrainServlet extends D3TilesServlet {
         }
     }
 
-    public GirLayerConfigContext getGirLayerConfigContext(String fileId, String fileName, String layerName) {
-        GirLayerConfigContext config = GirLayerConfigContextHelper.getInstance().getGirLayerConfigContext(
-                        GirMapTileType.TERRAIN_3D, layerName, fileId, fileName
-                )
-                .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
+    public GirLayerConfigContext getGirLayerConfigContext(
+            String fileId, String fileName, String layerName) {
+        GirLayerConfigContext config =
+                GirLayerConfigContextHelper.getInstance()
+                        .getGirLayerConfigContext(
+                                GirMapTileType.TERRAIN_3D, layerName, fileId, fileName)
+                        .orElseThrow(() -> new RuntimeException("图层[" + layerName + "]配置不存在"));
         return config;
     }
-
-
-
 
     /**
      * 解析请求URI
@@ -86,12 +84,13 @@ public class D3TerrainServlet extends D3TilesServlet {
             return null;
         }
 
-        TileParseResult result = TileParseResult.of()
-                .setRequestURI(requestURI)
-                .setFileId(matcher.group(1))        // FileId
-                .setFileName(matcher.group(2))      // 文件名称
-                .setServiceName(matcher.group(3))   // 服务名称
-                .setFullPath(matcher.group(4));     // 第3段及以后的部分
+        TileParseResult result =
+                TileParseResult.of()
+                        .setRequestURI(requestURI)
+                        .setFileId(matcher.group(1)) // FileId
+                        .setFileName(matcher.group(2)) // 文件名称
+                        .setServiceName(matcher.group(3)) // 服务名称
+                        .setFullPath(matcher.group(4)); // 第3段及以后的部分
 
         String pathPart = matcher.group(4);
 
@@ -114,6 +113,4 @@ public class D3TerrainServlet extends D3TilesServlet {
 
         return result;
     }
-
-
 }

@@ -5,16 +5,14 @@ import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
 import cn.geoair.map.tile.forge.core.enums.GirStorageType;
 import cn.geoair.map.tile.forge.core.model.GirLayerConfigContext;
 
-/**
- * TileRequest 返回对象示例
- */
+/** TileRequest 返回对象示例 */
 public class TileRequestExample {
 
     public static void main(String[] args) {
         GirLayerConfigContext context = new GirLayerConfigContext();
         context.setDataId("base_layer")
-            .setStorageType(GirStorageType.LOCAL_ZIP)
-            .setMapTileType(GirMapTileType.XYZ);
+                .setStorageType(GirStorageType.LOCAL_ZIP)
+                .setMapTileType(GirMapTileType.XYZ);
 
         TileRequest empty = TileRequest.emptyByContext(context);
 

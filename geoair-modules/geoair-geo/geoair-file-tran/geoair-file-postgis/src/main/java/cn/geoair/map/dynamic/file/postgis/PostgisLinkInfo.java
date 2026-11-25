@@ -10,13 +10,11 @@ import java.util.Properties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
- 
 
 /** PostGIS 链接信息类 包含数据库连接、排序字段、几何字段等核心配置 */
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
- 
 public abstract class PostgisLinkInfo extends LinkInfo {
     public static GiLogger log = GirLoggerFactory.getLogger();
     // 数据库基础配置

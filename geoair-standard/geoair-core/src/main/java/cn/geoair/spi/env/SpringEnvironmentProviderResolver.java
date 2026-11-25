@@ -4,8 +4,7 @@ import java.lang.ref.WeakReference;
 
 final class SpringEnvironmentProviderResolver {
 
-    private static WeakReference<SpringEnvironment4Gir> weakReference =
-            new WeakReference<>(null);
+    private static WeakReference<SpringEnvironment4Gir> weakReference = new WeakReference<>(null);
 
     private SpringEnvironmentProviderResolver() {}
 

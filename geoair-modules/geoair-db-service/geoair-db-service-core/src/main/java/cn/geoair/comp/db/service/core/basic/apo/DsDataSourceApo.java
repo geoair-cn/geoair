@@ -1,14 +1,12 @@
 package cn.geoair.comp.db.service.core.basic.apo;
 
-import java.io.Serializable;
-import java.util.function.Consumer;
-
 import cn.geoair.comp.db.service.core.basic.util.DESUtils;
 import cn.geoair.comp.dynamic.ds.utils.DataSourceDruidFastCreate;
 import com.alibaba.druid.pool.DruidDataSource;
-import lombok.Data;
-
+import java.io.Serializable;
+import java.util.function.Consumer;
 import javax.sql.DataSource;
+import lombok.Data;
 
 /**
  * @program: dbApi
@@ -31,9 +29,7 @@ public class DsDataSourceApo implements Serializable {
 
     String password;
 
-    /**
-     * true 修改密码 false不修改
-     */
+    /** true 修改密码 false不修改 */
     boolean edit_password;
 
     String type;
@@ -50,7 +46,6 @@ public class DsDataSourceApo implements Serializable {
 
     String updateTime;
 
-
     public static DataSource toDataSource(DsDataSourceApo ds) {
         DataSourceDruidFastCreate druidFastCreate = new DataSourceDruidFastCreate();
         druidFastCreate.setUrl(ds.getUrl());
@@ -60,22 +55,20 @@ public class DsDataSourceApo implements Serializable {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        druidFastCreate.setConfigurator(new Consumer<DruidDataSource>() {
-            @Override
-            public void accept(DruidDataSource druidDataSource) {
-                druidDataSource.setName(ds.getName());
+        druidFastCreate.setConfigurator(
+                new Consumer<DruidDataSource>() {
+                    @Override
+                    public void accept(DruidDataSource druidDataSource) {
+                        druidDataSource.setName(ds.getName());
 
-                druidDataSource.setRemoveAbandoned(true);
-                druidDataSource.setRemoveAbandonedTimeout(300); // 5分钟自动回收
+                        druidDataSource.setRemoveAbandoned(true);
+                        druidDataSource.setRemoveAbandonedTimeout(300); // 5分钟自动回收
 
-                druidDataSource.setDriverClassName(ds.getDriver());
-                druidDataSource.setConnectionErrorRetryAttempts(3); // 失败后重连次数
-                druidDataSource.setBreakAfterAcquireFailure(true);
-
-            }
-        });
+                        druidDataSource.setDriverClassName(ds.getDriver());
+                        druidDataSource.setConnectionErrorRetryAttempts(3); // 失败后重连次数
+                        druidDataSource.setBreakAfterAcquireFailure(true);
+                    }
+                });
         return druidFastCreate.toDataSource();
-
     }
-
 }

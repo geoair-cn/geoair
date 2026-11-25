@@ -1,7 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.precache;
 
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
-
 import lombok.Getter;
 
 /** 单级任务计划，范围为闭区间；几何和行列必须属于相同的输出网格。 */

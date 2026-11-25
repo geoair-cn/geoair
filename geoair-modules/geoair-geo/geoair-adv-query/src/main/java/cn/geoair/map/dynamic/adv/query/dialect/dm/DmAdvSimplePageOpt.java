@@ -20,8 +20,11 @@ public class DmAdvSimplePageOpt extends AbstractExecAdvSimplePageOpt {
     protected IAdvBaseOpt baseOpt;
     protected IAdvDDLOpt advDDLOpt;
 
-    public DmAdvSimplePageOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt,
-                              IAdvGeoPreOpt advGeoPreOpt, IAdvDDLOpt advDDLOpt) {
+    public DmAdvSimplePageOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvGeoPreOpt advGeoPreOpt,
+            IAdvDDLOpt advDDLOpt) {
         super(dataSourceGetter);
         this.baseOpt = baseOpt;
         this.advDDLOpt = advDDLOpt;

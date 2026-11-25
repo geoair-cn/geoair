@@ -3,19 +3,16 @@ package cn.geoair.map.tile.forge.fuser.precache.bask;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.dynamic.tools.GirAdvTools;
-import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
-
 import cn.geoair.map.tile.forge.fuser.precache.TileFuserCheckAndRepairTask;
 import cn.geoair.map.tile.forge.fuser.precache.TileFuserPreCacheTask;
 import cn.geoair.web.mime.GirImageMime;
-import org.locationtech.jts.geom.Geometry;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * 预缓存逻辑
@@ -23,9 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author 张俊
  * @date Created in 2026/6/15 11:54
  */
-
 public class PreCache {
-    private static GiLogger log = GirLoggerFactory.getLogger( );
+    private static GiLogger log = GirLoggerFactory.getLogger();
     private final ExecutorService executorService;
 
     public static PreCache getInstance() {
@@ -33,14 +29,14 @@ public class PreCache {
     }
 
     public PreCache() {
-        this.executorService = Executors.newFixedThreadPool(
-                Runtime.getRuntime().availableProcessors(),
-                r -> {
-                    Thread t = new Thread(r, "precache-" + System.currentTimeMillis());
-                    t.setDaemon(true);
-                    return t;
-                }
-        );
+        this.executorService =
+                Executors.newFixedThreadPool(
+                        Runtime.getRuntime().availableProcessors(),
+                        r -> {
+                            Thread t = new Thread(r, "precache-" + System.currentTimeMillis());
+                            t.setDaemon(true);
+                            return t;
+                        });
     }
 
     public PreCache(int threadCount) {
@@ -50,29 +46,45 @@ public class PreCache {
     /**
      * 执行预缓存
      *
-     * @param config        图层配置
+     * @param config 图层配置
      * @param wkt4326String WKT几何范围
-     * @param minZoom       最小层级
-     * @param maxZoom       最大层级
+     * @param minZoom 最小层级
+     * @param maxZoom 最大层级
      */
     public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
         executePreCache(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void executePreCache(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format) {
+    public void executePreCache(
+            PxyLayerInfo config,
+            String wkt4326String,
+            int minZoom,
+            int maxZoom,
+            GirImageMime format) {
         execute(config, wkt4326String, minZoom, maxZoom, format, false);
     }
 
-    public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
+    public void executePreCheck(
+            PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom) {
         executePreCheck(config, wkt4326String, minZoom, maxZoom, null);
     }
 
-    public void executePreCheck(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format) {
+    public void executePreCheck(
+            PxyLayerInfo config,
+            String wkt4326String,
+            int minZoom,
+            int maxZoom,
+            GirImageMime format) {
         execute(config, wkt4326String, minZoom, maxZoom, format, true);
     }
 
-
-    public void execute(PxyLayerInfo config, String wkt4326String, int minZoom, int maxZoom, GirImageMime format, boolean isPreCheck) {
+    public void execute(
+            PxyLayerInfo config,
+            String wkt4326String,
+            int minZoom,
+            int maxZoom,
+            GirImageMime format,
+            boolean isPreCheck) {
         if (!isCacheEnabled(config)) {
             log.warn("缓存未启用，跳过预缓存: {}", config.getLayerName());
             return;
@@ -82,7 +94,6 @@ public class PreCache {
             format = GirImageMime.png;
         }
         Geometry geometry = GirAdvTools.getFormatOpt().wktToJtsGeometry(wkt4326String);
-
 
         int zoomCount = maxZoom - minZoom + 1;
         CountDownLatch latch = new CountDownLatch(zoomCount);
@@ -96,15 +107,28 @@ public class PreCache {
         for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
             Runnable task;
             if (isPreCheck) {
-                task = new TileFuserCheckAndRepairTask(
-                        config.getLayerName(), zoom, geometry,
-                        latch, totalCount, checkedCount, successCount, failCount, format
-                );
+                task =
+                        new TileFuserCheckAndRepairTask(
+                                config.getLayerName(),
+                                zoom,
+                                geometry,
+                                latch,
+                                totalCount,
+                                checkedCount,
+                                successCount,
+                                failCount,
+                                format);
             } else {
-                task = new TileFuserPreCacheTask(
-                        config.getLayerName(), zoom, geometry,
-                        latch, totalCount, successCount, failCount, format
-                );
+                task =
+                        new TileFuserPreCacheTask(
+                                config.getLayerName(),
+                                zoom,
+                                geometry,
+                                latch,
+                                totalCount,
+                                successCount,
+                                failCount,
+                                format);
             }
 
             executorService.submit(task);
@@ -113,11 +137,20 @@ public class PreCache {
         try {
             latch.await();
             if (isPreCheck) {
-                log.info("预检查完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {},检查瓦片：{}",
-                        config.getLayerName(), totalCount.get(), successCount.get(), failCount.get(), checkedCount.get());
+                log.info(
+                        "预检查完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {},检查瓦片：{}",
+                        config.getLayerName(),
+                        totalCount.get(),
+                        successCount.get(),
+                        failCount.get(),
+                        checkedCount.get());
             } else {
-                log.info("预缓存完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {}",
-                        config.getLayerName(), totalCount.get(), successCount.get(), failCount.get());
+                log.info(
+                        "预缓存完成 - 图层: {}, 总瓦片: {}, 成功: {}, 失败: {}",
+                        config.getLayerName(),
+                        totalCount.get(),
+                        successCount.get(),
+                        failCount.get());
             }
 
         } catch (InterruptedException e) {
@@ -126,17 +159,13 @@ public class PreCache {
         }
     }
 
-    /**
-     * 检查缓存是否启用
-     */
+    /** 检查缓存是否启用 */
     private boolean isCacheEnabled(PxyLayerInfo config) {
         return "true".equalsIgnoreCase(config.getEnableCache())
                 || "1".equals(config.getEnableCache());
     }
 
-    /**
-     * 关闭线程池
-     */
+    /** 关闭线程池 */
     public void shutdown() {
         executorService.shutdown();
         try {

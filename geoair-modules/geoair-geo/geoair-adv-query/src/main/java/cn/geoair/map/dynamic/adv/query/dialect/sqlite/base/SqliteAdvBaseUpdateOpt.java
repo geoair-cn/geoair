@@ -5,7 +5,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.sqlite.SqliteDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.function.Supplier;
 
 /** SQLite 更新及 UPSERT 操作。 */
@@ -32,10 +31,17 @@ public class SqliteAdvBaseUpdateOpt extends AbstractExecAdvBaseUpdateOpt {
         if (StrUtil.isBlank(updateClause)) {
             return StrUtil.format(
                     "INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) DO NOTHING",
-                    tableName, fields, placeholders, conflictFields);
+                    tableName,
+                    fields,
+                    placeholders,
+                    conflictFields);
         }
         return StrUtil.format(
                 "INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) DO UPDATE SET {}",
-                tableName, fields, placeholders, conflictFields, updateClause);
+                tableName,
+                fields,
+                placeholders,
+                conflictFields,
+                updateClause);
     }
 }

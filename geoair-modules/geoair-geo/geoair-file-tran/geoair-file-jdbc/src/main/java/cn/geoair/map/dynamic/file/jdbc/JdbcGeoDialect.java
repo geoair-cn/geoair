@@ -5,9 +5,8 @@ import org.geotools.data.DataStore;
 
 /**
  * JDBC 空间数据库方言。
- * <p>
- * 方言只负责由连接信息创建 GeoTools {@link DataStore}；SQL 分页、字段读取和批量写入等
- * 公共流程由 JDBC 基类统一处理。
+ *
+ * <p>方言只负责由连接信息创建 GeoTools {@link DataStore}；SQL 分页、字段读取和批量写入等 公共流程由 JDBC 基类统一处理。
  *
  * @author 张逢吉
  */

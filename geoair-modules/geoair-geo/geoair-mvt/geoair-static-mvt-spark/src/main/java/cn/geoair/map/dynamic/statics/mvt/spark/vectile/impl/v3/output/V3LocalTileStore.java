@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.output;
 
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.V3TileOutputConfig;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,9 +30,12 @@ final class V3LocalTileStore implements V3TileStore {
 
     @Override
     public void writeTile(int z, int x, int y, byte[] data, boolean gzip) throws IOException {
-        Path tilePath = rootDirectory.resolve(String.valueOf(z))
-                .resolve(String.valueOf(x))
-                .resolve(y + ".pbf").normalize();
+        Path tilePath =
+                rootDirectory
+                        .resolve(String.valueOf(z))
+                        .resolve(String.valueOf(x))
+                        .resolve(y + ".pbf")
+                        .normalize();
         ensureWithinRoot(tilePath);
         Files.createDirectories(tilePath.getParent());
         write(tilePath, data);
@@ -56,7 +58,11 @@ final class V3LocalTileStore implements V3TileStore {
         if (!overwrite && Files.exists(path)) {
             throw new IOException("目标瓦片已存在且未开启覆盖: " + path);
         }
-        Files.write(path, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+        Files.write(
+                path,
+                data,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING,
                 StandardOpenOption.WRITE);
     }
 

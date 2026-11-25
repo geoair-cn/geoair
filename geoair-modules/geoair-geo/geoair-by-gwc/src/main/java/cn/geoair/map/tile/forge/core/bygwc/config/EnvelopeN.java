@@ -1,7 +1,6 @@
-
 package cn.geoair.map.tile.forge.core.bygwc.config;
 
-public class EnvelopeN  implements   java.io.Serializable {
+public class EnvelopeN implements java.io.Serializable {
 
     // 最小x坐标值
     private double xmin;
@@ -20,6 +19,7 @@ public class EnvelopeN  implements   java.io.Serializable {
 
     /**
      * 获取最小x坐标值
+     *
      * @return xmin 最小x坐标值
      */
     public double getXmin() {
@@ -28,6 +28,7 @@ public class EnvelopeN  implements   java.io.Serializable {
 
     /**
      * 获取最小y坐标值
+     *
      * @return ymin 最小y坐标值
      */
     public double getYmin() {
@@ -36,6 +37,7 @@ public class EnvelopeN  implements   java.io.Serializable {
 
     /**
      * 获取最大x坐标值
+     *
      * @return xmax 最大x坐标值
      */
     public double getXmax() {
@@ -44,6 +46,7 @@ public class EnvelopeN  implements   java.io.Serializable {
 
     /**
      * 获取最大y坐标值
+     *
      * @return ymax 最大y坐标值
      */
     public double getYmax() {
@@ -52,6 +55,7 @@ public class EnvelopeN  implements   java.io.Serializable {
 
     /**
      * 获取空间参考系统
+     *
      * @return spatialReference 空间参考系统
      */
     public SpatialReference getSpatialReference() {

@@ -1,15 +1,12 @@
 package cn.geoair.map.dynamic.file.shp;
 
 import cn.geoair.map.dynamic.file.core.link.LinkInfo;
+import java.io.File;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import java.io.File;
 
-/**
- * Shapefile 文件链接信息
- * 注意：shp 必须配套 .shx/.dbf 等文件，统一放在同一目录
- */
+/** Shapefile 文件链接信息 注意：shp 必须配套 .shx/.dbf 等文件，统一放在同一目录 */
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
@@ -24,9 +21,7 @@ public class ShpLinkInfo extends LinkInfo {
     /** 空间坐标系 SRID */
     private int srid = 4326;
 
-    /**
-     * 校验 shp 文件合法性
-     */
+    /** 校验 shp 文件合法性 */
     @Override
     public void checkLinkInfo() {
         if (shpFilePath == null || shpFilePath.trim().isEmpty()) {

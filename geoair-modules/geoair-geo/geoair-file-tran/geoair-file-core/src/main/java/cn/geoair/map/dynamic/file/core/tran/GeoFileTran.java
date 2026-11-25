@@ -6,10 +6,9 @@ import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.core.tran.model.TranContext;
 import cn.geoair.map.dynamic.file.core.tran.model.TranResult;
 import cn.geoair.map.dynamic.file.core.write.GeoFileWriter;
-import org.opengis.feature.simple.SimpleFeatureType;
-
 import java.io.Closeable;
 import java.util.function.Consumer;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * 空间文件转换核心接口
@@ -35,8 +34,8 @@ public interface GeoFileTran extends Closeable {
     /**
      * 核心转换方法（带自定义上下文）
      *
-     * @param reader  输入读取器
-     * @param writer  输出写入器
+     * @param reader 输入读取器
+     * @param writer 输出写入器
      * @param context 转换上下文（传递自定义参数、配置）
      * @return 结构化转换结果
      */
@@ -51,14 +50,12 @@ public interface GeoFileTran extends Closeable {
     GeoFileTran setExceptionConsumer(ExceptionConsumer exceptionConsumer);
 
     /**
-     *
      * @param oneRowConsumer
      * @return
      */
     GeoFileTran setGirAdvOneRowConsumer(Consumer<GirAdvOneRow> oneRowConsumer);
 
     /**
-     *
      * @param headConsumer
      * @return
      */
@@ -79,8 +76,6 @@ public interface GeoFileTran extends Closeable {
      */
     TranContext getContext();
 
-    /**
-     * 重置转换状态（复用实例）
-     */
+    /** 重置转换状态（复用实例） */
     void reset();
 }

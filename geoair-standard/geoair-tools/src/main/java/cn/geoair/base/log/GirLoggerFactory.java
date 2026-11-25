@@ -14,8 +14,7 @@ public class GirLoggerFactory {
 
     private static volatile LoggerProvider loggerProvider;
 
-    private GirLoggerFactory() {
-    }
+    private GirLoggerFactory() {}
 
     public interface LoggerProvider {
         GiLogger getLogger(String name);
@@ -49,10 +48,8 @@ public class GirLoggerFactory {
     @GaMethodHandImpl(
             implClass = GirLoggerFactory.class,
             implMethod = "getLogger",
-            type = GaMethodHandImpl.ImplType.comity
-    )
+            type = GaMethodHandImpl.ImplType.comity)
     private static GiLogger _getLogger(String name) {
         return GirConsoleLog.forName(name);
     }
-
 }

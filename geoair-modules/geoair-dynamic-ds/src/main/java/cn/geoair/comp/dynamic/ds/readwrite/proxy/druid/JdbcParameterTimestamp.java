@@ -45,5 +45,4 @@ public final class JdbcParameterTimestamp implements JdbcParameter {
     public int getSqlType() {
         return Types.TIMESTAMP;
     }
-
 }

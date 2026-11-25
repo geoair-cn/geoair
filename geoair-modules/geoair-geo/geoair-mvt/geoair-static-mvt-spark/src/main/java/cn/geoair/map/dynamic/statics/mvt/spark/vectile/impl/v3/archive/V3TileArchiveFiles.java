@@ -1,7 +1,6 @@
 package cn.geoair.map.dynamic.statics.mvt.spark.vectile.impl.v3.archive;
 
 import cn.geoair.map.dynamic.tools.grid.dto.TileYAxis;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,11 +17,11 @@ import java.util.stream.Stream;
  */
 final class V3TileArchiveFiles {
 
-    private V3TileArchiveFiles() {
-    }
+    private V3TileArchiveFiles() {}
 
     /** 扫描 {@code z/x/y.pbf} 目录，并统一换算为 XYZ 行号。 */
-    static List<TileFile> listTiles(Path stagingDirectory, TileYAxis stagingYAxis) throws IOException {
+    static List<TileFile> listTiles(Path stagingDirectory, TileYAxis stagingYAxis)
+            throws IOException {
         if (stagingDirectory == null || !Files.isDirectory(stagingDirectory)) {
             throw new IllegalArgumentException("V3 归档中间目录不存在: " + stagingDirectory);
         }
@@ -50,7 +49,9 @@ final class V3TileArchiveFiles {
 
     /** 按 PMTiles TileID 的升序排列。 */
     static void sortByPmtilesId(List<TileFile> tiles) {
-        Collections.sort(tiles, Comparator.comparingLong(tile -> PmtilesUtils.tileId(tile.z, tile.x, tile.xyzY)));
+        Collections.sort(
+                tiles,
+                Comparator.comparingLong(tile -> PmtilesUtils.tileId(tile.z, tile.x, tile.xyzY)));
     }
 
     private static TileFile parseTile(Path root, Path path, TileYAxis sourceYAxis) {

@@ -4,9 +4,7 @@ import cn.geoair.comp.db.service.core.basic.apo.DsDataSourceApo;
 import cn.geoair.comp.db.service.core.basic.dto.SQLTaskDto;
 import cn.geoair.comp.db.service.core.common.ResponseDto;
 
-/**
- * db-service 基础 DTO 示例
- */
+/** db-service 基础 DTO 示例 */
 public class DbServiceDtoExample {
 
     public static void main(String[] args) {

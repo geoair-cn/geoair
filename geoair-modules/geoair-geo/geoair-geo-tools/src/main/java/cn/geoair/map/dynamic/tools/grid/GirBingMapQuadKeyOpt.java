@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Bing Maps QuadKey 的生成、解析与层级聚合契约。
  *
- * <p>QuadKey 的 Y 行号采用 Bing/Google/XYZ 顶部原点约定，并非 TMS 行号。</p>
+ * <p>QuadKey 的 Y 行号采用 Bing/Google/XYZ 顶部原点约定，并非 TMS 行号。
  *
  * @author 张逢吉
  */
@@ -158,7 +158,7 @@ public interface GirBingMapQuadKeyOpt {
      * 将多个 QuadKey 截断到指定层级，并以列表形式返回去重后的父级 QuadKey。
      *
      * @param targetLevel 要截断到的层级
-     * @param quadKeys    待聚合的 QuadKey
+     * @param quadKeys 待聚合的 QuadKey
      * @return 按输入出现顺序去重的父级 QuadKey 列表
      * @throws IllegalArgumentException 入参不合法时抛出
      */

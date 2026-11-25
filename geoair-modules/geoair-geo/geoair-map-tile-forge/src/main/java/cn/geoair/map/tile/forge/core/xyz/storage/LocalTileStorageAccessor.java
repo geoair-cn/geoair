@@ -3,18 +3,14 @@ package cn.geoair.map.tile.forge.core.xyz.storage;
 import java.io.File;
 import java.util.*;
 
-/**
- * 本地文件存储访问器
- */
+/** 本地文件存储访问器 */
 public class LocalTileStorageAccessor extends AbstractTileStorageAccessor {
 
     static LocalTileStorageAccessor instance = null;
 
     private final Set<String> supportedFormats = new HashSet<>(Arrays.asList("png", "jpg", "jpeg"));
 
-    /**
-     * 单例获取
-     */
+    /** 单例获取 */
     public static LocalTileStorageAccessor getInstance() {
         if (instance == null) {
             instance = new LocalTileStorageAccessor();
@@ -22,9 +18,7 @@ public class LocalTileStorageAccessor extends AbstractTileStorageAccessor {
         return instance;
     }
 
-    /**
-     * 构建文件路径
-     */
+    /** 构建文件路径 */
     private File buildFile(String basePath, String... parts) {
         File parent = new File(basePath);
         for (String part : parts) {
@@ -47,7 +41,12 @@ public class LocalTileStorageAccessor extends AbstractTileStorageAccessor {
 
     @Override
     protected boolean yTileExists(String basePath, int z, int x, int y, String format) {
-        File tileFile = buildFile(basePath, String.valueOf(z), String.valueOf(x), y + "." + format.toLowerCase());
+        File tileFile =
+                buildFile(
+                        basePath,
+                        String.valueOf(z),
+                        String.valueOf(x),
+                        y + "." + format.toLowerCase());
         if (tileFile.exists() && tileFile.isFile()) {
             return true;
         }
@@ -55,7 +54,12 @@ public class LocalTileStorageAccessor extends AbstractTileStorageAccessor {
         // 尝试其他格式
         for (String altFormat : supportedFormats) {
             if (!altFormat.equalsIgnoreCase(format)) {
-                File altFile = buildFile(basePath, String.valueOf(z), String.valueOf(x), y + "." + altFormat);
+                File altFile =
+                        buildFile(
+                                basePath,
+                                String.valueOf(z),
+                                String.valueOf(x),
+                                y + "." + altFormat);
                 if (altFile.exists() && altFile.isFile()) {
                     return true;
                 }
@@ -65,10 +69,9 @@ public class LocalTileStorageAccessor extends AbstractTileStorageAccessor {
         return false;
     }
 
-    /**
-     * 批量检查文件是否存在
-     */
-    public Set<Integer> batchCheckFilesExist(String dirPath, int z, int x, int[] ys, String suffix) {
+    /** 批量检查文件是否存在 */
+    public Set<Integer> batchCheckFilesExist(
+            String dirPath, int z, int x, int[] ys, String suffix) {
         Set<Integer> exists = new HashSet<>();
         File xDir = buildFile(dirPath, String.valueOf(z), String.valueOf(x));
 
@@ -82,9 +85,7 @@ public class LocalTileStorageAccessor extends AbstractTileStorageAccessor {
         return exists;
     }
 
-    /**
-     * 批量检查Z层级是否存在
-     */
+    /** 批量检查Z层级是否存在 */
     @Override
     public Set<Integer> batchCheckZLevels(String basePath, List<Integer> zLevels) {
         Set<Integer> existingZs = new HashSet<>();
@@ -100,9 +101,7 @@ public class LocalTileStorageAccessor extends AbstractTileStorageAccessor {
         return existingZs;
     }
 
-    /**
-     * 批量检查X层级是否存在
-     */
+    /** 批量检查X层级是否存在 */
     @Override
     public Set<Integer> batchCheckXLevels(String basePath, int z, List<Integer> xLevels) {
         Set<Integer> existingXs = new HashSet<>();
@@ -120,11 +119,10 @@ public class LocalTileStorageAccessor extends AbstractTileStorageAccessor {
         return existingXs;
     }
 
-    /**
-     * 批量检查Y瓦片是否存在
-     */
+    /** 批量检查Y瓦片是否存在 */
     @Override
-    public Set<Integer> batchCheckYLevels(String basePath, int z, int x, String format, List<Integer> yLevels) {
+    public Set<Integer> batchCheckYLevels(
+            String basePath, int z, int x, String format, List<Integer> yLevels) {
         Set<Integer> existingYs = new HashSet<>();
         File xDir = new File(new File(basePath, String.valueOf(z)), String.valueOf(x));
 

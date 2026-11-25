@@ -5,7 +5,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseAccessOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.sqlite.SqliteDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.core.util.StrUtil;
-
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -20,14 +19,14 @@ public class SqliteAdvBaseAccessOpt extends AbstractExecAdvBaseAccessOpt {
 
     @Override
     protected String buildInsertIgnoreSql(
-            String tableName,
-            String fields,
-            String placeholders,
-            List<String> conflictKeys) {
+            String tableName, String fields, String placeholders, List<String> conflictKeys) {
         if (conflictKeys != null && !conflictKeys.isEmpty()) {
             return StrUtil.format(
                     "INSERT INTO {} ({}) VALUES ({}) ON CONFLICT ({}) DO NOTHING",
-                    tableName, fields, placeholders, String.join(",", conflictKeys));
+                    tableName,
+                    fields,
+                    placeholders,
+                    String.join(",", conflictKeys));
         }
         return StrUtil.format(
                 "INSERT OR IGNORE INTO {} ({}) VALUES ({})", tableName, fields, placeholders);

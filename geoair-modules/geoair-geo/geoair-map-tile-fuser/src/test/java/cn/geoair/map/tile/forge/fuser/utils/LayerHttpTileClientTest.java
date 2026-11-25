@@ -6,20 +6,16 @@ import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.execution.*;
 import cn.geoair.map.tile.forge.fuser.upstream.UpstreamRequestOptions;
 import cn.geoair.web.mime.GirImageMime;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-
-import org.junit.*;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
-
 import javax.imageio.ImageIO;
+import org.junit.*;
 
 /** 仅使用本地 HTTP 服务，覆盖鉴权隔离、重试、重定向及在途取消。 */
 public class LayerHttpTileClientTest {

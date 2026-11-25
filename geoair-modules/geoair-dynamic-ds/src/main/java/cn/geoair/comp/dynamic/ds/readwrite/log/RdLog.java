@@ -18,47 +18,51 @@ public class RdLog extends GirLogWrapper {
         return INSTANCE;
     }
 
-
-    /**
-     * 输出的最小的日志级别 , 这里只是标记输出的最小级别，
-     * 这只是第一道拦截器，具体的日志级别还需要看具体的日志实现
-     */
+    /** 输出的最小的日志级别 , 这里只是标记输出的最小级别， 这只是第一道拦截器，具体的日志级别还需要看具体的日志实现 */
     public static GemLogLevel minLogLevel = GemLogLevel.INFO;
 
     /**
      * 是否使用独立日志实现，不依托于全局的日志实现
-     * <p>
-     * true: 使用独立的日志实现（如自定义的日志处理逻辑）<br>
+     *
+     * <p>true: 使用独立的日志实现（如自定义的日志处理逻辑）<br>
      * false: 使用默认的日志实现（如 Slf4j、Log4j 等）
      */
     public static boolean useIndependentLog = false;
 
     ConsoleColorLogFactory consoleColorLogFactory = null;
 
-    protected void recordLog(GemLogLevel level, String message, LoggerInfo loggerInfo, Object... arguments) {
+    protected void recordLog(
+            GemLogLevel level, String message, LoggerInfo loggerInfo, Object... arguments) {
         if (level.isGreaterOrEqual(minLogLevel)) {
             if (useIndependentLog) {
                 if (consoleColorLogFactory == null) {
                     consoleColorLogFactory = new ConsoleColorLogFactory();
                 }
-                consoleColorLogFactory.createLog(loggerInfo.getClassName()).log(Level.valueOf(level.name()), message,arguments);
+                consoleColorLogFactory
+                        .createLog(loggerInfo.getClassName())
+                        .log(Level.valueOf(level.name()), message, arguments);
             } else {
-                super.recordLog(level, message, loggerInfo,arguments);
+                super.recordLog(level, message, loggerInfo, arguments);
             }
-
         }
     }
 
-
-    protected void recordLogWithThrowable(GemLogLevel level, String message, Throwable t, LoggerInfo loggerInfo, Object... arguments) {
+    protected void recordLogWithThrowable(
+            GemLogLevel level,
+            String message,
+            Throwable t,
+            LoggerInfo loggerInfo,
+            Object... arguments) {
         if (level.isGreaterOrEqual(minLogLevel)) {
             if (useIndependentLog) {
                 if (consoleColorLogFactory == null) {
                     consoleColorLogFactory = new ConsoleColorLogFactory();
                 }
-                consoleColorLogFactory.createLog(loggerInfo.getClassName()).log(Level.valueOf(level.name()), t, message,arguments);
+                consoleColorLogFactory
+                        .createLog(loggerInfo.getClassName())
+                        .log(Level.valueOf(level.name()), t, message, arguments);
             } else {
-                super.recordLogWithThrowable(level, message, t, loggerInfo,arguments);
+                super.recordLogWithThrowable(level, message, t, loggerInfo, arguments);
             }
         }
     }

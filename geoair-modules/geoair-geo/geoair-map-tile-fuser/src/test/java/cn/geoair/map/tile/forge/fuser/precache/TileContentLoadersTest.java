@@ -4,14 +4,11 @@ import static org.junit.Assert.*;
 
 import cn.geoair.map.tile.forge.core.bygwc.core.mime.ImageMime;
 import cn.geoair.map.tile.forge.fuser.execution.*;
-
-import org.junit.Test;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-
 import javax.imageio.ImageIO;
+import org.junit.Test;
 
 public class TileContentLoadersTest {
     private TileOperationContext context() {

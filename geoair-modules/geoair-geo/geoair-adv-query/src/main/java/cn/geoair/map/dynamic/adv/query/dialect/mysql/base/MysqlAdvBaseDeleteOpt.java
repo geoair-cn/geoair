@@ -4,13 +4,13 @@ import cn.geoair.map.dynamic.adv.config.AdvQueryGlobalConfig;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvBaseDeleteOpt;
 import cn.geoair.map.dynamic.adv.query.dialect.mysql.MysqlDialectTableNameUtil;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
-
 import java.util.function.Supplier;
 
 /** MySQL删除操作实现类 仅实现MySQL专属的差异化语法，复用父类所有通用逻辑 */
 public class MysqlAdvBaseDeleteOpt extends AbstractExecAdvBaseDeleteOpt {
 
-    public MysqlAdvBaseDeleteOpt(Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
+    public MysqlAdvBaseDeleteOpt(
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter, AdvTypeHandlerRegistry registry) {
         super(configAdvQueryGetter, registry);
         // 绑定MySQL专属的表名处理器
         this.dialectTableNameProcessor = MysqlDialectTableNameUtil.getInstance();

@@ -18,7 +18,10 @@ public class GirPostGisOrgTran {
         Geometry jtsGeom = null;
         if (value instanceof PGgeometry) { // 判断是否为pG的空间对象
             PGgeometry pgGeometry = (PGgeometry) value;
-            jtsGeom = GirGeoTools.defaultInstance().getFormatOpt().pgGeometryToJtsGeometry(pgGeometry, true);
+            jtsGeom =
+                    GirGeoTools.defaultInstance()
+                            .getFormatOpt()
+                            .pgGeometryToJtsGeometry(pgGeometry, true);
         }
         return jtsGeom;
     }
@@ -30,7 +33,8 @@ public class GirPostGisOrgTran {
     public static Geometry toJtsGeometry(Object pgGeometry) throws Exception {
         org.postgis.Geometry geometry = cast(pgGeometry).getGeometry();
         Geometry jtsGeom =
-                GirGeoTools.defaultInstance().getFormatOpt()
+                GirGeoTools.defaultInstance()
+                        .getFormatOpt()
                         .getWKTReader()
                         .read(geometry.getTypeString() + geometry.getValue());
         jtsGeom.setSRID(geometry.getSrid());
@@ -38,7 +42,10 @@ public class GirPostGisOrgTran {
     }
 
     public static Object toPGGeometry(Geometry jtsGeometry) throws Exception {
-        String wkt = GirGeoTools.defaultInstance().getFormatOpt().jtsGeometryToWktString(jtsGeometry, true);
+        String wkt =
+                GirGeoTools.defaultInstance()
+                        .getFormatOpt()
+                        .jtsGeometryToWktString(jtsGeometry, true);
         org.postgis.PGgeometry pgGeometry = new org.postgis.PGgeometry();
         pgGeometry.setValue(wkt);
         pgGeometry.setType("geometry");
@@ -46,6 +53,5 @@ public class GirPostGisOrgTran {
             pgGeometry.getGeometry().setSrid(jtsGeometry.getSRID());
         }
         return pgGeometry;
-
     }
 }

@@ -1,8 +1,6 @@
 package cn.geoair.map.tile.forge.fuser.precache.bask;
 
-/**
- * 瓦片坐标实体类
- */
+/** 瓦片坐标实体类 */
 public class TileCoordinate {
     private final int x;
     private final int y;
@@ -39,8 +37,6 @@ public class TileCoordinate {
         TileCoordinate that = (TileCoordinate) o;
         return x == that.x && y == that.y && zoom == that.zoom;
     }
-
-
 
     @Override
     public String toString() {

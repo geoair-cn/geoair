@@ -942,7 +942,8 @@ public class GirExample {
             this(entityClass, exists, false, resolve);
         }
 
-        public Builder(Class<?> entityClass, boolean exists, boolean notNull, GirEntityResolve resolve) {
+        public Builder(
+                Class<?> entityClass, boolean exists, boolean notNull, GirEntityResolve resolve) {
             this.entityClass = entityClass;
             this.exists = exists;
             this.notNull = notNull;

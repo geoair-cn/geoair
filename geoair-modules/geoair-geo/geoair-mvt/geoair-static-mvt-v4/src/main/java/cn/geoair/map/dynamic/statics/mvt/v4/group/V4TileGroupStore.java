@@ -9,8 +9,6 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.utils.TileUtils;
 import cn.geoair.map.dynamic.statics.mvt.v4.dto.V4Options;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.geoair.map.dynamic.tools.grid.dto.TileZxyApo;
-import org.locationtech.jts.geom.Envelope;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
@@ -29,37 +27,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.TreeSet;
+import org.locationtech.jts.geom.Envelope;
 
 /**
  * V4 的按瓦片聚合容器：内存缓冲 + 溢写落盘 + 有界归并。
  *
- * <p>这一层是 V4 用来替代 Spark {@code reduceByKey} 的部分，思路是外部排序聚合：</p>
+ * <p>这一层是 V4 用来替代 Spark {@code reduceByKey} 的部分，思路是外部排序聚合：
+ *
  * <ol>
- *   <li>要素按瓦片键追加进内存缓冲（<b>不做逐条 merge</b>，避免 V3 里
- *       {@code reduceByKey} 那种"每来一条就复制一遍列表"的开销）；</li>
- *   <li>缓冲行数超过阈值时，把缓冲按瓦片键排序落成一个 run 文件，然后清空内存；</li>
- *   <li>全部要素读完后，若没有 run 文件就直接逐瓦片回调；否则把剩余缓冲也落成一个 run，
- *       再对所有 run 做 k 路归并，同一个瓦片键的记录合并后回调一次。</li>
+ *   <li>要素按瓦片键追加进内存缓冲（<b>不做逐条 merge</b>，避免 V3 里 {@code reduceByKey} 那种"每来一条就复制一遍列表"的开销）；
+ *   <li>缓冲行数超过阈值时，把缓冲按瓦片键排序落成一个 run 文件，然后清空内存；
+ *   <li>全部要素读完后，若没有 run 文件就直接逐瓦片回调；否则把剩余缓冲也落成一个 run， 再对所有 run 做 k 路归并，同一个瓦片键的记录合并后回调一次。
  * </ol>
  *
- * <p><b>保留哪些行：全局确定性，与溢写无关。</b>每个图层的行不超过 {@code hardFeatureLimit}（记作 N），
- * 选取规则见 {@link V4IdentitySelector} —— 按 (身份排名, 输入序号, 批内下标) 取最小的 N 个。
- * 该算子可结合、可交换、幂等，因此三处施加（累积时、归并时、回调前）结果完全一致，
- * 溢写、run 数、到达顺序都不影响产物。这是 V4 与 V3 的关键差别：V3 的削减次数决定了保留量，
- * 同一份数据在不同运行时配置下能差 18%（见 {@code V4开发计划.md} 7.8）。</p>
+ * <p><b>保留哪些行：全局确定性，与溢写无关。</b>每个图层的行不超过 {@code hardFeatureLimit}（记作 N）， 选取规则见 {@link
+ * V4IdentitySelector} —— 按 (身份排名, 输入序号, 批内下标) 取最小的 N 个。 该算子可结合、可交换、幂等，因此三处施加（累积时、归并时、回调前）结果完全一致，
+ * 溢写、run 数、到达顺序都不影响产物。这是 V4 与 V3 的关键差别：V3 的削减次数决定了保留量， 同一份数据在不同运行时配置下能差 18%（见 {@code V4开发计划.md}
+ * 7.8）。
  *
- * <p><b>内存取向：宁可多算，不要多存。</b></p>
+ * <p><b>内存取向：宁可多算，不要多存。</b>
+ *
  * <ul>
- *   <li>缓冲里每个瓦片每个图层 ≤ 2N 行，超了立刻用有界选择削到 N；</li>
- *   <li>归并时同一个瓦片键的多个 run 记录<b>流式喂进容量 N 的堆</b>，不再"先 addAll 成并集再削"。
- *       实测旧写法在 62 个 run 时会把堆撑到 4 GB 上限；有界之后归并的内存与 run 数无关，
- *       多出来的只是 CPU（每行 O(log N) 比较）；</li>
- *   <li>回调前排序与构建聚合单元只作用在 ≤ N 行上。</li>
+ *   <li>缓冲里每个瓦片每个图层 ≤ 2N 行，超了立刻用有界选择削到 N；
+ *   <li>归并时同一个瓦片键的多个 run 记录<b>流式喂进容量 N 的堆</b>，不再"先 addAll 成并集再削"。 实测旧写法在 62 个 run 时会把堆撑到 4 GB
+ *       上限；有界之后归并的内存与 run 数无关， 多出来的只是 CPU（每行 O(log N) 比较）；
+ *   <li>回调前排序与构建聚合单元只作用在 ≤ N 行上。
  * </ul>
  *
  * <p><b>排序的位置</b>：{@code --preserve-input-order} / {@code --reorder} / {@code --hilbert}
- * 放在削减<b>之后</b>（顺序号由 {@link V4OrderedRow} 带着走，不需要额外的映射表），
- * 否则用户要的顺序会被削减打乱。</p>
+ * 放在削减<b>之后</b>（顺序号由 {@link V4OrderedRow} 带着走，不需要额外的映射表）， 否则用户要的顺序会被削减打乱。
  *
  * @author 张逢吉
  */
@@ -93,13 +89,17 @@ public final class V4TileGroupStore implements Closeable {
     private boolean finished;
 
     /**
-     * @param layers             任务的全部内部图层（按配置顺序）
-     * @param outGridSrid        输出网格 SRID
-     * @param options            V4 单机运行时参数（溢写阈值、溢写目录、三种排序开关）
+     * @param layers 任务的全部内部图层（按配置顺序）
+     * @param outGridSrid 输出网格 SRID
+     * @param options V4 单机运行时参数（溢写阈值、溢写目录、三种排序开关）
      * @param emittedRowListener 逐瓦片回调最终保留的行（可为 null；统计用它）
      */
-    public V4TileGroupStore(List<MvtLayerSliceParameter> layers, int outGridSrid,
-            V4Options options, V4EmittedRowListener emittedRowListener) throws IOException {
+    public V4TileGroupStore(
+            List<MvtLayerSliceParameter> layers,
+            int outGridSrid,
+            V4Options options,
+            V4EmittedRowListener emittedRowListener)
+            throws IOException {
         V4Options resolved = options == null ? new V4Options() : options;
         this.layersByName = new LinkedHashMap<>();
         for (MvtLayerSliceParameter layer : layers) {
@@ -129,17 +129,17 @@ public final class V4TileGroupStore implements Closeable {
     /**
      * 追加一个要素在某个瓦片上的落点。
      *
-     * @param tileKey   Bing QuadKey
+     * @param tileKey Bing QuadKey
      * @param layerName MVT 内部图层名
-     * @param rows     该要素落在这块瓦片上的行（一个要素可能被切成多行）
+     * @param rows 该要素落在这块瓦片上的行（一个要素可能被切成多行）
      * @param sequence 输入顺序号
      */
     public void add(String tileKey, String layerName, List<GirAdvOneRow> rows, long sequence) {
         if (rows == null || rows.isEmpty()) {
             return;
         }
-        Map<String, List<V4OrderedRow>> byLayer = buffer
-                .computeIfAbsent(tileKey, key -> new LinkedHashMap<>());
+        Map<String, List<V4OrderedRow>> byLayer =
+                buffer.computeIfAbsent(tileKey, key -> new LinkedHashMap<>());
         List<V4OrderedRow> target = byLayer.computeIfAbsent(layerName, key -> new ArrayList<>());
         int rowIndex = 0;
         for (GirAdvOneRow row : rows) {
@@ -153,12 +153,10 @@ public final class V4TileGroupStore implements Closeable {
     /**
      * 单个瓦片某个图层的行数超过 「N × 2」时就地削到 N。
      *
-     * <p>这一步不能省：只在回调前削的话，低层级瓦片会在内存里堆到几百万行。</p>
+     * <p>这一步不能省：只在回调前削的话，低层级瓦片会在内存里堆到几百万行。
      *
-     * <p>触发线取 2N 而不是 N，是为了摊薄削减本身的开销 —— 削一次要按优先序重排一遍，
-     * 每来一行就削一次会把 O(n log N) 变成 O(n² log N)。这与 V3 的 2N 触发线相同，
-     * 但因为 V3 的最终保留量取决于触发次数、V4 的最终保留量由<b>回调前那一次</b>统一决定，
-     * 所以这里削到哪一步都不影响产物。</p>
+     * <p>触发线取 2N 而不是 N，是为了摊薄削减本身的开销 —— 削一次要按优先序重排一遍， 每来一行就削一次会把 O(n log N) 变成 O(n² log N)。这与 V3 的
+     * 2N 触发线相同， 但因为 V3 的最终保留量取决于触发次数、V4 的最终保留量由<b>回调前那一次</b>统一决定， 所以这里削到哪一步都不影响产物。
      */
     private void trimTileIfNeeded(String layerName, Map<String, List<V4OrderedRow>> byLayer) {
         MvtLayerSliceParameter layer = layersByName.get(layerName);
@@ -217,12 +215,12 @@ public final class V4TileGroupStore implements Closeable {
     private void spill() throws IOException {
         Path run = spillDir.resolve(String.format("run-%05d.bin", runSeq++));
         long bytes = 0L;
-        try (ObjectOutputStream out = new ObjectOutputStream(
-                new BufferedOutputStream(Files.newOutputStream(run)))) {
+        try (ObjectOutputStream out =
+                new ObjectOutputStream(new BufferedOutputStream(Files.newOutputStream(run)))) {
             for (String tileKey : new TreeSet<>(buffer.keySet())) {
                 // writeUnshared + reset：避免序列化器为"已写过的对象"建引用表，
                 // 否则百万级行的 run 文件会让堆在写出阶段持续增长
-                out.writeUnshared(new Object[]{tileKey, buffer.get(tileKey)});
+                out.writeUnshared(new Object[] {tileKey, buffer.get(tileKey)});
                 out.reset();
             }
             out.flush();
@@ -238,8 +236,7 @@ public final class V4TileGroupStore implements Closeable {
     /**
      * 对全部 run 做 k 路归并，同一个瓦片键的记录合并后回调一次。
      *
-     * <p>合并是<b>有界</b>的：同一瓦片键的记录不落成并集，而是逐条喂进容量 N 的选择器
-     * （{@link MergeAccumulator}），因此归并阶段的内存与 run 数无关。</p>
+     * <p>合并是<b>有界</b>的：同一瓦片键的记录不落成并集，而是逐条喂进容量 N 的选择器 （{@link MergeAccumulator}），因此归并阶段的内存与 run 数无关。
      */
     private void mergeRuns(V4TileConsumer consumer) throws Exception {
         List<RunReader> readers = new ArrayList<>(runs.size());
@@ -247,8 +244,8 @@ public final class V4TileGroupStore implements Closeable {
             for (Path run : runs) {
                 readers.add(new RunReader(run));
             }
-            PriorityQueue<RunReader> queue = new PriorityQueue<>(
-                    Comparator.comparing(RunReader::currentKey));
+            PriorityQueue<RunReader> queue =
+                    new PriorityQueue<>(Comparator.comparing(RunReader::currentKey));
             for (RunReader reader : readers) {
                 if (reader.currentKey() != null) {
                     queue.add(reader);
@@ -276,8 +273,7 @@ public final class V4TileGroupStore implements Closeable {
     /**
      * 归并累加器：配置了安全上限的图层走容量 N 的有界选择，没配置的按原样累加。
      *
-     * <p>没配置上限（{@code hardFeatureLimit} 为空/≤0）的图层与 V3 行为一致 —— 不削。
-     * 这时缓冲与归并的内存不受约束，低层级任务需要用户自己把上限配上。</p>
+     * <p>没配置上限（{@code hardFeatureLimit} 为空/≤0）的图层与 V3 行为一致 —— 不削。 这时缓冲与归并的内存不受约束，低层级任务需要用户自己把上限配上。
      */
     private static final class MergeAccumulator {
 
@@ -298,10 +294,13 @@ public final class V4TileGroupStore implements Closeable {
                 MvtLayerSliceParameter layer = layersByName.get(layerName);
                 int limit = hardLimitOf(layer);
                 if (limit <= 0) {
-                    unbounded.computeIfAbsent(layerName, key -> new ArrayList<>()).addAll(entry.getValue());
+                    unbounded
+                            .computeIfAbsent(layerName, key -> new ArrayList<>())
+                            .addAll(entry.getValue());
                     continue;
                 }
-                bounded.computeIfAbsent(layerName, key -> new V4IdentitySelector.Bounded(limit, layer))
+                bounded.computeIfAbsent(
+                                layerName, key -> new V4IdentitySelector.Bounded(limit, layer))
                         .offerAll(entry.getValue());
             }
         }
@@ -322,11 +321,11 @@ public final class V4TileGroupStore implements Closeable {
     /**
      * 回调前的最后一道：把每个图层的行统一削到不超过 N，再按用户指定的顺序排好，最后交给编码器。
      *
-     * <p>这一道是"产物口径"的唯一定义处。前面累积与归并阶段的削减只影响内存，
-     * 不影响结果 —— 因为"取优先序最小的 N 个"可结合、可交换、幂等。</p>
+     * <p>这一道是"产物口径"的唯一定义处。前面累积与归并阶段的削减只影响内存， 不影响结果 —— 因为"取优先序最小的 N 个"可结合、可交换、幂等。
      */
-    private void emit(String tileKey, Map<String, List<V4OrderedRow>> byLayer,
-            V4TileConsumer consumer) throws Exception {
+    private void emit(
+            String tileKey, Map<String, List<V4OrderedRow>> byLayer, V4TileConsumer consumer)
+            throws Exception {
         if (byLayer == null || byLayer.isEmpty()) {
             return;
         }
@@ -343,7 +342,8 @@ public final class V4TileGroupStore implements Closeable {
             if (limit > 0) {
                 rows = V4IdentitySelector.keepSmallest(rows, limit, layer);
             }
-            if (layer != null && V4FeatureOrdering.needsSort(hilbert, reorder, keepInputOrder, rows.size())) {
+            if (layer != null
+                    && V4FeatureOrdering.needsSort(hilbert, reorder, keepInputOrder, rows.size())) {
                 V4FeatureOrdering.sort(rows, hilbert, reorder, keepInputOrder, layer, envelope);
             }
             if (emittedRowListener != null) {
@@ -373,14 +373,17 @@ public final class V4TileGroupStore implements Closeable {
 
     /** 图层的安全上限 N；未配置时返回 0 表示不削。 */
     private static int hardLimitOf(MvtLayerSliceParameter layer) {
-        if (layer == null || layer.getHardFeatureLimit() == null || layer.getHardFeatureLimit() <= 0) {
+        if (layer == null
+                || layer.getHardFeatureLimit() == null
+                || layer.getHardFeatureLimit() <= 0) {
             return 0;
         }
         return layer.getHardFeatureLimit();
     }
 
     private Envelope envelopeOf(String tileKey) {
-        TileZxyApo zxy = GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileKey);
+        TileZxyApo zxy =
+                GirGeoTools.defaultInstance().getTileGridBingMapOpt().quadKeyToXyz(tileKey);
         return TileUtils.getTileEnvelope(zxy.getZ(), zxy.getX(), zxy.getY(), outGridSrid);
     }
 
@@ -491,7 +494,8 @@ public final class V4TileGroupStore implements Closeable {
 
         @Override
         public String toString() {
-            return String.format("聚合行数=%d，安全阀次数=%d，溢写run数=%d，溢写字节=%d",
+            return String.format(
+                    "聚合行数=%d，安全阀次数=%d，溢写run数=%d，溢写字节=%d",
                     totalRows, capEvents, runFiles, spillBytes);
         }
     }

@@ -13,7 +13,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.sqlite.base.SqliteAdvBaseSelectOp
 import cn.geoair.map.dynamic.adv.query.dialect.sqlite.base.SqliteAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.db.dialect.DialectName;
-
 import java.util.function.Supplier;
 
 /** SQLite 基础 CRUD 代理。 */
@@ -22,11 +21,11 @@ public class SqliteAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     private final AdvTypeHandlerRegistry typeHandlerRegistry;
 
     public SqliteAdvBaseOpt(
-            IDataSourceGetter dataSourceGetter,
-            Supplier<AdvQueryGlobalConfig> configGetter) {
+            IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configGetter) {
         super(dataSourceGetter, configGetter);
-        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
-                DialectName.SQLITE3, configGetter.get().getTypeHandlers());
+        this.typeHandlerRegistry =
+                AdvTypeHandlerRegistry.create(
+                        DialectName.SQLITE3, configGetter.get().getTypeHandlers());
     }
 
     @Override

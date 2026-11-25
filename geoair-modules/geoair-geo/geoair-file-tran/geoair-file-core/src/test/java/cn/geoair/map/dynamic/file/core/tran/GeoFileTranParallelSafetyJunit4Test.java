@@ -1,5 +1,7 @@
 package cn.geoair.map.dynamic.file.core.tran;
 
+import static org.junit.Assert.assertEquals;
+
 import cn.geoair.base.data.page.support.GirPageParam;
 import cn.geoair.base.data.page.support.GirPager;
 import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
@@ -20,16 +22,18 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-import static org.junit.Assert.assertEquals;
-
 /** GeoFileTran 并发读写协商与异常收集的回归测试。 */
 public class GeoFileTranParallelSafetyJunit4Test {
 
     @Test
     public void writerWithoutParallelCapabilityIsExecutedSequentially() {
         ConcurrentDetectWriter writer = new ConcurrentDetectWriter();
-        TranResult result = new GeoFileTranImpl().transform(
-                new ParallelPagedReader(), writer, new TranContext().setBatchSize(1));
+        TranResult result =
+                new GeoFileTranImpl()
+                        .transform(
+                                new ParallelPagedReader(),
+                                writer,
+                                new TranContext().setBatchSize(1));
 
         assertEquals(TranStatus.SUCCESS, result.getStatus());
         assertEquals(1, writer.maxConcurrency.get());
@@ -37,9 +41,12 @@ public class GeoFileTranParallelSafetyJunit4Test {
 
     @Test
     public void concurrentWriteFailuresAreCollectedSafely() {
-        TranResult result = new GeoFileTranImpl().transform(
-                new ParallelPagedReader(), new FailingParallelWriter(),
-                new TranContext().setBatchSize(1).setSkipErrorRecord(true));
+        TranResult result =
+                new GeoFileTranImpl()
+                        .transform(
+                                new ParallelPagedReader(),
+                                new FailingParallelWriter(),
+                                new TranContext().setBatchSize(1).setSkipErrorRecord(true));
 
         assertEquals(8L, result.getFailCount());
         assertEquals(8, result.getExceptions().size());
@@ -47,8 +54,7 @@ public class GeoFileTranParallelSafetyJunit4Test {
 
     private static class ParallelPagedReader implements GeoFileReader {
         @Override
-        public void setLinkInfo(cn.geoair.map.dynamic.file.core.link.LinkInfo linkInfo) {
-        }
+        public void setLinkInfo(cn.geoair.map.dynamic.file.core.link.LinkInfo linkInfo) {}
 
         @Override
         public boolean supportParallelPageRead() {
@@ -79,17 +85,17 @@ public class GeoFileTranParallelSafetyJunit4Test {
         }
 
         @Override
-        public GirPager<GirAdvOneRow> readRowPage(GirPageParam pageParam, ExceptionConsumer exceptionConsumer) {
+        public GirPager<GirAdvOneRow> readRowPage(
+                GirPageParam pageParam, ExceptionConsumer exceptionConsumer) {
             GirPager<GirAdvOneRow> pager = new GirPager<>();
-            GirAdvOneRow row = GirAdvOneRow.ofByMap(
-                    Collections.<String, Object>singletonMap("name", "test"));
+            GirAdvOneRow row =
+                    GirAdvOneRow.ofByMap(Collections.<String, Object>singletonMap("name", "test"));
             pager.put(Collections.singletonList(row), getFeatureCount(), pageParam);
             return pager;
         }
 
         @Override
-        public void close() {
-        }
+        public void close() {}
     }
 
     private static class ConcurrentDetectWriter implements GeoFileWriter {
@@ -97,15 +103,14 @@ public class GeoFileTranParallelSafetyJunit4Test {
         private final AtomicInteger maxConcurrency = new AtomicInteger();
 
         @Override
-        public void setLinkInfo(cn.geoair.map.dynamic.file.core.link.LinkInfo linkInfo) {
-        }
+        public void setLinkInfo(cn.geoair.map.dynamic.file.core.link.LinkInfo linkInfo) {}
 
         @Override
-        public void setWriteConfig(WriteConfig writeConfig) {
-        }
+        public void setWriteConfig(WriteConfig writeConfig) {}
 
         @Override
-        public GeoFileWriter writeHeader(SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer) {
+        public GeoFileWriter writeHeader(
+                SimpleFeatureType featureType, ExceptionConsumer exceptionConsumer) {
             return this;
         }
 
@@ -115,7 +120,8 @@ public class GeoFileTranParallelSafetyJunit4Test {
         }
 
         @Override
-        public GeoFileWriter writeRows(List<GirAdvOneRow> rows, ExceptionConsumer exceptionConsumer) {
+        public GeoFileWriter writeRows(
+                List<GirAdvOneRow> rows, ExceptionConsumer exceptionConsumer) {
             int current = active.incrementAndGet();
             maxConcurrency.accumulateAndGet(current, Math::max);
             try {
@@ -130,8 +136,7 @@ public class GeoFileTranParallelSafetyJunit4Test {
         }
 
         @Override
-        public void close() throws IOException {
-        }
+        public void close() throws IOException {}
     }
 
     private static class FailingParallelWriter extends ConcurrentDetectWriter {
@@ -141,7 +146,8 @@ public class GeoFileTranParallelSafetyJunit4Test {
         }
 
         @Override
-        public GeoFileWriter writeRows(List<GirAdvOneRow> rows, ExceptionConsumer exceptionConsumer) {
+        public GeoFileWriter writeRows(
+                List<GirAdvOneRow> rows, ExceptionConsumer exceptionConsumer) {
             throw new GeoFileWriteException("simulated write failure");
         }
     }

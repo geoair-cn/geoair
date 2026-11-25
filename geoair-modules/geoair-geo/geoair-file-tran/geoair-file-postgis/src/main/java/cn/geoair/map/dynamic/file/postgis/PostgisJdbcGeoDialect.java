@@ -3,11 +3,10 @@ package cn.geoair.map.dynamic.file.postgis;
 import cn.geoair.map.dynamic.file.jdbc.JdbcGeoDataStoreParams;
 import cn.geoair.map.dynamic.file.jdbc.JdbcGeoDialect;
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoLinkInfo;
+import java.util.Map;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
-
-import java.util.Map;
 
 /** PostGIS 的 JDBC 空间方言。 */
 public class PostgisJdbcGeoDialect implements JdbcGeoDialect {

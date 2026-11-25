@@ -1,5 +1,12 @@
 package cn.geoair.map.dynamic.adv.query.dialect.sqlite;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import cn.geoair.map.dynamic.adv.dbmeta.SqliteType;
 import cn.geoair.map.dynamic.adv.query.IAdvExecutor;
 import cn.geoair.map.dynamic.adv.query.apo.DataFieldsApo;
@@ -10,24 +17,16 @@ import cn.geoair.map.dynamic.adv.query.result.GirAdvOneRow;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvQueryRequest;
 import cn.geoair.map.dynamic.adv.query.wherequery.GirAdvWhereFilter;
 import cn.geoair.map.dynamic.adv.spring.AdvExecutorFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.sqlite.SQLiteDataSource;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.sqlite.SQLiteDataSource;
 
 /** SQLite Core 的真实 JDBC 集成测试。 */
 public class SqliteDialectIntegrationTest {
@@ -63,21 +62,16 @@ public class SqliteDialectIntegrationTest {
 
         assertEquals(
                 0,
-                executor.bInsertIgnore(
-                        "people", row(1, "ignored", 0), Arrays.asList("id"))
+                executor.bInsertIgnore("people", row(1, "ignored", 0), Arrays.asList("id"))
                         .intValue());
         assertEquals(
-                1,
-                executor.bUpsert(
-                        "people", row(2, "Bobby", 95), Arrays.asList("id"))
-                        .intValue());
+                1, executor.bUpsert("people", row(2, "Bobby", 95), Arrays.asList("id")).intValue());
 
         GirAdvOneRow bob = executor.bSelectOne("SELECT * FROM people WHERE id = 2");
         assertNotNull(bob);
         assertEquals("Bobby", bob.getStr("name"));
 
-        PageApo<GirAdvOneRow> page = executor.pPage(
-                "SELECT * FROM people ORDER BY id", 1, 2);
+        PageApo<GirAdvOneRow> page = executor.pPage("SELECT * FROM people ORDER BY id", 1, 2);
         assertEquals(3L, page.getTotal());
         assertEquals(2, page.geRecordsList().size());
         assertEquals(1, page.geRecordsList().get(0).getInt("id").intValue());
@@ -86,10 +80,12 @@ public class SqliteDialectIntegrationTest {
         assertEquals(Arrays.asList("id"), executor.dGetPrimaryKeys("people"));
         assertEquals(3, fields.getDataFieldList().size());
         assertFalse(fields.getDataFieldList().get(0).isGeometryFieldIs());
-        FieldBySchemaApo nameField = fields.findField(f -> "name".equals(f.getColumnName()))
-                .orElseThrow(IllegalStateException::new);
-        FieldBySchemaApo scoreField = fields.findField(f -> "score".equals(f.getColumnName()))
-                .orElseThrow(IllegalStateException::new);
+        FieldBySchemaApo nameField =
+                fields.findField(f -> "name".equals(f.getColumnName()))
+                        .orElseThrow(IllegalStateException::new);
+        FieldBySchemaApo scoreField =
+                fields.findField(f -> "score".equals(f.getColumnName()))
+                        .orElseThrow(IllegalStateException::new);
         assertEquals(SqliteType.TEXT, nameField.getDbType());
         assertEquals(SqliteType.NUMERIC, scoreField.getDbType());
         assertEquals(Integer.valueOf(40), nameField.getCharacterMaximumLength());
@@ -108,8 +104,7 @@ public class SqliteDialectIntegrationTest {
 
         assertEquals(
                 1,
-                executor.bUpdateByPK(
-                        "people", "id", 3, singletonRow("name", "Caroline"))
+                executor.bUpdateByPK("people", "id", 3, singletonRow("name", "Caroline"))
                         .intValue());
         assertEquals(1, executor.bDeleteByPK("people", "id", 1).intValue());
         assertEquals(2L, executor.bSelectRecordRowCount("SELECT * FROM people").longValue());
@@ -122,9 +117,7 @@ public class SqliteDialectIntegrationTest {
 
         executor.dCopyTableByTableName("people_copy", "people", true);
         assertTrue(executor.dIsTableExists("people_copy"));
-        assertEquals(
-                2L,
-                executor.bSelectRecordRowCount("SELECT * FROM people_copy").longValue());
+        assertEquals(2L, executor.bSelectRecordRowCount("SELECT * FROM people_copy").longValue());
 
         executor.dDropColumn("people_copy", "score");
         assertEquals(
@@ -145,10 +138,11 @@ public class SqliteDialectIntegrationTest {
     @Test
     public void shouldRollbackTransaction() {
         try {
-            executor.tx(() -> {
-                executor.bInsertOne("people", row(99, "rollback", 1));
-                throw new IllegalStateException("force rollback");
-            });
+            executor.tx(
+                    () -> {
+                        executor.bInsertOne("people", row(99, "rollback", 1));
+                        throw new IllegalStateException("force rollback");
+                    });
             fail("事务异常应向外抛出");
         } catch (IllegalStateException expected) {
             assertEquals("force rollback", expected.getMessage());
@@ -172,23 +166,24 @@ public class SqliteDialectIntegrationTest {
         executor.bInsertOne("people", row(1, "Alice", 91.5));
         executor.bInsertOne("people", row(2, "Bob", 82));
 
-        GirAdvQueryRequest filteredQuery = GirAdvQueryRequest.builder()
-                .table("people")
-                .fields("id", "name")
-                .where(GirAdvWhereFilter.of()
-                        .in("id", Arrays.asList(1, 2))
-                        .ge("score", 90))
-                .build();
+        GirAdvQueryRequest filteredQuery =
+                GirAdvQueryRequest.builder()
+                        .table("people")
+                        .fields("id", "name")
+                        .where(GirAdvWhereFilter.of().in("id", Arrays.asList(1, 2)).ge("score", 90))
+                        .build();
         List<GirAdvOneRow> filteredRows = executor.wSelectList(filteredQuery);
         assertEquals(1, filteredRows.size());
         assertEquals("Alice", filteredRows.get(0).getStr("name"));
 
-        GirAdvQueryRequest nullSafeQuery = GirAdvQueryRequest.builder()
-                .table("people")
-                .fields("id")
-                .where(GirAdvWhereFilter.of()
-                        .addCondition("id", AdvOperatorEnums.EQUAL_NULL_SAFE, 2))
-                .build();
+        GirAdvQueryRequest nullSafeQuery =
+                GirAdvQueryRequest.builder()
+                        .table("people")
+                        .fields("id")
+                        .where(
+                                GirAdvWhereFilter.of()
+                                        .addCondition("id", AdvOperatorEnums.EQUAL_NULL_SAFE, 2))
+                        .build();
         List<GirAdvOneRow> nullSafeRows = executor.wSelectList(nullSafeQuery);
         assertEquals(1, nullSafeRows.size());
         assertEquals(2, nullSafeRows.get(0).getInt("id").intValue());
@@ -198,12 +193,18 @@ public class SqliteDialectIntegrationTest {
                 SqliteDialectTableNameUtil.getInstance()
                         .tbGetOperatorSql(AdvOperatorEnums.EQUAL_NULL_SAFE));
         assertUnsupported(
-                () -> executor.wSelectList(GirAdvQueryRequest.builder()
-                        .table("people")
-                        .fields("id")
-                        .where(GirAdvWhereFilter.of()
-                                .addCondition("name", AdvOperatorEnums.ILIKE_ALL, "ali"))
-                        .build()),
+                () ->
+                        executor.wSelectList(
+                                GirAdvQueryRequest.builder()
+                                        .table("people")
+                                        .fields("id")
+                                        .where(
+                                                GirAdvWhereFilter.of()
+                                                        .addCondition(
+                                                                "name",
+                                                                AdvOperatorEnums.ILIKE_ALL,
+                                                                "ali"))
+                                        .build()),
                 "ilike");
     }
 

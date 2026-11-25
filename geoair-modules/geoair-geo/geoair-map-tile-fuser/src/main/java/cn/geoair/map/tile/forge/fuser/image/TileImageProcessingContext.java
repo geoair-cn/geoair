@@ -13,7 +13,8 @@ public final class TileImageProcessingContext {
     public TileImageProcessingContext(double scaleX, double scaleY) {
         if (!Double.isFinite(scaleX) || !Double.isFinite(scaleY) || scaleX <= 0 || scaleY <= 0)
             throw new IllegalArgumentException("图像缩放比例必须为正数");
-        this.scaleX = scaleX; this.scaleY = scaleY;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
     }
 
     public static TileImageProcessingContext from(TileRenderPlan plan) {

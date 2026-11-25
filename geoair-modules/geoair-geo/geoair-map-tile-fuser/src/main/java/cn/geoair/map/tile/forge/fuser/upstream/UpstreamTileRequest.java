@@ -1,11 +1,10 @@
 package cn.geoair.map.tile.forge.fuser.upstream;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import lombok.Getter;
+import lombok.Setter;
 
 /** 一次请求独立的可变副本，行号已转换为上游实际行号。避免持有或修改全局请求头。 */
 @Getter

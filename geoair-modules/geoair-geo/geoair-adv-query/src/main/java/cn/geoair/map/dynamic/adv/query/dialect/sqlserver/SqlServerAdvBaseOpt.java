@@ -13,7 +13,6 @@ import cn.geoair.map.dynamic.adv.query.dialect.sqlserver.base.SqlServerAdvBaseSe
 import cn.geoair.map.dynamic.adv.query.dialect.sqlserver.base.SqlServerAdvBaseUpdateOpt;
 import cn.geoair.map.dynamic.adv.query.typehandler.AdvTypeHandlerRegistry;
 import cn.hutool.db.dialect.DialectName;
-
 import java.util.function.Supplier;
 
 /** SQL Server 基础 CRUD 聚合器。@author 张逢吉 */
@@ -21,36 +20,49 @@ public class SqlServerAdvBaseOpt extends AbstractPxyAdvBaseOpt {
     private final AdvTypeHandlerRegistry typeHandlerRegistry;
 
     public SqlServerAdvBaseOpt(
-            IDataSourceGetter dataSourceGetter, Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
+            IDataSourceGetter dataSourceGetter,
+            Supplier<AdvQueryGlobalConfig> configAdvQueryGetter) {
         super(dataSourceGetter, configAdvQueryGetter);
-        this.typeHandlerRegistry = AdvTypeHandlerRegistry.create(
-                DialectName.SQLSERVER, configAdvQueryGetter.get().getTypeHandlers());
+        this.typeHandlerRegistry =
+                AdvTypeHandlerRegistry.create(
+                        DialectName.SQLSERVER, configAdvQueryGetter.get().getTypeHandlers());
     }
 
-    @Override public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
+    @Override
+    public IAdvBaseAccessOpt getAdvBaseAccessPxyOpt() {
         if (advBaseAccessPxyOpt == null) {
-            advBaseAccessPxyOpt = new SqlServerAdvBaseAccessOpt(this::getConfig, typeHandlerRegistry);
+            advBaseAccessPxyOpt =
+                    new SqlServerAdvBaseAccessOpt(this::getConfig, typeHandlerRegistry);
             advBaseAccessPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseAccessPxyOpt;
     }
-    @Override public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
+
+    @Override
+    public IAdvBaseSelectOpt getAdvBaseSelectPxyOpt() {
         if (advBaseSelectPxyOpt == null) {
-            advBaseSelectPxyOpt = new SqlServerAdvBaseSelectOpt(this::getConfig, typeHandlerRegistry);
+            advBaseSelectPxyOpt =
+                    new SqlServerAdvBaseSelectOpt(this::getConfig, typeHandlerRegistry);
             advBaseSelectPxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseSelectPxyOpt;
     }
-    @Override public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
+
+    @Override
+    public IAdvBaseUpdateOpt getAdvBaseUpdatePxyOpt() {
         if (advBaseUpdatePxyOpt == null) {
-            advBaseUpdatePxyOpt = new SqlServerAdvBaseUpdateOpt(this::getConfig, typeHandlerRegistry);
+            advBaseUpdatePxyOpt =
+                    new SqlServerAdvBaseUpdateOpt(this::getConfig, typeHandlerRegistry);
             advBaseUpdatePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseUpdatePxyOpt;
     }
-    @Override public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
+
+    @Override
+    public IAdvBaseDeleteOpt getAdvBaseDeletePxyOpt() {
         if (advBaseDeletePxyOpt == null) {
-            advBaseDeletePxyOpt = new SqlServerAdvBaseDeleteOpt(this::getConfig, typeHandlerRegistry);
+            advBaseDeletePxyOpt =
+                    new SqlServerAdvBaseDeleteOpt(this::getConfig, typeHandlerRegistry);
             advBaseDeletePxyOpt.setDataSourceGetter(dataSourceGetter);
         }
         return advBaseDeletePxyOpt;

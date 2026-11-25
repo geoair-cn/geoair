@@ -7,8 +7,7 @@ import org.locationtech.jts.geom.Geometry;
  * @author ：张逢吉
  * @date ：Created in 2026/8/11
  * @description： 达梦 / 通用 WKT 空间类型处理器 —— WKT 字符串 ↔ JTS Geometry
- * <p>用于达梦数据库以及其他不提供原生几何二进制驱动的数据库。
- * 读写均通过 WKT (Well-Known Text) 字符串，JDBC 驱动原生兼容</p>
+ *     <p>用于达梦数据库以及其他不提供原生几何二进制驱动的数据库。 读写均通过 WKT (Well-Known Text) 字符串，JDBC 驱动原生兼容
  */
 public class WktGeometryAdvTypeHandler extends JtsGeometryAdvTypeHandler {
 

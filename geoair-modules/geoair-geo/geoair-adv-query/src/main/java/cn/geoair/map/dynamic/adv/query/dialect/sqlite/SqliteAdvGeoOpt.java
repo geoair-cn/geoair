@@ -7,15 +7,14 @@ import cn.geoair.map.dynamic.adv.query.IAdvDDLOpt;
 import cn.geoair.map.dynamic.adv.query.apo.GirSqlParam;
 import cn.geoair.map.dynamic.adv.query.dialect.AbstractExecAdvGeoOpt;
 import cn.geoair.map.dynamic.adv.query.enums.AdvEnumsTypeGeom;
-
 import java.util.List;
 import java.util.Map;
 
 /**
  * SQLite Core 的空间能力边界。
  *
- * <p>普通 SQLite 没有 geometry_columns、SRID、空间索引及 ST_* 函数。本实现保留统一执行器的
- * 非空间查询通道，但所有空间 API 都明确失败；后续 SpatiaLite 应提供独立方言实现。
+ * <p>普通 SQLite 没有 geometry_columns、SRID、空间索引及 ST_* 函数。本实现保留统一执行器的 非空间查询通道，但所有空间 API 都明确失败；后续
+ * SpatiaLite 应提供独立方言实现。
  */
 public class SqliteAdvGeoOpt extends AbstractExecAdvGeoOpt {
 
@@ -89,8 +88,7 @@ public class SqliteAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public Map<String, Integer> eGetSrid(
-            String tableNameOrSqlView, List<String> geomFieldNames) {
+    public Map<String, Integer> eGetSrid(String tableNameOrSqlView, List<String> geomFieldNames) {
         throw unsupported();
     }
 
@@ -160,8 +158,7 @@ public class SqliteAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public String getValidateGeometriesSql(
-            String qualifiedTableName, String geomFieldName) {
+    public String getValidateGeometriesSql(String qualifiedTableName, String geomFieldName) {
         throw unsupported();
     }
 
@@ -172,14 +169,12 @@ public class SqliteAdvGeoOpt extends AbstractExecAdvGeoOpt {
     }
 
     @Override
-    public String getRepairGeometriesSql(
-            String qualifiedTableName, String geomFieldName) {
+    public String getRepairGeometriesSql(String qualifiedTableName, String geomFieldName) {
         throw unsupported();
     }
 
     @Override
-    public String getGetExtentSql(
-            String geomFieldName, String qualifiedTableName, int srid) {
+    public String getGetExtentSql(String geomFieldName, String qualifiedTableName, int srid) {
         throw unsupported();
     }
 }

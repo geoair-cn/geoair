@@ -3,11 +3,10 @@ package cn.geoair.map.dynamic.file.mysql;
 import cn.geoair.map.dynamic.file.jdbc.JdbcGeoDataStoreParams;
 import cn.geoair.map.dynamic.file.jdbc.JdbcGeoDialect;
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoLinkInfo;
+import java.util.Map;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.mysql.MySQLDataStoreFactory;
-
-import java.util.Map;
 
 /** MySQL 8 Spatial JDBC 方言，不兼容 MySQL 5.7。 */
 public class MysqlJdbcGeoDialect implements JdbcGeoDialect {

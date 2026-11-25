@@ -5,12 +5,14 @@ import java.util.*;
 
 /**
  * 动态 SQL 生成的运行时上下文，贯穿整个 SQL 解析过程。
- * <p>
- * 职责：
+ *
+ * <p>职责：
+ *
  * <ul>
- *   <li><b>SQL 拼接</b> — 通过 {@link #appendSql(String)} 逐步构建最终 SQL</li>
- *   <li><b>参数收集</b> — 通过 {@link #addParameter(Object)} 收集 {@code #{}} 对应的 JDBC 参数值</li>
- *   <li><b>表达式求值</b> — 通过 {@link #getOgnlValue(String)} 和 {@link #getOgnlBooleanValue(String)} 对 OGNL 表达式求值</li>
+ *   <li><b>SQL 拼接</b> — 通过 {@link #appendSql(String)} 逐步构建最终 SQL
+ *   <li><b>参数收集</b> — 通过 {@link #addParameter(Object)} 收集 {@code #{}} 对应的 JDBC 参数值
+ *   <li><b>表达式求值</b> — 通过 {@link #getOgnlValue(String)} 和 {@link #getOgnlBooleanValue(String)} 对
+ *       OGNL 表达式求值
  * </ul>
  *
  * @author zhangjun
@@ -24,8 +26,7 @@ public class Context {
     /**
      * 创建上下文。
      *
-     * @param data OGNL 求值的数据上下文（变量名 → 值的映射）。构造时会进行浅拷贝，
-     *             因此解析过程写入的内部变量不会回写到调用方。
+     * @param data OGNL 求值的数据上下文（变量名 → 值的映射）。构造时会进行浅拷贝， 因此解析过程写入的内部变量不会回写到调用方。
      */
     public Context(Map<String, Object> data) {
         this.data = data == null ? new HashMap<String, Object>() : new HashMap<>(data);
@@ -34,9 +35,8 @@ public class Context {
     /**
      * 创建共享指定数据映射的内部上下文。
      *
-     * <p>仅供动态 SQL 节点在同一次解析期间创建子上下文使用。这样嵌套
-     * {@code <foreach>} 写入的内部索引变量可以被当前解析的根上下文继续使用，
-     * 但根上下文本身仍然不会修改调用方传入的 Map。</p>
+     * <p>仅供动态 SQL 节点在同一次解析期间创建子上下文使用。这样嵌套 {@code <foreach>} 写入的内部索引变量可以被当前解析的根上下文继续使用，
+     * 但根上下文本身仍然不会修改调用方传入的 Map。
      *
      * @param data 当前解析持有的数据映射
      * @return 共享当前解析数据的子上下文

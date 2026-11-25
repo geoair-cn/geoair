@@ -10,6 +10,11 @@ import cn.geoair.map.dynamic.file.core.read.GeoFileReader;
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoReadLinkInfo;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
 import cn.hutool.core.util.IdUtil;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -23,12 +28,6 @@ import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 /**
  * 基于 GeoTools JDBC DataStore 的通用空间读取器。
@@ -87,7 +86,8 @@ public abstract class AbstractJdbcGeoFileReader implements GeoFileReader {
             }
             SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
             builder.init(featureType);
-            CoordinateReferenceSystem crs = GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
+            CoordinateReferenceSystem crs =
+                    GirGeoTools.defaultInstance().getSridOpt().getCRS(linkInfo.getSrid());
             builder.setCRS(crs);
             return builder.buildFeatureType();
         } catch (Exception e) {
@@ -161,7 +161,8 @@ public abstract class AbstractJdbcGeoFileReader implements GeoFileReader {
     }
 
     @Override
-    public GirPager<GirAdvOneRow> readRowPage(GirPageParam pageParam, ExceptionConsumer exceptionConsumer) {
+    public GirPager<GirAdvOneRow> readRowPage(
+            GirPageParam pageParam, ExceptionConsumer exceptionConsumer) {
         if (pageParam == null) {
             throw new IllegalArgumentException("pageParam 不能为空");
         }
@@ -171,7 +172,8 @@ public abstract class AbstractJdbcGeoFileReader implements GeoFileReader {
             Query query = new Query();
             query.setStartIndex(Math.max(0, (pageNum - 1) * pageSize));
             query.setMaxFeatures(pageSize);
-            FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(query);
+            FeatureCollection<SimpleFeatureType, SimpleFeature> features =
+                    featureSource.getFeatures(query);
             java.util.List<GirAdvOneRow> rows = new java.util.ArrayList<>();
             try (FeatureIterator<SimpleFeature> iterator = features.features()) {
                 while (iterator.hasNext()) {
@@ -201,7 +203,8 @@ public abstract class AbstractJdbcGeoFileReader implements GeoFileReader {
     private void resetFeatureSource() throws Exception {
         String viewName = "gir_" + IdUtil.fastSimpleUUID();
         String sql = trimTrailingSemicolon(linkInfo.getQuerySql());
-        String orderedSql = "SELECT * FROM (" + sql + ") gir_source ORDER BY " + linkInfo.getOrderBy();
+        String orderedSql =
+                "SELECT * FROM (" + sql + ") gir_source ORDER BY " + linkInfo.getOrderBy();
         VirtualTable virtualTable = new VirtualTable(viewName, orderedSql);
         ((JDBCDataStore) dataStore).createVirtualTable(virtualTable);
         this.featureSource = dataStore.getFeatureSource(viewName);
@@ -210,8 +213,11 @@ public abstract class AbstractJdbcGeoFileReader implements GeoFileReader {
     private SimpleFeatureType resolveFeatureType() throws IOException {
         Query query = new Query();
         query.setMaxFeatures(1);
-        try (FeatureIterator<SimpleFeature> iterator = featureSource.getFeatures(query).features()) {
-            return iterator.hasNext() ? iterator.next().getFeatureType() : featureSource.getSchema();
+        try (FeatureIterator<SimpleFeature> iterator =
+                featureSource.getFeatures(query).features()) {
+            return iterator.hasNext()
+                    ? iterator.next().getFeatureType()
+                    : featureSource.getSchema();
         }
     }
 
@@ -228,7 +234,8 @@ public abstract class AbstractJdbcGeoFileReader implements GeoFileReader {
         Map<String, Object> values = new LinkedHashMap<>();
         for (Property property : feature.getProperties()) {
             Object value = property.getValue();
-            values.put(property.getName().getLocalPart(), value instanceof Geometry ? value : value);
+            values.put(
+                    property.getName().getLocalPart(), value instanceof Geometry ? value : value);
         }
         return GirAdvOneRow.ofByMap(values);
     }

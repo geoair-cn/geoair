@@ -1,8 +1,6 @@
 package cn.geoair.map.tile.forge.core.bygwc.io;
 
-
 import cn.hutool.core.lang.Assert;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,7 +12,8 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io.Resource, Serializable {
+public class ByteArrayResource
+        implements cn.geoair.map.tile.forge.core.bygwc.io.Resource, Serializable {
 
     private byte[] data;
 
@@ -24,9 +23,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
 
     private long lastModified = System.currentTimeMillis();
 
-    /**
-     * Create a new empty ByteArrayResource
-     */
+    /** Create a new empty ByteArrayResource */
     public ByteArrayResource() {
         this((byte[]) null);
     }
@@ -56,7 +53,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
     /**
      * Create a new ByteArrayResource from the given byte array.
      *
-     * @param data   the array of bytes. It will be retained by the Resource for storage.
+     * @param data the array of bytes. It will be retained by the Resource for storage.
      * @param offset the beginning of the portion of the array to use as content
      * @param length the length of the portion of the array to use as content
      */
@@ -76,44 +73,33 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
         }
     }
 
-    /**
-     * Create a new empty ByteArrayResource with a particular initial capacity.
-     */
+    /** Create a new empty ByteArrayResource with a particular initial capacity. */
     public ByteArrayResource(final int initialCapacity) {
         this(new byte[initialCapacity], 0, 0);
     }
 
-    /**
-     * @see Resource#getLastModified()
-     */
+    /** @see Resource#getLastModified() */
     public long getLastModified() {
         return lastModified;
     }
 
-    /**
-     * @see Resource#getSize()
-     */
+    /** @see Resource#getSize() */
     public long getSize() {
         return length;
     }
 
-    /**
-     * @see Resource#transferTo(WritableByteChannel)
-     */
+    /** @see Resource#transferTo(WritableByteChannel) */
     public long transferTo(WritableByteChannel channel) throws IOException {
         if (length > 0) {
             ByteBuffer buffer = ByteBuffer.wrap(data, offset, length);
             long written = 0;
-            while ((written += channel.write(buffer)) < length) {
-                ;
+            while ((written += channel.write(buffer)) < length) {;
             }
         }
         return length;
     }
 
-    /**
-     * @see Resource#transferFrom(ReadableByteChannel)
-     */
+    /** @see Resource#transferFrom(ReadableByteChannel) */
     public long transferFrom(ReadableByteChannel channel) throws IOException {
         if (channel instanceof FileChannel) {
             FileChannel fc = (FileChannel) channel;
@@ -124,8 +110,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
             }
             ByteBuffer buffer = ByteBuffer.wrap(data);
             int read = 0;
-            while ((read += channel.read(buffer)) < length) {
-                ;
+            while ((read += channel.read(buffer)) < length) {;
             }
         } else {
             offset = 0;
@@ -148,9 +133,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
         return length;
     }
 
-    /**
-     * @see Resource#getInputStream()
-     */
+    /** @see Resource#getInputStream() */
     public SeekableInputStream getInputStream() throws IOException {
         if (data == null) {
             throw new IOException("no data");
@@ -158,9 +141,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
         return new SeekableInputStream(this);
     }
 
-    /**
-     * Get the contents of the resource.
-     */
+    /** Get the contents of the resource. */
     public byte[] getContents() {
         if (data == null || length == 0) {
             return null;
@@ -173,9 +154,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
         return buff;
     }
 
-    /**
-     * Discard the contents.
-     */
+    /** Discard the contents. */
     public void truncate() {
         offset = 0;
         length = 0;
@@ -185,9 +164,7 @@ public class ByteArrayResource implements cn.geoair.map.tile.forge.core.bygwc.io
         this.lastModified = lastModified;
     }
 
-    /**
-     * @see Resource#getOutputStream()
-     */
+    /** @see Resource#getOutputStream() */
     public OutputStream getOutputStream() throws IOException {
         return new SeekableOutputStream(this);
     }

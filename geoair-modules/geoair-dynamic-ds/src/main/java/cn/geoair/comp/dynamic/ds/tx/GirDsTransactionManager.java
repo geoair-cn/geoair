@@ -8,13 +8,12 @@ import cn.geoair.comp.dynamic.ds.base.IDsConnectionOpt;
 import cn.geoair.comp.dynamic.ds.base.IDsDataSourceOpt;
 import cn.geoair.comp.dynamic.ds.base.RealConnectionOpt;
 import cn.geoair.comp.dynamic.ds.tx.enums.IsolationLevel;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.function.Supplier;
+import javax.sql.DataSource;
 
 /**
  * 事务管理器
@@ -30,7 +29,8 @@ public class GirDsTransactionManager implements IDataSourceGetter {
     IDsDataSourceOpt dsDataSourceOpt;
     IDsTransactionTemplate dsTransactionTemplate;
 
-    public GirDsTransactionManager(IDsConnectionOpt connectionOpt, IDsDataSourceOpt dsDataSourceOpt) {
+    public GirDsTransactionManager(
+            IDsConnectionOpt connectionOpt, IDsDataSourceOpt dsDataSourceOpt) {
         this.connectionOpt = connectionOpt;
         this.dsDataSourceOpt = dsDataSourceOpt;
         this.dsTransactionTemplate = new GirDsTransactionTemplate(connectionOpt);
@@ -42,7 +42,10 @@ public class GirDsTransactionManager implements IDataSourceGetter {
         this.dsTransactionTemplate = new GirDsTransactionTemplate(connectionOpt);
     }
 
-    public GirDsTransactionManager(IDsConnectionOpt connectionOpt, IDsDataSourceOpt dsDataSourceOpt, IDsTransactionTemplate dsTransactionTemplate) {
+    public GirDsTransactionManager(
+            IDsConnectionOpt connectionOpt,
+            IDsDataSourceOpt dsDataSourceOpt,
+            IDsTransactionTemplate dsTransactionTemplate) {
         this.connectionOpt = connectionOpt;
         this.dsDataSourceOpt = dsDataSourceOpt;
         this.dsTransactionTemplate = dsTransactionTemplate;
@@ -104,7 +107,8 @@ public class GirDsTransactionManager implements IDataSourceGetter {
     }
 
     @Override
-    public void setTransactionConnectionHolder(IDsTransactionConnectionHolder transactionConnectionHolder) {
+    public void setTransactionConnectionHolder(
+            IDsTransactionConnectionHolder transactionConnectionHolder) {
         dsTransactionTemplate.setTransactionConnectionHolder(transactionConnectionHolder);
     }
 
@@ -174,7 +178,7 @@ public class GirDsTransactionManager implements IDataSourceGetter {
 
     @Override
     public void connectionClose(Connection connection) {
-         // 这里调用的是事务的关闭连接
+        // 这里调用的是事务的关闭连接
         dsTransactionTemplate.connectionClose(connection);
     }
 

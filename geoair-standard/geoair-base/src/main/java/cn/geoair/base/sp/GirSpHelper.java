@@ -21,10 +21,11 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>提供服务发现与加载功能，支持基于注解的SPI机制，可以根据接口类型动态加载其实现类。 支持单例模式缓存，避免重复创建实例，提高系统性能。
  *
  * <p>接口可以使用{@link GkSP @GkSP}注解配置加载策略，也可以不使用注解直接调用， 此时将使用默认配置：
+ *
  * <ul>
- *   <li>加载器链：GirBeanFactorySpLoader → GirJdkSpLoader</li>
- *   <li>单例模式：true</li>
- *   <li>默认实现类：无</li>
+ *   <li>加载器链：GirBeanFactorySpLoader → GirJdkSpLoader
+ *   <li>单例模式：true
+ *   <li>默认实现类：无
  * </ul>
  *
  * @author Ray
@@ -37,7 +38,7 @@ public class GirSpHelper {
     /** 默认加载器链 */
     @SuppressWarnings("unchecked")
     private static final Class<? extends GkSpLoader>[] DEFAULT_LOADERS =
-            new Class[]{GirBeanFactorySpLoader.class, GirJdkSpLoader.class};
+            new Class[] {GirBeanFactorySpLoader.class, GirJdkSpLoader.class};
 
     /**
      * 获取加载器链配置，注解缺失时使用默认值
@@ -158,10 +159,11 @@ public class GirSpHelper {
      * 如果前面都未找到，则使用默认的GirPlaceHolderSpLoader加载
      *
      * <p>name匹配规则：
+     *
      * <ul>
-     *   <li>Spring容器：通过bean name获取</li>
-     *   <li>JDK SPI：通过实现类的Class简单名称匹配</li>
-     *   <li>PlaceHolder：通过配置的Class简单名称匹配</li>
+     *   <li>Spring容器：通过bean name获取
+     *   <li>JDK SPI：通过实现类的Class简单名称匹配
+     *   <li>PlaceHolder：通过配置的Class简单名称匹配
      * </ul>
      *
      * <p>如果接口未添加@GkSP注解，将使用默认配置：加载器链为GirBeanFactorySpLoader→GirJdkSpLoader。
@@ -185,7 +187,9 @@ public class GirSpHelper {
             }
         }
         if (res == null) {
-            res = getGkSpiLoader(GirPlaceHolderSpLoader.class).load(requiredType, name, new Type[0]);
+            res =
+                    getGkSpiLoader(GirPlaceHolderSpLoader.class)
+                            .load(requiredType, name, new Type[0]);
         }
         return res;
     }

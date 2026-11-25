@@ -8,31 +8,27 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json.LayerStat
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.statistics.json.TileStats;
 import cn.geoair.map.dynamic.statics.mvt.v4.group.V4EmittedRowListener;
 import cn.geoair.map.dynamic.statics.mvt.v4.group.V4OrderedRow;
-import org.locationtech.jts.geom.Geometry;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.locationtech.jts.geom.Geometry;
 
 /**
  * V4 的瓦片要素统计（tippecanoe 的 {@code tilestats}）。
  *
- * <p>统计对象是<b>源要素</b>：每个图层的要素数、几何类型，以及每个输出字段的类型、
- * 取值分布与数值范围。产出对象直接复用 V1/V2 写库那套 DTO（{@link TileStats}），
- * 因此 JSON 结构与历史统计完全同构。</p>
+ * <p>统计对象是<b>源要素</b>：每个图层的要素数、几何类型，以及每个输出字段的类型、 取值分布与数值范围。产出对象直接复用 V1/V2 写库那套 DTO（{@link
+ * TileStats}）， 因此 JSON 结构与历史统计完全同构。
  *
- * <p><b>去重怎么做的：不用往行里塞标记。</b></p>
- * <p>V1/V2 必须给每行打一个跨分区的唯一 Id 才能在统计时区分"同一个要素被铺进了多块瓦片"
- * —— 因为它们的统计发生在瓦片铺开之后的 RDD 上。V4 是单机顺序读取，读取时给每行编的
- * 输入序号（{@link V4OrderedRow#getSequence()}）本身就是<b>源要素</b>的编号：
- * 同一个要素的所有瓦片行共用同一个序号。于是去重退化成"序号查重"，
- * 一个要素只占 1 bit，既不用往行对象里写东西（写进去就会变成 PBF 属性），也不用存字符串。</p>
+ * <p><b>去重怎么做的：不用往行里塞标记。</b>
  *
- * <p><b>内存上限：</b>序号位图与要素数成正比（约 1 bit/要素），字段取值表每字段最多
- * {@link #MAX_VALUE_COUNT_PER_FIELD} 项 —— 与 V1/V2 的取值上限同值。统计全程只保留
- * "计数与少量样本值"，不保留任何行。</p>
+ * <p>V1/V2 必须给每行打一个跨分区的唯一 Id 才能在统计时区分"同一个要素被铺进了多块瓦片" —— 因为它们的统计发生在瓦片铺开之后的 RDD 上。V4 是单机顺序读取，读取时给每行编的
+ * 输入序号（{@link V4OrderedRow#getSequence()}）本身就是<b>源要素</b>的编号： 同一个要素的所有瓦片行共用同一个序号。于是去重退化成"序号查重"，
+ * 一个要素只占 1 bit，既不用往行对象里写东西（写进去就会变成 PBF 属性），也不用存字符串。
+ *
+ * <p><b>内存上限：</b>序号位图与要素数成正比（约 1 bit/要素），字段取值表每字段最多 {@link #MAX_VALUE_COUNT_PER_FIELD} 项 —— 与 V1/V2
+ * 的取值上限同值。统计全程只保留 "计数与少量样本值"，不保留任何行。
  *
  * @author 张逢吉
  */
@@ -95,9 +91,12 @@ public final class V4TileStats implements V4EmittedRowListener {
                 summary.append("；");
             }
             summary.append(stats.getLayerName())
-                    .append(": 要素=").append(stats.featureCount())
-                    .append("，几何=").append(stats.geometryType())
-                    .append("，字段=").append(stats.fieldCount());
+                    .append(": 要素=")
+                    .append(stats.featureCount())
+                    .append("，几何=")
+                    .append(stats.geometryType())
+                    .append("，字段=")
+                    .append(stats.fieldCount());
         }
         return summary.length() == 0 ? "无图层" : summary.toString();
     }
@@ -161,9 +160,8 @@ public final class V4TileStats implements V4EmittedRowListener {
         /**
          * 该字段是否会出现在 PBF 属性里。
          *
-         * <p>判据与 {@code MultiLayerMvtEncoderV3.getAttributes} 逐条对齐：几何字段排除、
-         * 排除字段优先、{@code includeFields} 为空表示全保留、id 字段强制保留。
-         * 统计"实际写出去的东西"，避免报出瓦片里根本没有的字段。</p>
+         * <p>判据与 {@code MultiLayerMvtEncoderV3.getAttributes} 逐条对齐：几何字段排除、 排除字段优先、{@code
+         * includeFields} 为空表示全保留、id 字段强制保留。 统计"实际写出去的东西"，避免报出瓦片里根本没有的字段。
          */
         private boolean isOutputField(String field) {
             if (field == null || field.equals(geomFieldName)) {
@@ -182,7 +180,8 @@ public final class V4TileStats implements V4EmittedRowListener {
                 return true;
             }
             return includeFields.contains(field)
-                    || (layer.getSysIncludeFields() != null && layer.getSysIncludeFields().contains(field));
+                    || (layer.getSysIncludeFields() != null
+                            && layer.getSysIncludeFields().contains(field));
         }
 
         private Map<String, String> fieldTypes() {
@@ -277,9 +276,8 @@ public final class V4TileStats implements V4EmittedRowListener {
     /**
      * 输入序号的去重位图。
      *
-     * <p>序号是从 0 起的稠密整数，因此可以直接当位图下标用：容量按需翻倍，
-     * 一个要素 1 bit。到 {@link #MAX_FEATURES} 之后不再扩容（也不再去重），
-     * 避免异常大的序号把位图撑爆。</p>
+     * <p>序号是从 0 起的稠密整数，因此可以直接当位图下标用：容量按需翻倍， 一个要素 1 bit。到 {@link #MAX_FEATURES} 之后不再扩容（也不再去重），
+     * 避免异常大的序号把位图撑爆。
      */
     static final class SequenceSet {
 

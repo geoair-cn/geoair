@@ -1,12 +1,11 @@
 package cn.geoair.map.tile.forge.fuser.cache;
-import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessCoordinator;
-import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessLease;
 
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationGuard;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessCoordinator;
+import cn.geoair.map.tile.forge.fuser.mbtiles.MbtilesAccessLease;
 import cn.geoair.map.tile.forge.fuser.utils.FuserCacheUtils;
 import cn.geoair.map.tile.forge.fuser.utils.TileResourceLimits;
-
 import java.io.IOException;
 import java.nio.file.*;
 import java.sql.*;
@@ -89,13 +88,13 @@ final class CacheInspection {
         if (!Files.isRegularFile(path)) return found;
         boolean reverse = FuserCacheUtils.mbtilesCheckIsNeedReverseY(q.getLayerName());
         int srid = FuserCacheUtils.getCacheGridSrid(q.getLayerName());
-        try (MbtilesAccessLease lease=MbtilesAccessCoordinator.backgroundRead(path);
+        try (MbtilesAccessLease lease = MbtilesAccessCoordinator.backgroundRead(path);
                 Connection connection = open(path);
                 PreparedStatement query =
                         connection.prepareStatement(
                                 "SELECT tile_row FROM tiles WHERE zoom_level=? AND tile_column=?"
-                                    + " AND tile_row BETWEEN ? AND ? AND length(tile_data)>0 AND"
-                                    + " length(tile_data)<=?");
+                                        + " AND tile_row BETWEEN ? AND ? AND length(tile_data)>0 AND"
+                                        + " length(tile_data)<=?");
                 TileOperationGuard guard = new TileOperationGuard(context, () -> cancel(query))) {
             for (long index = q.getFrom(); index < q.getTo(); ) {
                 context.check();
@@ -160,8 +159,11 @@ final class CacheInspection {
                         scanStatisticsBatches(connection, path, levels, context);
                     } else {
                         // 旧版 tiles 视图和 WITHOUT ROWID 表继续使用兼容聚合入口。
-                        try (MbtilesAccessLease lease=MbtilesAccessCoordinator.backgroundRead(path);
-                             ResultSet rows = statement.executeQuery("SELECT zoom_level,COUNT(*),SUM(length(tile_data)) FROM tiles WHERE length(tile_data)>0 GROUP BY zoom_level")) {
+                        try (MbtilesAccessLease lease =
+                                        MbtilesAccessCoordinator.backgroundRead(path);
+                                ResultSet rows =
+                                        statement.executeQuery(
+                                                "SELECT zoom_level,COUNT(*),SUM(length(tile_data)) FROM tiles WHERE length(tile_data)>0 GROUP BY zoom_level")) {
                             while (rows.next()) {
                                 context.check();
                                 add(levels, rows.getInt(1), rows.getLong(2), rows.getLong(3));
@@ -211,59 +213,74 @@ final class CacheInspection {
     }
 
     /** 普通表按 rowid 取有界批次，聚合只访问当前批次的图片长度。 */
-    private static void scanStatisticsBatches(Connection connection, Path path, Map<Integer,TileCacheLevelStatistics> levels,
-                                              TileOperationContext context) throws SQLException,IOException {
+    private static void scanStatisticsBatches(
+            Connection connection,
+            Path path,
+            Map<Integer, TileCacheLevelStatistics> levels,
+            TileOperationContext context)
+            throws SQLException, IOException {
         final int batchSize = 10000;
         boolean first = true;
         long cursor = 0;
         int version = dataVersion(connection);
         while (true) {
             context.check();
-            if(dataVersion(connection)!=version) throw new SQLException("缓存正在变化，本次统计结果已失效");
+            if (dataVersion(connection) != version) throw new SQLException("缓存正在变化，本次统计结果已失效");
             long consumed = 0;
-            String sql = "SELECT zoom_level,SUM(CASE WHEN bytes>0 THEN 1 ELSE 0 END),SUM(bytes),MAX(rid),COUNT(*) FROM ("
-                    + "SELECT rowid AS rid,zoom_level,COALESCE(LENGTH(tile_data),0) AS bytes FROM tiles "
-                    + (first ? "" : "WHERE rowid>? ") + "ORDER BY rowid LIMIT ?) GROUP BY zoom_level";
-            try (MbtilesAccessLease lease=MbtilesAccessCoordinator.backgroundRead(path);
-                 PreparedStatement query = connection.prepareStatement(sql)) {
+            String sql =
+                    "SELECT zoom_level,SUM(CASE WHEN bytes>0 THEN 1 ELSE 0 END),SUM(bytes),MAX(rid),COUNT(*) FROM ("
+                            + "SELECT rowid AS rid,zoom_level,COALESCE(LENGTH(tile_data),0) AS bytes FROM tiles "
+                            + (first ? "" : "WHERE rowid>? ")
+                            + "ORDER BY rowid LIMIT ?) GROUP BY zoom_level";
+            try (MbtilesAccessLease lease = MbtilesAccessCoordinator.backgroundRead(path);
+                    PreparedStatement query = connection.prepareStatement(sql)) {
                 int parameter = 1;
                 if (!first) query.setLong(parameter++, cursor);
                 query.setInt(parameter, batchSize);
                 try (ResultSet rows = query.executeQuery()) {
                     while (rows.next()) {
                         context.check();
-                        if (rows.getLong(2) > 0) add(levels,rows.getInt(1),rows.getLong(2),rows.getLong(3));
-                        if (consumed == 0) cursor=rows.getLong(4);
-                        else cursor=Math.max(cursor,rows.getLong(4));
-                        consumed+=rows.getLong(5);
+                        if (rows.getLong(2) > 0)
+                            add(levels, rows.getInt(1), rows.getLong(2), rows.getLong(3));
+                        if (consumed == 0) cursor = rows.getLong(4);
+                        else cursor = Math.max(cursor, rows.getLong(4));
+                        consumed += rows.getLong(5);
                     }
                 }
             }
-            if(dataVersion(connection)!=version) throw new SQLException("缓存正在变化，本次统计结果已失效");
-            first=false;
-            if(consumed==0) return;
+            if (dataVersion(connection) != version) throw new SQLException("缓存正在变化，本次统计结果已失效");
+            first = false;
+            if (consumed == 0) return;
             // 每批释放读事务后主动让出，保留默认 statistics 的同步接口。
             context.sleep(5);
         }
     }
 
     private static int dataVersion(Connection connection) throws SQLException {
-        try(Statement sql=connection.createStatement();ResultSet value=sql.executeQuery("PRAGMA data_version")) {
-            value.next();return value.getInt(1);
+        try (Statement sql = connection.createStatement();
+                ResultSet value = sql.executeQuery("PRAGMA data_version")) {
+            value.next();
+            return value.getInt(1);
         }
     }
 
     private static boolean supportsBatchedStatistics(Connection connection) throws SQLException {
-        try(Statement sql=connection.createStatement();ResultSet table=sql.executeQuery("SELECT type,sql FROM sqlite_master WHERE name='tiles'")) {
-            if(!table.next() || !"table".equals(table.getString(1))) return false;
-            String ddl=String.valueOf(table.getString(2)).toUpperCase(Locale.ROOT);
-            if(ddl.matches("(?s).*WITHOUT\\s+ROWID.*") || ddl.matches("(?s).*CREATE\\s+VIRTUAL\\s+TABLE.*")) return false;
+        try (Statement sql = connection.createStatement();
+                ResultSet table =
+                        sql.executeQuery("SELECT type,sql FROM sqlite_master WHERE name='tiles'")) {
+            if (!table.next() || !"table".equals(table.getString(1))) return false;
+            String ddl = String.valueOf(table.getString(2)).toUpperCase(Locale.ROOT);
+            if (ddl.matches("(?s).*WITHOUT\\s+ROWID.*")
+                    || ddl.matches("(?s).*CREATE\\s+VIRTUAL\\s+TABLE.*")) return false;
         }
-        try(Statement sql=connection.createStatement();ResultSet columns=sql.executeQuery("PRAGMA table_info(tiles)")) {
-            while(columns.next()) if("rowid".equalsIgnoreCase(columns.getString("name"))) return false;
+        try (Statement sql = connection.createStatement();
+                ResultSet columns = sql.executeQuery("PRAGMA table_info(tiles)")) {
+            while (columns.next())
+                if ("rowid".equalsIgnoreCase(columns.getString("name"))) return false;
         }
         return true;
     }
+
     private static void cancel(Statement statement) {
         try {
             statement.cancel();

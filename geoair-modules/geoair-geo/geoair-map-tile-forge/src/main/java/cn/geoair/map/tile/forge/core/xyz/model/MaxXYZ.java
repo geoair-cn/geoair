@@ -6,29 +6,19 @@ package cn.geoair.map.tile.forge.core.xyz.model;
  * @description ：用于存储瓦片坐标最大值的实体类
  */
 public class MaxXYZ {
-    /**
-     * X方向上的最大瓦片编号
-     */
+    /** X方向上的最大瓦片编号 */
     private Integer maxX;
 
-    /**
-     * Y方向上的最大瓦片编号
-     */
+    /** Y方向上的最大瓦片编号 */
     private Integer maxY;
 
-    /**
-     * Z方向（缩放级别）上的最大值
-     */
+    /** Z方向（缩放级别）上的最大值 */
     private Integer maxZ;
 
-    /**
-     * Z方向（缩放级别）上的最小值
-     */
+    /** Z方向（缩放级别）上的最小值 */
     private Integer minZ;
 
-
-    public MaxXYZ() {
-    }
+    public MaxXYZ() {}
 
     public MaxXYZ(Integer maxX, Integer maxY, Integer maxZ) {
         this.maxX = maxX;
@@ -75,5 +65,4 @@ public class MaxXYZ {
         minZ = 0;
         return this;
     }
-
 }

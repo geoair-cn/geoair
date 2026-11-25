@@ -6,12 +6,6 @@ import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MultiLayerTileSlic
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerGeometryMode;
 import cn.geoair.map.dynamic.statics.mvt.spark.vectile.dto.v3.MvtLayerSliceParameter;
 import cn.geoair.map.dynamic.tools.GirGeoTools;
-import org.junit.Assert;
-import org.junit.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import vector_tile.VectorTile;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +14,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+import org.junit.Assert;
+import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import vector_tile.VectorTile;
 
 /** V3 多图层编码器的格式验证。 */
 public class MultiLayerMvtEncoderV3Test {
@@ -30,16 +29,30 @@ public class MultiLayerMvtEncoderV3Test {
     public void shouldEncodeTwoInternalLayersIntoOnePbf() throws Exception {
         MvtLayerSliceParameter roads = layer("roads", MvtLayerGeometryMode.ORIGINAL);
         MvtLayerSliceParameter labels = layer("road_labels", MvtLayerGeometryMode.CENTROID);
-        MultiLayerTileSliceParameter task = new MultiLayerTileSliceParameter()
-                .setOutGridSrid(3857)
-                .setTileSetName("base-map")
-                .setTileSizeLimitEnabled(false)
-                .setLayers(Arrays.asList(roads, labels));
+        MultiLayerTileSliceParameter task =
+                new MultiLayerTileSliceParameter()
+                        .setOutGridSrid(3857)
+                        .setTileSetName("base-map")
+                        .setTileSizeLimitEnabled(false)
+                        .setLayers(Arrays.asList(roads, labels));
 
-        GirAdvOneRow road = row("road-1", "Road A", geometryFactory.createLineString(new Coordinate[]{
-                new Coordinate(-1000000, -1000000), new Coordinate(1000000, 1000000)}));
-        GirAdvOneRow label = row("label-1", "Road A", geometryFactory.createLineString(new Coordinate[]{
-                new Coordinate(-500000, 0), new Coordinate(500000, 0)}));
+        GirAdvOneRow road =
+                row(
+                        "road-1",
+                        "Road A",
+                        geometryFactory.createLineString(
+                                new Coordinate[] {
+                                    new Coordinate(-1000000, -1000000),
+                                    new Coordinate(1000000, 1000000)
+                                }));
+        GirAdvOneRow label =
+                row(
+                        "label-1",
+                        "Road A",
+                        geometryFactory.createLineString(
+                                new Coordinate[] {
+                                    new Coordinate(-500000, 0), new Coordinate(500000, 0)
+                                }));
 
         V3TileFeatureGroup group = new V3TileFeatureGroup();
         group.setFeaturesByLayer(new java.util.LinkedHashMap<String, List<GirAdvOneRow>>());
@@ -64,43 +77,60 @@ public class MultiLayerMvtEncoderV3Test {
     @Test
     public void shouldAllowUncompressedPbfWhenConfigured() throws Exception {
         MvtLayerSliceParameter roads = layer("roads", MvtLayerGeometryMode.ORIGINAL);
-        MultiLayerTileSliceParameter task = new MultiLayerTileSliceParameter()
-                .setOutGridSrid(3857)
-                .setTileSetName("base-map")
-                .setTileSizeLimitEnabled(false)
-                .setGzipPbf(false)
-                .setLayers(Arrays.asList(roads));
+        MultiLayerTileSliceParameter task =
+                new MultiLayerTileSliceParameter()
+                        .setOutGridSrid(3857)
+                        .setTileSetName("base-map")
+                        .setTileSizeLimitEnabled(false)
+                        .setGzipPbf(false)
+                        .setLayers(Arrays.asList(roads));
         V3TileFeatureGroup group = new V3TileFeatureGroup();
         group.setFeaturesByLayer(new java.util.LinkedHashMap<String, List<GirAdvOneRow>>());
-        group.getFeaturesByLayer().put("roads", Arrays.asList(row("road-1", "Road A",
-                geometryFactory.createPoint(new Coordinate(0, 0)))));
+        group.getFeaturesByLayer()
+                .put(
+                        "roads",
+                        Arrays.asList(
+                                row(
+                                        "road-1",
+                                        "Road A",
+                                        geometryFactory.createPoint(new Coordinate(0, 0)))));
 
         String tileId = GirGeoTools.defaultInstance().getTileGridBingMapOpt().xyzToQuadKey(1, 1, 2);
         PbfInfo pbf = MultiLayerMvtEncoderV3.encode(tileId, group, task);
 
-        Assert.assertFalse("关闭 gzip 后不应保留 gzip 文件头", pbf.getData()[0] == (byte) 0x1F
-                && pbf.getData()[1] == (byte) 0x8B);
+        Assert.assertFalse(
+                "关闭 gzip 后不应保留 gzip 文件头",
+                pbf.getData()[0] == (byte) 0x1F && pbf.getData()[1] == (byte) 0x8B);
         Assert.assertEquals(1, VectorTile.Tile.parseFrom(pbf.getData()).getLayersCount());
     }
 
     @Test
     public void shouldDropLowPriorityFeaturesWhenTotalTileSizeIsLimited() throws Exception {
-        MvtLayerSliceParameter important = layer("important", MvtLayerGeometryMode.ORIGINAL).setPriority(10);
-        MvtLayerSliceParameter optional = layer("optional", MvtLayerGeometryMode.ORIGINAL).setPriority(0);
-        MultiLayerTileSliceParameter task = new MultiLayerTileSliceParameter()
-                .setOutGridSrid(3857)
-                .setTileSetName("base-map")
-                .setTileSizeLimitEnabled(true)
-                .setTileSizeLimit("1KB")
-                .setLayers(Arrays.asList(important, optional));
+        MvtLayerSliceParameter important =
+                layer("important", MvtLayerGeometryMode.ORIGINAL).setPriority(10);
+        MvtLayerSliceParameter optional =
+                layer("optional", MvtLayerGeometryMode.ORIGINAL).setPriority(0);
+        MultiLayerTileSliceParameter task =
+                new MultiLayerTileSliceParameter()
+                        .setOutGridSrid(3857)
+                        .setTileSetName("base-map")
+                        .setTileSizeLimitEnabled(true)
+                        .setTileSizeLimit("1KB")
+                        .setLayers(Arrays.asList(important, optional));
 
         V3TileFeatureGroup group = new V3TileFeatureGroup();
         Map<String, List<GirAdvOneRow>> rows = new java.util.LinkedHashMap<>();
-        rows.put("important", Arrays.asList(row("main", "main", geometryFactory.createPoint(new Coordinate(0, 0)))));
+        rows.put(
+                "important",
+                Arrays.asList(
+                        row("main", "main", geometryFactory.createPoint(new Coordinate(0, 0)))));
         GirAdvOneRow[] optionalRows = new GirAdvOneRow[32];
         for (int i = 0; i < optionalRows.length; i++) {
-            optionalRows[i] = row("optional-" + i, repeat('x', 180),
-                    geometryFactory.createPoint(new Coordinate(i * 1000D, i * 1000D)));
+            optionalRows[i] =
+                    row(
+                            "optional-" + i,
+                            repeat('x', 180),
+                            geometryFactory.createPoint(new Coordinate(i * 1000D, i * 1000D)));
         }
         rows.put("optional", Arrays.asList(optionalRows));
         group.setFeaturesByLayer(rows);
@@ -137,7 +167,7 @@ public class MultiLayerMvtEncoderV3Test {
 
     private static byte[] unGzip(byte[] compressed) throws IOException {
         try (GZIPInputStream input = new GZIPInputStream(new ByteArrayInputStream(compressed));
-             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[512];
             int length;
             while ((length = input.read(buffer)) >= 0) {

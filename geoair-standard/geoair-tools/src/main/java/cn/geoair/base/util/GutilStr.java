@@ -923,8 +923,8 @@ public class GutilStr {
         boolean isStartWith;
         if (ignoreCase) {
             // 使用regionMatches忽略大小写比较，避免toLowerCase产生的额外对象开销与Unicode大小写映射问题
-            isStartWith = str.toString()
-                    .regionMatches(true, 0, prefix.toString(), 0, prefix.length());
+            isStartWith =
+                    str.toString().regionMatches(true, 0, prefix.toString(), 0, prefix.length());
         } else {
             isStartWith = str.toString().startsWith(prefix.toString());
         }
@@ -1021,7 +1021,11 @@ public class GutilStr {
         if (isIgnoreCase) {
             // 使用regionMatches忽略大小写比较，避免toLowerCase产生的额外对象开销与Unicode大小写映射问题
             return str.toString()
-                    .regionMatches(true, str.length() - suffix.length(), suffix.toString(), 0,
+                    .regionMatches(
+                            true,
+                            str.length() - suffix.length(),
+                            suffix.toString(),
+                            0,
                             suffix.length());
         } else {
             return str.toString().endsWith(suffix.toString());
@@ -1343,8 +1347,8 @@ public class GutilStr {
      *
      * @param str 被处理的字符串
      * @param preLength 去掉的长度
-     * @return 处理后的字符串，若{@code str}为null、{@code preLength}为负数或剩余部分为空（即
-     *     {@code str.length() <= preLength}），不符合规范返回null
+     * @return 处理后的字符串，若{@code str}为null、{@code preLength}为负数或剩余部分为空（即 {@code str.length() <=
+     *     preLength}），不符合规范返回null
      */
     public static String removePreAndLowerFirst(CharSequence str, int preLength) {
         if (str == null || preLength < 0) {
@@ -1746,8 +1750,8 @@ public class GutilStr {
      *
      * @param string 字符串
      * @param fromIndex 切割开始的位置（包括）
-     * @return 切割后后剩余的后半部分字符串；若为{@code null}返回{@code null}，若为空串返回{@code ""}，
-     *     与{@link #subPre(CharSequence, int)}保持一致
+     * @return 切割后后剩余的后半部分字符串；若为{@code null}返回{@code null}，若为空串返回{@code ""}， 与{@link
+     *     #subPre(CharSequence, int)}保持一致
      */
     public static String subSuf(CharSequence string, int fromIndex) {
         if (null == string) {
@@ -2440,7 +2444,8 @@ public class GutilStr {
      * @return 字符串
      */
     public static String str(Object obj, String charsetName) {
-        return str(obj,
+        return str(
+                obj,
                 isBlank(charsetName) ? Charset.defaultCharset() : Charset.forName(charsetName));
     }
 
@@ -2585,9 +2590,8 @@ public class GutilStr {
 
     /**
      * 调用对象的toString方法，null会返回字符串 {@code "null"}<br>
-     * 注意：本方法与 {@link #str(CharSequence)} 及 {@link #str(Object, Charset)} 的差异在于：
-     * 本方法对 {@code null} 入参返回字符串 {@code "null"}，而 str 系列方法对 {@code null} 返回
-     * {@code null}
+     * 注意：本方法与 {@link #str(CharSequence)} 及 {@link #str(Object, Charset)} 的差异在于： 本方法对 {@code null}
+     * 入参返回字符串 {@code "null"}，而 str 系列方法对 {@code null} 返回 {@code null}
      *
      * @param obj 对象
      * @return 字符串，对象为 {@code null} 时返回 {@code "null"}
@@ -4076,8 +4080,7 @@ public class GutilStr {
 
     /**
      * 将数组中的元素以分隔符拼接为字符串，数字不加引号，其余元素按 isSqm 加单引号或双引号<br>
-     * 元素为 {@code null} 时跳过；原始类型数组元素会先转为包装类型数组再拼接，避免输出类似
-     * {@code [J@1a2b3c} 的对象地址
+     * 元素为 {@code null} 时跳过；原始类型数组元素会先转为包装类型数组再拼接，避免输出类似 {@code [J@1a2b3c} 的对象地址
      *
      * @param keys 数组
      * @param split 分隔符
@@ -4116,8 +4119,8 @@ public class GutilStr {
 
     /**
      * 以分隔符拼接多个元素，数字不加引号，其余元素按 isSqm 加单引号或双引号<br>
-     * 注意：本方法与 {@link #join(Object[], String, boolean)} 的参数顺序不同——本方法第一个参数为
-     * 分隔符 split，最后一个参数为待拼接的元素 keys
+     * 注意：本方法与 {@link #join(Object[], String, boolean)} 的参数顺序不同——本方法第一个参数为 分隔符 split，最后一个参数为待拼接的元素
+     * keys
      *
      * @param split 分隔符
      * @param isSqm 是否使用单引号，false 时使用双引号
@@ -4590,8 +4593,7 @@ public class GutilStr {
     }
 
     /**
-     * 去掉以指定分隔符分隔的限定名，例如使用 ':' 分隔时，"this:name:is:qualified" 返回
-     * "qualified"<br>
+     * 去掉以指定分隔符分隔的限定名，例如使用 ':' 分隔时，"this:name:is:qualified" 返回 "qualified"<br>
      * 字符串为 {@code null} 时返回 {@code null}
      *
      * @param qualifiedName 限定名
@@ -4660,8 +4662,10 @@ public class GutilStr {
             return null;
         }
 
-        int separatorIndex = Math.max(
-                path.lastIndexOf(FOLDER_SEPARATOR), path.lastIndexOf(WINDOWS_FOLDER_SEPARATOR));
+        int separatorIndex =
+                Math.max(
+                        path.lastIndexOf(FOLDER_SEPARATOR),
+                        path.lastIndexOf(WINDOWS_FOLDER_SEPARATOR));
         return (separatorIndex != -1 ? path.substring(separatorIndex + 1) : path);
     }
 
@@ -4682,8 +4686,10 @@ public class GutilStr {
             return null;
         }
 
-        int folderIndex = Math.max(
-                path.lastIndexOf(FOLDER_SEPARATOR), path.lastIndexOf(WINDOWS_FOLDER_SEPARATOR));
+        int folderIndex =
+                Math.max(
+                        path.lastIndexOf(FOLDER_SEPARATOR),
+                        path.lastIndexOf(WINDOWS_FOLDER_SEPARATOR));
         if (folderIndex > extIndex) {
             return null;
         }
@@ -4821,8 +4827,8 @@ public class GutilStr {
      * 解码给定的 URI 编码字符串，遵循以下规则：
      *
      * <ul>
-     *   <li>字母数字字符 {@code "a"} 到 {@code "z"}、{@code "A"} 到 {@code "Z"} 以及 {@code "0"}
-     *       到 {@code "9"} 保持不变。
+     *   <li>字母数字字符 {@code "a"} 到 {@code "z"}、{@code "A"} 到 {@code "Z"} 以及 {@code "0"} 到 {@code "9"}
+     *       保持不变。
      *   <li>特殊字符 {@code "-"}、{@code "_"}、{@code "."} 和 {@code "*"} 保持不变。
      *   <li>序列 "{@code %<i>xy</i>}" 被解释为该字符的十六进制表示。
      *   <li>非 ASCII 字符（如中文）按 UTF-8 编码写入字节，避免只保留低 8 位导致乱码。
@@ -5277,8 +5283,8 @@ public class GutilStr {
      * 将给定的分隔列表字符串转换为字符串数组<br>
      * 空 token（如尾部分隔符产生的空元素）会被过滤
      *
-     * <p>单个 {@code delimiter} 可以由多个字符组成，但它仍被视为单个分隔字符串，而非多个可能的分隔
-     * 字符，这一点与 {@link #tokenizeToStringArray} 不同。
+     * <p>单个 {@code delimiter} 可以由多个字符组成，但它仍被视为单个分隔字符串，而非多个可能的分隔 字符，这一点与 {@link
+     * #tokenizeToStringArray} 不同。
      *
      * @param str 输入的字符串（可能为 {@code null} 或空）
      * @param delimiter 元素之间的分隔符（是单个分隔字符串，而非一组单独的分隔字符）
@@ -5293,13 +5299,12 @@ public class GutilStr {
      * 将给定的分隔列表字符串转换为字符串数组<br>
      * 空 token（如尾部分隔符产生的空元素）会被过滤
      *
-     * <p>单个 {@code delimiter} 可以由多个字符组成，但它仍被视为单个分隔字符串，而非多个可能的分隔
-     * 字符，这一点与 {@link #tokenizeToStringArray} 不同。
+     * <p>单个 {@code delimiter} 可以由多个字符组成，但它仍被视为单个分隔字符串，而非多个可能的分隔 字符，这一点与 {@link
+     * #tokenizeToStringArray} 不同。
      *
      * @param str 输入的字符串（可能为 {@code null} 或空）
      * @param delimiter 元素之间的分隔符（是单个分隔字符串，而非一组单独的分隔字符）
-     * @param charsToDelete 需要删除的一组字符；可用于删除不需要的换行符，例如 {@code "\r\n\f"} 会删除
-     *     字符串中的所有换行和换页符
+     * @param charsToDelete 需要删除的一组字符；可用于删除不需要的换行符，例如 {@code "\r\n\f"} 会删除 字符串中的所有换行和换页符
      * @return 列表中的 token 数组
      * @see #tokenizeToStringArray
      */

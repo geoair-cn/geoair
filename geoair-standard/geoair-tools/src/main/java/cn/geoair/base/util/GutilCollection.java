@@ -62,8 +62,8 @@ public abstract class GutilCollection {
     /**
      * 将给定的数组转换为 List。基本类型数组会被转换为对应包装类型组成的 List。
      *
-     * <p><b>注意：</b>一般情况下推荐使用标准的 {@link Arrays#asList} 方法。本 {@code arrayToList}
-     * 方法仅用于处理运行时可能为 {@code Object[]} 或基本类型数组的 Object 入参。
+     * <p><b>注意：</b>一般情况下推荐使用标准的 {@link Arrays#asList} 方法。本 {@code arrayToList} 方法仅用于处理运行时可能为 {@code
+     * Object[]} 或基本类型数组的 Object 入参。
      *
      * <p>{@code null} 源值将被转换为空 List。
      *
@@ -168,8 +168,7 @@ public abstract class GutilCollection {
      * @param enumeration 要检查的 Enumeration（可以为 {@code null}，此时返回 {@code false}）
      * @param element 要查找的元素
      * @return 找到返回 {@code true}，否则返回 {@code false}
-     * @apiNote 本方法会<b>消费（耗尽）</b>传入的Enumeration：无论是否找到，调用后该Enumeration不再有
-     *     剩余元素。
+     * @apiNote 本方法会<b>消费（耗尽）</b>传入的Enumeration：无论是否找到，调用后该Enumeration不再有 剩余元素。
      */
     public static boolean contains(Enumeration<?> enumeration, Object element) {
         if (enumeration != null) {
@@ -204,18 +203,17 @@ public abstract class GutilCollection {
     }
 
     /**
-     * 如果 '{@code candidates}' 中的任一元素包含在 '{@code source}' 中，返回 {@code true}；否则返回
-     * {@code false}。
+     * 如果 '{@code candidates}' 中的任一元素包含在 '{@code source}' 中，返回 {@code true}；否则返回 {@code false}。
      *
-     * <p>优化策略：始终迭代<b>较小的</b>集合做包含性查询；当较大的集合是{@link List}时，先将其转成
-     * {@link HashSet}以摊平查询成本（O(min)次查询 + O(max)次哈希构建）。
+     * <p>优化策略：始终迭代<b>较小的</b>集合做包含性查询；当较大的集合是{@link List}时，先将其转成 {@link HashSet}以摊平查询成本（O(min)次查询 +
+     * O(max)次哈希构建）。
      *
      * @param source 源 Collection
      * @param candidates 要查找的候选元素集合
      * @return 是否找到任一候选元素
-     * @apiNote 当较大的集合为{@link List}并走哈希优化路径时，元素必须满足{@code hashCode}与
-     *     {@code equals}一致性的契约，否则可能得到与{@code contains}逐一遍历不同的结果；元素为
-     *     {@code null}时始终按{@code contains}语义处理（HashSet支持null元素）。
+     * @apiNote 当较大的集合为{@link List}并走哈希优化路径时，元素必须满足{@code hashCode}与 {@code
+     *     equals}一致性的契约，否则可能得到与{@code contains}逐一遍历不同的结果；元素为 {@code null}时始终按{@code
+     *     contains}语义处理（HashSet支持null元素）。
      */
     public static boolean containsAny(Collection<?> source, Collection<?> candidates) {
         if (isEmpty(source) || isEmpty(candidates)) {
@@ -241,17 +239,17 @@ public abstract class GutilCollection {
     }
 
     /**
-     * 返回 '{@code candidates}' 中第一个包含在 '{@code source}' 中的元素。如果 '{@code candidates}'
-     * 中没有元素存在于 '{@code source}' 中，返回 {@code null}。迭代顺序取决于 {@link Collection} 的具体实现。
+     * 返回 '{@code candidates}' 中第一个包含在 '{@code source}' 中的元素。如果 '{@code candidates}' 中没有元素存在于
+     * '{@code source}' 中，返回 {@code null}。迭代顺序取决于 {@link Collection} 的具体实现。
      *
-     * <p>优化策略：保持按'{@code candidates}'的迭代顺序查找（保证返回"第一个"的语义），当'{@code source}'
-     * 是{@link List}时，先将其转成{@link HashSet}以摊平包含性查询成本。
+     * <p>优化策略：保持按'{@code candidates}'的迭代顺序查找（保证返回"第一个"的语义），当'{@code source}' 是{@link
+     * List}时，先将其转成{@link HashSet}以摊平包含性查询成本。
      *
      * @param source 源 Collection
      * @param candidates 要查找的候选元素集合
      * @return 第一个匹配的元素，未找到返回 {@code null}
-     * @apiNote 当'{@code source}'为{@link List}并走哈希优化路径时，元素必须满足{@code hashCode}与
-     *     {@code equals}一致性的契约，否则可能得到与{@code contains}逐一遍历不同的结果。
+     * @apiNote 当'{@code source}'为{@link List}并走哈希优化路径时，元素必须满足{@code hashCode}与 {@code
+     *     equals}一致性的契约，否则可能得到与{@code contains}逐一遍历不同的结果。
      */
     @SuppressWarnings("unchecked")
     public static <E> E findFirstMatch(Collection<?> source, Collection<E> candidates) {
@@ -316,8 +314,7 @@ public abstract class GutilCollection {
      * 判断给定的 Collection 是否只包含一个唯一的对象。
      *
      * @param collection 要检查的 Collection
-     * @return 如果集合中只包含同一个实例（单个引用或对同一实例的多个引用），返回 {@code true}，
-     *     否则返回 {@code false}
+     * @return 如果集合中只包含同一个实例（单个引用或对同一实例的多个引用），返回 {@code true}， 否则返回 {@code false}
      */
     public static boolean hasUniqueObject(Collection<?> collection) {
         if (isEmpty(collection)) {
@@ -365,8 +362,7 @@ public abstract class GutilCollection {
     }
 
     /**
-     * 获取给定 Set 的最后一个元素：优先使用 {@link SortedSet#last()}，否则遍历所有元素
-     * （假定为有序集合）。
+     * 获取给定 Set 的最后一个元素：优先使用 {@link SortedSet#last()}，否则遍历所有元素 （假定为有序集合）。
      *
      * @param set 要检查的 Set（可以为 {@code null} 或空）
      * @return 最后一个元素，没有则返回 {@code null}
@@ -407,8 +403,7 @@ public abstract class GutilCollection {
     }
 
     /**
-     * 将给定枚举中的元素装入指定类型的数组中。枚举元素必须可赋值给给定数组的类型。
-     * 返回的数组是与传入数组不同的实例。
+     * 将给定枚举中的元素装入指定类型的数组中。枚举元素必须可赋值给给定数组的类型。 返回的数组是与传入数组不同的实例。
      *
      * @param enumeration 要装载的枚举，不能为 {@code null}
      * @param array 用于指定结果类型的数组，不能为 {@code null}
@@ -491,9 +486,8 @@ public abstract class GutilCollection {
     }
 
     /**
-     * 将 Map 适配为 MultiValueMap 契约的实现（以下为注释掉的参考实现代码）。
-     * @SuppressWarnings("serial") private static class
-     * MultiValueMapAdapter<K, V> implements gtcMultiValueMap<K, V>, Serializable {
+     * 将 Map 适配为 MultiValueMap 契约的实现（以下为注释掉的参考实现代码）。 @SuppressWarnings("serial") private static
+     * class MultiValueMapAdapter<K, V> implements gtcMultiValueMap<K, V>, Serializable {
      *
      * <p>private final Map<K, List<V>> map;
      *

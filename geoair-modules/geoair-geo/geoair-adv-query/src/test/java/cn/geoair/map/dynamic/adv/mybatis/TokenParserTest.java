@@ -2,13 +2,10 @@ package cn.geoair.map.dynamic.adv.mybatis;
 
 import static org.junit.Assert.*;
 
-import cn.geoair.map.dynamic.adv.mybatis.token.TokenHandler;
 import cn.geoair.map.dynamic.adv.mybatis.token.TokenParser;
 import org.junit.Test;
 
-/**
- * {@link TokenParser} 的单元测试。
- */
+/** {@link TokenParser} 的单元测试。 */
 public class TokenParserTest {
 
     @Test

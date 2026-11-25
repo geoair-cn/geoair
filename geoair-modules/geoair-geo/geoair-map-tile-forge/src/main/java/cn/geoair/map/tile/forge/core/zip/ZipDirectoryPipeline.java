@@ -2,7 +2,6 @@ package cn.geoair.map.tile.forge.core.zip;
 
 import cn.geoair.map.tile.forge.core.zip.model.CentralDirectoryModel;
 import cn.geoair.map.tile.forge.core.zip.model.EocdInfo;
-
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -15,25 +14,34 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** 分块读取/解析与批量入库并行，队列满时生产端等待，避免全量目录堆积在内存中。 */
 final class ZipDirectoryPipeline {
-    private ZipDirectoryPipeline() { }
+    private ZipDirectoryPipeline() {}
 
-    static void scan(AbstractZipCompressionHandler handler, EocdInfo eocd, String source,
-                     TerminatingConsumer<CentralDirectoryModel> consumer) throws IOException {
+    static void scan(
+            AbstractZipCompressionHandler handler,
+            EocdInfo eocd,
+            String source,
+            TerminatingConsumer<CentralDirectoryModel> consumer)
+            throws IOException {
         BlockingQueue<CentralDirectoryModel> queue = new ArrayBlockingQueue<>(512);
         AtomicBoolean stopped = new AtomicBoolean();
-        FutureTask<Void> producer = new FutureTask<>(() -> {
-            handler.scanDirectoryEntries(eocd, source, (entry, total, index) -> {
-                if (stopped.get()) return false;
-                try {
-                    queue.put(entry);
-                    return true;
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new CancellationException("ZIP中央目录生产已取消");
-                }
-            });
-            return null;
-        });
+        FutureTask<Void> producer =
+                new FutureTask<>(
+                        () -> {
+                            handler.scanDirectoryEntries(
+                                    eocd,
+                                    source,
+                                    (entry, total, index) -> {
+                                        if (stopped.get()) return false;
+                                        try {
+                                            queue.put(entry);
+                                            return true;
+                                        } catch (InterruptedException e) {
+                                            Thread.currentThread().interrupt();
+                                            throw new CancellationException("ZIP中央目录生产已取消");
+                                        }
+                                    });
+                            return null;
+                        });
         Thread worker = new Thread(producer, "zip-directory-producer");
         worker.setDaemon(true);
         worker.start();
@@ -46,7 +54,8 @@ final class ZipDirectoryPipeline {
                     if (queue.isEmpty()) return;
                 }
                 CentralDirectoryModel entry = queue.poll(100, TimeUnit.MILLISECONDS);
-                if (entry != null && !consumer.accept(entry, eocd.getTotalEntries(), index++)) return;
+                if (entry != null && !consumer.accept(entry, eocd.getTotalEntries(), index++))
+                    return;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

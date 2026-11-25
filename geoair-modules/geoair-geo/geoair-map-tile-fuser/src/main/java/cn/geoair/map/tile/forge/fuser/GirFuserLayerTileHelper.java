@@ -1,9 +1,7 @@
 package cn.geoair.map.tile.forge.fuser;
 
-
 import cn.geoair.base.Gir;
 import cn.geoair.base.util.GutilObject;
-import cn.geoair.map.tile.forge.fuser.cache.TileCacheFactory;
 import cn.geoair.map.tile.forge.fuser.entity.PxyLayerInfo;
 import cn.geoair.map.tile.forge.fuser.provider.LayerTileGetter;
 import cn.geoair.map.tile.forge.fuser.provider.TileGetterFactory;
@@ -24,9 +22,9 @@ public interface GirFuserLayerTileHelper {
         if (GutilObject.isEmpty(pxyLayerInfo)) {
             return null;
         }
-        return TileGetterFactory.create(pxyLayerInfo, CustomTileCacheHelper.getInstance().getTileCache(layerName));
+        return TileGetterFactory.create(
+                pxyLayerInfo, CustomTileCacheHelper.getInstance().getTileCache(layerName));
     }
 
     PxyLayerInfo getPxyLayerInfo(String layerName);
-
 }

@@ -1,8 +1,7 @@
 package cn.geoair.spi.bean;
 
-import java.lang.ref.WeakReference;
-
 import cn.geoair.base.bean.GiBeanFactory;
+import java.lang.ref.WeakReference;
 
 final class SpringBeanProviderResolver {
 

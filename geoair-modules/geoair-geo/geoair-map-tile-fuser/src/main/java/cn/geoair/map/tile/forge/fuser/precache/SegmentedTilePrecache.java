@@ -3,13 +3,12 @@ package cn.geoair.map.tile.forge.fuser.precache;
 import cn.geoair.map.dynamic.tools.grid.dto.RangeApo;
 import cn.geoair.map.tile.forge.fuser.cache.TileCache;
 import cn.geoair.map.tile.forge.fuser.cache.TileCacheQuery;
+import cn.geoair.map.tile.forge.fuser.encoding.TileEncodingContext;
 import cn.geoair.map.tile.forge.fuser.execution.TileCancellationToken;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
 import cn.geoair.map.tile.forge.fuser.execution.TileOperationStatus;
 import cn.geoair.web.mime.GiMimeType;
-import cn.geoair.map.tile.forge.fuser.encoding.TileEncodingContext;
 import cn.hutool.crypto.SecureUtil;
-
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
@@ -29,37 +28,101 @@ public final class SegmentedTilePrecache {
             TileCancellationToken cancellation,
             TilePrecacheOptions options,
             Consumer<TilePrecacheProgress> listener) {
-        return execute(layer, levels, format, cache, loader, null, workers, cancellation, options, listener);
+        return execute(
+                layer,
+                levels,
+                format,
+                cache,
+                loader,
+                null,
+                workers,
+                cancellation,
+                options,
+                listener);
     }
 
     /** 显式的预缓存与处理组合入口；旧签名继续只下载缺片。 */
     public static List<TilePrecacheProgress> execute(
-            String layer, List<TilePrecacheLevel> levels, GiMimeType format, TileCache cache,
-            TileContentLoader loader, TilePrecachePipeline pipeline, ExecutorService workers,
-            TileCancellationToken cancellation, TilePrecacheOptions options, Consumer<TilePrecacheProgress> listener) {
-        return execute(layer, levels, format, cache, loader, pipeline, workers, cancellation, options, listener,
-                null, null, null, false);
+            String layer,
+            List<TilePrecacheLevel> levels,
+            GiMimeType format,
+            TileCache cache,
+            TileContentLoader loader,
+            TilePrecachePipeline pipeline,
+            ExecutorService workers,
+            TileCancellationToken cancellation,
+            TilePrecacheOptions options,
+            Consumer<TilePrecacheProgress> listener) {
+        return execute(
+                layer,
+                levels,
+                format,
+                cache,
+                loader,
+                pipeline,
+                workers,
+                cancellation,
+                options,
+                listener,
+                null,
+                null,
+                null,
+                false);
     }
 
     /** 库负责范围和格式校验；调用方提供图层版本、缓存身份、矩阵/行原点及处理策略的稳定指纹。 */
     public static List<TilePrecacheProgress> executeResumable(
-            String layer, List<TilePrecacheLevel> levels, GiMimeType format, TileCache cache,
-            TileContentLoader loader, TilePrecachePipeline pipeline, ExecutorService workers,
-            TileCancellationToken cancellation, TilePrecacheOptions options, Consumer<TilePrecacheProgress> listener,
-            TilePrecacheBatchGate gate, String taskIdentity, TilePrecacheCheckpoint checkpoint, boolean retryFailuresOnly) {
+            String layer,
+            List<TilePrecacheLevel> levels,
+            GiMimeType format,
+            TileCache cache,
+            TileContentLoader loader,
+            TilePrecachePipeline pipeline,
+            ExecutorService workers,
+            TileCancellationToken cancellation,
+            TilePrecacheOptions options,
+            Consumer<TilePrecacheProgress> listener,
+            TilePrecacheBatchGate gate,
+            String taskIdentity,
+            TilePrecacheCheckpoint checkpoint,
+            boolean retryFailuresOnly) {
         Objects.requireNonNull(gate, "批次调度器不能为空");
         if (taskIdentity == null || taskIdentity.trim().isEmpty())
             throw new IllegalArgumentException("预缓存任务身份不能为空");
-        if (retryFailuresOnly && checkpoint == null) throw new IllegalArgumentException("补跑失败瓦片需要有效检查点");
-        return execute(layer, levels, format, cache, loader, pipeline, workers, cancellation, options, listener,
-                gate, taskIdentity, checkpoint, retryFailuresOnly);
+        if (retryFailuresOnly && checkpoint == null)
+            throw new IllegalArgumentException("补跑失败瓦片需要有效检查点");
+        return execute(
+                layer,
+                levels,
+                format,
+                cache,
+                loader,
+                pipeline,
+                workers,
+                cancellation,
+                options,
+                listener,
+                gate,
+                taskIdentity,
+                checkpoint,
+                retryFailuresOnly);
     }
 
     private static List<TilePrecacheProgress> execute(
-            String layer, List<TilePrecacheLevel> levels, GiMimeType format, TileCache cache,
-            TileContentLoader loader, TilePrecachePipeline pipeline, ExecutorService workers,
-            TileCancellationToken cancellation, TilePrecacheOptions suppliedOptions, Consumer<TilePrecacheProgress> listener,
-            TilePrecacheBatchGate gate, String taskIdentity, TilePrecacheCheckpoint checkpoint, boolean retryFailuresOnly) {
+            String layer,
+            List<TilePrecacheLevel> levels,
+            GiMimeType format,
+            TileCache cache,
+            TileContentLoader loader,
+            TilePrecachePipeline pipeline,
+            ExecutorService workers,
+            TileCancellationToken cancellation,
+            TilePrecacheOptions suppliedOptions,
+            Consumer<TilePrecacheProgress> listener,
+            TilePrecacheBatchGate gate,
+            String taskIdentity,
+            TilePrecacheCheckpoint checkpoint,
+            boolean retryFailuresOnly) {
         Objects.requireNonNull(levels);
         Objects.requireNonNull(cache);
         Objects.requireNonNull(loader);
@@ -81,7 +144,10 @@ public final class SegmentedTilePrecache {
             counters.add(counter);
             if (checkpoint == null) counter.publish();
         }
-        int batchSize = gate == null ? options.getSegmentSize() : Math.min(options.getSegmentSize(), options.getBatchSize());
+        int batchSize =
+                gate == null
+                        ? options.getSegmentSize()
+                        : Math.min(options.getSegmentSize(), options.getBatchSize());
         if (checkpoint != null) {
             try {
                 checkpoint.begin(identity(layer, format, plans, taskIdentity), retryFailuresOnly);
@@ -96,7 +162,8 @@ public final class SegmentedTilePrecache {
         boolean interrupted = false;
         try {
             if (checkpoint != null && listener != null) {
-                for (TilePrecacheLevel level : plans) listener.accept(checkpoint.progress(level.getZoom(), level.getTotal()));
+                for (TilePrecacheLevel level : plans)
+                    listener.accept(checkpoint.progress(level.getZoom(), level.getTotal()));
             }
             // 轮流投递不同级别的分段，避免低级别占满队列。窗口只限制排队内存。
             while (true) {
@@ -111,8 +178,9 @@ public final class SegmentedTilePrecache {
                         long start = next[i];
                         if (checkpoint != null && !retryFailuresOnly) {
                             long completed;
-                            while (start < level.getTotal() && (completed = checkpoint.completedTo(level.getZoom(), start)) > start)
-                                start = completed;
+                            while (start < level.getTotal()
+                                    && (completed = checkpoint.completedTo(level.getZoom(), start))
+                                            > start) start = completed;
                             next[i] = start;
                         }
                         if (start >= level.getTotal()) continue;
@@ -122,7 +190,8 @@ public final class SegmentedTilePrecache {
                         List<TilePrecacheFailure> previous = Collections.emptyList();
                         BitSet selection = null;
                         if (retryFailuresOnly) {
-                            List<TilePrecacheFailure> page = checkpoint.failures(level.getZoom(), start - 1, batchSize);
+                            List<TilePrecacheFailure> page =
+                                    checkpoint.failures(level.getZoom(), start - 1, batchSize);
                             if (page.isEmpty()) {
                                 next[i] = level.getTotal();
                                 continue;
@@ -130,36 +199,70 @@ public final class SegmentedTilePrecache {
                             start = page.get(0).getPosition();
                             long limit = start + Math.min(batchSize, level.getTotal() - start);
                             int count = 0;
-                            while (count < page.size() && page.get(count).getPosition() < limit) count++;
+                            while (count < page.size() && page.get(count).getPosition() < limit)
+                                count++;
                             previous = page.subList(0, count);
                             end = previous.get(count - 1).getPosition() + 1;
                             selection = new BitSet((int) (end - start));
-                            for (TilePrecacheFailure failed : previous) selection.set((int) (failed.getPosition() - start));
+                            for (TilePrecacheFailure failed : previous)
+                                selection.set((int) (failed.getPosition() - start));
                         }
-                        TileCacheQuery query = new TileCacheQuery(layer, level.getZoom(), level.getRange(), start, end, format);
-                        TilePrecacheCounter counter = checkpoint == null ? counters.get(i) : new TilePrecacheCounter(level, null);
-                        List<TilePrecacheFailure> failures = checkpoint == null ? null : new ArrayList<>();
-                        TilePrecacheSegment segment = new TilePrecacheSegment(level, query, counter, cache, loader,
-                                cancellation, options, pipeline, encoding, selection, failures);
+                        TileCacheQuery query =
+                                new TileCacheQuery(
+                                        layer,
+                                        level.getZoom(),
+                                        level.getRange(),
+                                        start,
+                                        end,
+                                        format);
+                        TilePrecacheCounter counter =
+                                checkpoint == null
+                                        ? counters.get(i)
+                                        : new TilePrecacheCounter(level, null);
+                        List<TilePrecacheFailure> failures =
+                                checkpoint == null ? null : new ArrayList<>();
+                        TilePrecacheSegment segment =
+                                new TilePrecacheSegment(
+                                        level,
+                                        query,
+                                        counter,
+                                        cache,
+                                        loader,
+                                        cancellation,
+                                        options,
+                                        pipeline,
+                                        encoding,
+                                        selection,
+                                        failures);
                         List<TilePrecacheFailure> replay = previous;
                         if (gate != null) gate.acquire(taskIdentity, cancellation);
                         try {
-                            completion.submit(() -> {
-                                try {
-                                    segment.call();
-                                    if (checkpoint != null) {
-                                        // 只有已处理完整批次才提交；停止或崩溃后，未提交批次可以安全复查缓存。
-                                        synchronized (checkpoint) {
-                                            checkpoint.commit(level.getZoom(), query.getFrom(), query.getTo(),
-                                                    counter.snapshot(), failures, replay);
-                                            if (listener != null) listener.accept(checkpoint.progress(level.getZoom(), level.getTotal()));
+                            completion.submit(
+                                    () -> {
+                                        try {
+                                            segment.call();
+                                            if (checkpoint != null) {
+                                                // 只有已处理完整批次才提交；停止或崩溃后，未提交批次可以安全复查缓存。
+                                                synchronized (checkpoint) {
+                                                    checkpoint.commit(
+                                                            level.getZoom(),
+                                                            query.getFrom(),
+                                                            query.getTo(),
+                                                            counter.snapshot(),
+                                                            failures,
+                                                            replay);
+                                                    if (listener != null)
+                                                        listener.accept(
+                                                                checkpoint.progress(
+                                                                        level.getZoom(),
+                                                                        level.getTotal()));
+                                                }
+                                            }
+                                            return null;
+                                        } finally {
+                                            if (gate != null) gate.release();
                                         }
-                                    }
-                                    return null;
-                                } finally {
-                                    if (gate != null) gate.release();
-                                }
-                            });
+                                    });
                         } catch (RuntimeException | Error rejected) {
                             if (gate != null) gate.release();
                             throw rejected;
@@ -200,15 +303,19 @@ public final class SegmentedTilePrecache {
         }
         try {
             if (failure instanceof Error) throw (Error) failure;
-            if (failure != null && !(failure instanceof InterruptedException)
+            if (failure != null
+                    && !(failure instanceof InterruptedException)
                     && !(failure instanceof TileOperationException
-                        && ((TileOperationException) failure).getStatus() == TileOperationStatus.CANCELLED))
+                            && ((TileOperationException) failure).getStatus()
+                                    == TileOperationStatus.CANCELLED))
                 throw new IllegalStateException("预缓存分段执行失败", failure);
             List<TilePrecacheProgress> result = new ArrayList<>();
             for (int i = 0; i < plans.size(); i++) {
                 TilePrecacheLevel level = plans.get(i);
-                result.add(checkpoint == null ? counters.get(i).snapshot()
-                        : checkpoint.progress(level.getZoom(), level.getTotal()));
+                result.add(
+                        checkpoint == null
+                                ? counters.get(i).snapshot()
+                                : checkpoint.progress(level.getZoom(), level.getTotal()));
             }
             return result;
         } catch (SQLException problem) {
@@ -218,17 +325,35 @@ public final class SegmentedTilePrecache {
         }
     }
 
-    private static String identity(String layer, GiMimeType format, List<TilePrecacheLevel> plans, String taskIdentity) {
-        StringBuilder text = new StringBuilder("tile-precache-v1|").append(taskIdentity.length())
-                .append(':').append(taskIdentity).append('|').append(layer.length()).append(':').append(layer)
-                .append('|').append(format.getFormat());
+    private static String identity(
+            String layer, GiMimeType format, List<TilePrecacheLevel> plans, String taskIdentity) {
+        StringBuilder text =
+                new StringBuilder("tile-precache-v1|")
+                        .append(taskIdentity.length())
+                        .append(':')
+                        .append(taskIdentity)
+                        .append('|')
+                        .append(layer.length())
+                        .append(':')
+                        .append(layer)
+                        .append('|')
+                        .append(format.getFormat());
         List<TilePrecacheLevel> ordered = new ArrayList<>(plans);
         ordered.sort(Comparator.comparingInt(TilePrecacheLevel::getZoom));
         for (TilePrecacheLevel level : ordered) {
             RangeApo range = level.getRange();
-            text.append('|').append(level.getZoom()).append(':').append(range.getMinX()).append(':')
-                    .append(range.getMaxX()).append(':').append(range.getMinY()).append(':').append(range.getMaxY());
-            if (level.getMask() != null) text.append(':').append(SecureUtil.sha256(level.getMask().checkpointGeometry()));
+            text.append('|')
+                    .append(level.getZoom())
+                    .append(':')
+                    .append(range.getMinX())
+                    .append(':')
+                    .append(range.getMaxX())
+                    .append(':')
+                    .append(range.getMinY())
+                    .append(':')
+                    .append(range.getMaxY());
+            if (level.getMask() != null)
+                text.append(':').append(SecureUtil.sha256(level.getMask().checkpointGeometry()));
         }
         return SecureUtil.sha256(text.toString());
     }

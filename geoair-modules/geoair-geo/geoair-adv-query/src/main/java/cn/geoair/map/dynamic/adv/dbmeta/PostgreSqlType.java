@@ -2,9 +2,7 @@ package cn.geoair.map.dynamic.adv.dbmeta;
 
 import java.util.*;
 
-/**
- * PostgreSQL UDT类型与Java类型映射枚举
- */
+/** PostgreSQL UDT类型与Java类型映射枚举 */
 public enum PostgreSqlType implements DataBaseFieldType {
 
     // 字符串/文本类
@@ -36,8 +34,13 @@ public enum PostgreSqlType implements DataBaseFieldType {
     DATE("date", "DATE", DefaultJavaType.JAVA_LOCAL_DATE, CategoryEnum.DATE),
     TIME("time", "TIME", DefaultJavaType.JAVA_LOCAL_TIME, CategoryEnum.TIME),
     TIMETZ("timetz", "TIME WITH TIME ZONE", DefaultJavaType.JAVA_OFFSET_TIME, CategoryEnum.TIME),
-    TIMESTAMP("timestamp", "TIMESTAMP", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CategoryEnum.TIMESTAMP),
-    TIMESTAMPTZ("timestamptz", "TIMESTAMP WITH TIME ZONE", DefaultJavaType.JAVA_OFFSET_DATE_TIME, CategoryEnum.TIMESTAMP),
+    TIMESTAMP(
+            "timestamp", "TIMESTAMP", DefaultJavaType.JAVA_LOCAL_DATE_TIME, CategoryEnum.TIMESTAMP),
+    TIMESTAMPTZ(
+            "timestamptz",
+            "TIMESTAMP WITH TIME ZONE",
+            DefaultJavaType.JAVA_OFFSET_DATE_TIME,
+            CategoryEnum.TIMESTAMP),
     INTERVAL("interval", "INTERVAL", DefaultJavaType.JAVA_INTERVAL, CategoryEnum.INTERVAL),
 
     // 二进制/特殊类
@@ -45,10 +48,16 @@ public enum PostgreSqlType implements DataBaseFieldType {
     BLOB("blob", "BLOB", DefaultJavaType.JAVA_BLOB, CategoryEnum.BLOB),
 
     // 空间类
-    GEOMETRY(DefaultJavaType.JAVA_GEOMETRY, CategoryEnum.GEOMETRY,
-            "geometry", "\"public\".\"geometry\""),
-    GEOGRAPHY(DefaultJavaType.JAVA_GEOGRAPHY, CategoryEnum.GEOMETRY,
-            "geography", "\"public\".\"geography\""),
+    GEOMETRY(
+            DefaultJavaType.JAVA_GEOMETRY,
+            CategoryEnum.GEOMETRY,
+            "geometry",
+            "\"public\".\"geometry\""),
+    GEOGRAPHY(
+            DefaultJavaType.JAVA_GEOGRAPHY,
+            CategoryEnum.GEOMETRY,
+            "geography",
+            "\"public\".\"geography\""),
 
     MONEY("money", "MONEY", DefaultJavaType.JAVA_MONEY, CategoryEnum.FLOAT);
 
@@ -67,19 +76,16 @@ public enum PostgreSqlType implements DataBaseFieldType {
         }
     }
 
-    /**
-     * 单一 udtName 的构造器
-     */
-    PostgreSqlType(String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
+    /** 单一 udtName 的构造器 */
+    PostgreSqlType(
+            String udtName, String standardName, DefaultJavaType javaType, CategoryEnum category) {
         this.udtNames = Arrays.asList(udtName);
         this.standardName = standardName;
         this.javaType = javaType;
         this.category = category;
     }
 
-    /**
-     * 多个 udtName 变体的构造器
-     */
+    /** 多个 udtName 变体的构造器 */
     PostgreSqlType(DefaultJavaType javaType, CategoryEnum category, String... udtNames) {
         this.udtNames = Arrays.asList(udtNames);
         this.standardName = this.name();
@@ -87,9 +93,7 @@ public enum PostgreSqlType implements DataBaseFieldType {
         this.category = category;
     }
 
-    /**
-     * 根据 udtName 查找（匹配任一变体名）
-     */
+    /** 根据 udtName 查找（匹配任一变体名） */
     public static PostgreSqlType getByUdtName(String udtName) {
         if (udtName == null) return null;
         return UDT_NAME_MAP.get(udtName.toLowerCase());

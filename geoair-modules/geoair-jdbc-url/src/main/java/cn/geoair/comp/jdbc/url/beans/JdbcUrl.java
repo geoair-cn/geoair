@@ -1,18 +1,17 @@
 package cn.geoair.comp.jdbc.url.beans;
 
+import cn.geoair.comp.jdbc.url.JdbcUrlDialect;
+import cn.geoair.comp.jdbc.url.enums.DatabaseType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import cn.geoair.comp.jdbc.url.JdbcUrlDialect;
-import cn.geoair.comp.jdbc.url.enums.DatabaseType;
 import lombok.Data;
 
 /**
  * JDBC URL 的无损结构化表示。
  *
- * <p>coreUrl 保留原始连接主体；参数按出现顺序保存，因此重写单个参数时不会改变其它参数。</p>
+ * <p>coreUrl 保留原始连接主体；参数按出现顺序保存，因此重写单个参数时不会改变其它参数。
  *
  * @author 张逢吉
  */
@@ -21,7 +20,9 @@ public final class JdbcUrl implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum PropertyStyle {
-        NONE, QUERY, SEMICOLON
+        NONE,
+        QUERY,
+        SEMICOLON
     }
 
     /** 调用方传入的原始 JDBC URL。 */
@@ -43,12 +44,17 @@ public final class JdbcUrl implements Serializable {
     /** 保持原始顺序的连接参数列表。 */
     private final List<JdbcUrlProperty> properties;
 
-    /**
-     * 创建结构化 JDBC URL。供自定义 {@link JdbcUrlDialect} 实现构造解析结果使用。
-     */
-    public JdbcUrl(String rawUrl, DatabaseType databaseType, String driverName, String subProtocol,
-            String coreUrl, List<JdbcEndpoint> endpoints, String databaseName,
-            PropertyStyle propertyStyle, List<JdbcUrlProperty> properties) {
+    /** 创建结构化 JDBC URL。供自定义 {@link JdbcUrlDialect} 实现构造解析结果使用。 */
+    public JdbcUrl(
+            String rawUrl,
+            DatabaseType databaseType,
+            String driverName,
+            String subProtocol,
+            String coreUrl,
+            List<JdbcEndpoint> endpoints,
+            String databaseName,
+            PropertyStyle propertyStyle,
+            List<JdbcUrlProperty> properties) {
         this.rawUrl = rawUrl;
         this.databaseType = databaseType;
         this.driverName = driverName;
@@ -73,11 +79,18 @@ public final class JdbcUrl implements Serializable {
         return null;
     }
 
-    /**
-     * 创建仅参数区不同的新 URL 对象，供编解码器执行不可变重写。
-     */
-    public JdbcUrl withProperties(List<JdbcUrlProperty> newProperties, PropertyStyle newPropertyStyle) {
-        return new JdbcUrl(rawUrl, databaseType, driverName, subProtocol, coreUrl, endpoints,
-                databaseName, newPropertyStyle, newProperties);
+    /** 创建仅参数区不同的新 URL 对象，供编解码器执行不可变重写。 */
+    public JdbcUrl withProperties(
+            List<JdbcUrlProperty> newProperties, PropertyStyle newPropertyStyle) {
+        return new JdbcUrl(
+                rawUrl,
+                databaseType,
+                driverName,
+                subProtocol,
+                coreUrl,
+                endpoints,
+                databaseName,
+                newPropertyStyle,
+                newProperties);
     }
 }

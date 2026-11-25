@@ -4,9 +4,8 @@ import cn.geoair.base.data.GiVisualValuable;
 
 /**
  * 长度/精度/小数位的忽略策略枚举。
- * <p>
- * 决定在 SQL DDL 生成时，是否需要输出 length、precision、scale 参数。
- * 例如：VARCHAR 需要长度(KEEP)，TEXT 不需要长度(IGNORE)，
+ *
+ * <p>决定在 SQL DDL 生成时，是否需要输出 length、precision、scale 参数。 例如：VARCHAR 需要长度(KEEP)，TEXT 不需要长度(IGNORE)，
  * INTERVAL 的精度和小数位存在互依赖关系(MUTUAL_DEPENDENT)。
  *
  * @author zhangjun

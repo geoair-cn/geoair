@@ -9,12 +9,20 @@ import cn.geoair.map.tile.forge.fuser.utils.GridInitUtils;
 public final class LegacyBytesFuser extends GirFuserExec {
     private final byte[] bytes;
     private final boolean fail;
+
     public LegacyBytesFuser(byte[] bytes, boolean fail) {
-        super(new FusionTestSource(GridInitUtils.getWorldGrid3857(), (x, y) -> null),
-                ImageMime.png, BoundingBox.WORLD3857, 256, 256);
-        this.bytes = bytes; this.fail = fail;
+        super(
+                new FusionTestSource(GridInitUtils.getWorldGrid3857(), (x, y) -> null),
+                ImageMime.png,
+                BoundingBox.WORLD3857,
+                256,
+                256);
+        this.bytes = bytes;
+        this.fail = fail;
     }
-    @Override public byte[] toImageBytes() {
+
+    @Override
+    public byte[] toImageBytes() {
         if (fail) throw new IllegalStateException("旧版融合器读取失败");
         return bytes == null ? null : bytes.clone();
     }

@@ -13,11 +13,35 @@ public class SqlServerAdvWhereSelectOpt extends AbstractExecAdvWhereSelectOpt {
     private final IAdvBaseOpt baseOpt;
     private final IAdvSimplePageOpt pageOpt;
     private final IAdvGeoPreOpt geoOpt;
-    public SqlServerAdvWhereSelectOpt(IDataSourceGetter dataSourceGetter, IAdvBaseOpt baseOpt, IAdvSimplePageOpt pageOpt, IAdvGeoPreOpt geoOpt) {
-        super(dataSourceGetter); this.baseOpt = baseOpt; this.pageOpt = pageOpt; this.geoOpt = geoOpt;
+
+    public SqlServerAdvWhereSelectOpt(
+            IDataSourceGetter dataSourceGetter,
+            IAdvBaseOpt baseOpt,
+            IAdvSimplePageOpt pageOpt,
+            IAdvGeoPreOpt geoOpt) {
+        super(dataSourceGetter);
+        this.baseOpt = baseOpt;
+        this.pageOpt = pageOpt;
+        this.geoOpt = geoOpt;
     }
-    @Override protected DialectTableNameProcessor getDialectTableNameProcessor() { return SqlServerDialectTableNameUtil.getInstance(); }
-    @Override protected IAdvBaseSelectOpt getBaseSelectOpt() { return baseOpt; }
-    @Override protected IAdvSimplePageOpt getSimplePageOpt() { return pageOpt; }
-    @Override protected IAdvGeoPreOpt getGeoOpt() { return geoOpt; }
+
+    @Override
+    protected DialectTableNameProcessor getDialectTableNameProcessor() {
+        return SqlServerDialectTableNameUtil.getInstance();
+    }
+
+    @Override
+    protected IAdvBaseSelectOpt getBaseSelectOpt() {
+        return baseOpt;
+    }
+
+    @Override
+    protected IAdvSimplePageOpt getSimplePageOpt() {
+        return pageOpt;
+    }
+
+    @Override
+    protected IAdvGeoPreOpt getGeoOpt() {
+        return geoOpt;
+    }
 }

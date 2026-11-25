@@ -51,5 +51,4 @@ public class SpringDiverManagerSourceWrapper extends GirAbstractDataSourceWrappe
     public Integer getActiveCount() {
         return null;
     }
-
 }

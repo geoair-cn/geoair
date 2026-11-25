@@ -9,33 +9,20 @@ import java.util.function.Consumer;
  * @description：
  */
 public class LoggingFilterConfig {
-    /**
-     * 需要记录日志的 URL 模式（白名单），为空则全部记录
-     */
+    /** 需要记录日志的 URL 模式（白名单），为空则全部记录 */
     private List<String> includeUrlPatterns;
 
-    /**
-     * 不需要记录日志的 URL 模式（黑名单），优先级高于白名单
-     */
+    /** 不需要记录日志的 URL 模式（黑名单），优先级高于白名单 */
     private List<String> excludeUrlPatterns;
 
-
-    /**
-     * 采样率（0.0 ~ 1.0），默认 1.0 表示全部记录
-     */
+    /** 采样率（0.0 ~ 1.0），默认 1.0 表示全部记录 */
     private double samplingRate = 1.0;
 
-    /**
-     * 请求体采集器
-     */
+    /** 请求体采集器 */
     private HttpContextCollector httpContextCollector;
 
-    /**
-     * HttpContext 消费者
-     */
-    private Consumer<HttpContext> contextConsumer = httpContext -> {
-
-    };
+    /** HttpContext 消费者 */
+    private Consumer<HttpContext> contextConsumer = httpContext -> {};
 
     public List<String> getIncludeUrlPatterns() {
         return includeUrlPatterns;

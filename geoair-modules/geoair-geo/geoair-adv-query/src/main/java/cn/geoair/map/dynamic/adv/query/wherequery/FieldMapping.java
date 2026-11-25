@@ -8,15 +8,13 @@ import lombok.Getter;
  * @date ：Created in 2026/4/16 13:44
  * @description： 字段映射配置类
  */
-
 @Getter
 public class FieldMapping {
-    private String columnName;           // 数据库列名
-    private AdvOperatorEnums operator;   // 操作符
-    private boolean ignoreNull = true;   // 是否忽略null值
+    private String columnName; // 数据库列名
+    private AdvOperatorEnums operator; // 操作符
+    private boolean ignoreNull = true; // 是否忽略null值
 
-    public FieldMapping() {
-    }
+    public FieldMapping() {}
 
     public FieldMapping(String columnName) {
         this.columnName = columnName;

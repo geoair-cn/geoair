@@ -33,9 +33,8 @@ public class GutilAop {
      * @see #isCglibProxy
      */
     @GaMethodHandDefine(
-        expectClassName = "org.springframework.aop.support.AopUtils",
-        expectMethodName = "isAopProxy"
-    )
+            expectClassName = "org.springframework.aop.support.AopUtils",
+            expectMethodName = "isAopProxy")
     public static boolean isAopProxy(Object object) {
         AopProvider provider = aopProvider;
         if (provider != null) {
@@ -54,9 +53,8 @@ public class GutilAop {
      * @see java.lang.reflect.Proxy#isProxyClass
      */
     @GaMethodHandDefine(
-        expectClassName = "org.springframework.aop.support.AopUtils",
-        expectMethodName = "isJdkDynamicProxy"
-    )
+            expectClassName = "org.springframework.aop.support.AopUtils",
+            expectMethodName = "isJdkDynamicProxy")
     public static boolean isJdkDynamicProxy(Object object) {
         AopProvider provider = aopProvider;
         if (provider != null) {
@@ -74,9 +72,8 @@ public class GutilAop {
      * @return 如果对象是CGLIB代理则返回true，否则返回false
      */
     @GaMethodHandDefine(
-        expectClassName = "org.springframework.aop.support.AopUtils",
-        expectMethodName = "isCglibProxy"
-    )
+            expectClassName = "org.springframework.aop.support.AopUtils",
+            expectMethodName = "isCglibProxy")
     public static boolean isCglibProxy(Object object) {
         AopProvider provider = aopProvider;
         if (provider != null) {
@@ -94,9 +91,8 @@ public class GutilAop {
      * @return 目标类（如果是AOP代理）或给定对象的普通类（作为后备）；永远不会为{@code null}
      */
     @GaMethodHandDefine(
-        expectClassName = "org.springframework.aop.support.AopUtils",
-        expectMethodName = "getTargetClass"
-    )
+            expectClassName = "org.springframework.aop.support.AopUtils",
+            expectMethodName = "getTargetClass")
     public static Class<?> getTargetClass(Object candidate) {
         AopProvider provider = aopProvider;
         if (provider != null) {

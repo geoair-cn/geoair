@@ -4,9 +4,7 @@ import cn.geoair.map.dynamic.file.core.enums.TranStatus;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-/**
- * 转换进度信息
- */
+/** 转换进度信息 */
 @Data
 @Accessors(chain = true)
 public class TranProgress {

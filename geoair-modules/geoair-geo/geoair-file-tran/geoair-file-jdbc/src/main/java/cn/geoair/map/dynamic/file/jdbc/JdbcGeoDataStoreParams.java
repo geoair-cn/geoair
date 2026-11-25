@@ -4,7 +4,6 @@ import cn.geoair.comp.jdbc.url.GirJdbcUrlCodecs;
 import cn.geoair.comp.jdbc.url.beans.JdbcEndpoint;
 import cn.geoair.comp.jdbc.url.beans.JdbcUrl;
 import cn.geoair.map.dynamic.file.jdbc.link.JdbcGeoLinkInfo;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,15 +14,15 @@ import java.util.Map;
  */
 public final class JdbcGeoDataStoreParams {
 
-    private JdbcGeoDataStoreParams() {
-    }
+    private JdbcGeoDataStoreParams() {}
 
     /** 创建 GeoTools JDBC DataStore 的公共参数。 */
     public static Map<String, Object> create(String dbType, JdbcGeoLinkInfo linkInfo) {
         JdbcUrl jdbcUrl = GirJdbcUrlCodecs.defaultCodec().parse(linkInfo.getJdbcUrl());
         JdbcEndpoint endpoint = jdbcUrl.getPrimaryEndpoint();
         if (endpoint == null || endpoint.getHost() == null) {
-            throw new IllegalArgumentException("JDBC URL 未包含可用于 GeoTools 的主机端点：" + linkInfo.getJdbcUrl());
+            throw new IllegalArgumentException(
+                    "JDBC URL 未包含可用于 GeoTools 的主机端点：" + linkInfo.getJdbcUrl());
         }
         Map<String, Object> params = new HashMap<>();
         params.put("dbtype", dbType);

@@ -65,5 +65,4 @@ public final class JdbcParameterDecimal implements JdbcParameter {
     public int getSqlType() {
         return Types.DECIMAL;
     }
-
 }
