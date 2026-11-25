@@ -1,8 +1,9 @@
 package cn.geoair.map.tile.forge.core.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import javax.annotation.PostConstruct;
+
 
 /** ZIP 按需读取的资源边界；普通 Java 调用也可通过构造实例配置。 */
 @Data
