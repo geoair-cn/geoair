@@ -62,6 +62,11 @@ public class TileGetterFactory {
         return create(pxyLayerInfo, tileCache);
     }
 
+    /** 使用同一套源配置校验，直接读取数据源。 */
+    public static LayerTileGetter createUncached(PxyLayerInfo layer) {
+        return createRealGetter(validateConfig(layer));
+    }
+
     /**
      * 创建一个返回类型明确、并且缓存实际可用的瓦片获取器。
      *

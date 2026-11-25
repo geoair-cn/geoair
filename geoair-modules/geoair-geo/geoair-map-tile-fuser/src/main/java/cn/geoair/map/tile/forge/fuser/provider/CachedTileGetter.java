@@ -1,5 +1,8 @@
 package cn.geoair.map.tile.forge.fuser.provider;
 
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
+
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.grid.GridSubset;
@@ -54,6 +57,7 @@ public class CachedTileGetter implements LayerTileGetter {
 
     @Override
     public Resource getTileResource(int z, int x, int y) {
+        TileOperationContext.checkCurrent();
         // 先尝试从缓存读取
         if (cacheEnabled) {
             try {
@@ -62,7 +66,7 @@ public class CachedTileGetter implements LayerTileGetter {
                     log.debug("从缓存获取瓦片成功: {} - ({},{},{})", layerCachePreFix, z, x, y);
                     return new ByteArrayResource(cachedData);
                 }
-            } catch (Exception e) {
+            } catch (TileOperationException e) { throw e; } catch (Exception e) {
                 log.error("从缓存读取瓦片失败: {} - ({},{},{})", layerCachePreFix, z, x, y, e);
             }
         }
@@ -70,15 +74,17 @@ public class CachedTileGetter implements LayerTileGetter {
         // 缓存未命中，调用真实获取器
         Resource resource = target.getTileResource(z, x, y);
 
+        TileOperationContext.checkCurrent();
         // 保存到缓存
         if (resource != null && cacheEnabled) {
             try {
                 byte[] data = resource.getByteData();
                 if (data != null && data.length > 0) {
+                    TileOperationContext.checkCurrent();
                     tileCache.put(layerCachePreFix, z, x, y, data, target.getSrcFormat());
                     log.debug("瓦片已保存到缓存: {} - ({},{},{})", layerCachePreFix, z, x, y);
                 }
-            } catch (Exception e) {
+            } catch (TileOperationException e) { throw e; } catch (Exception e) {
                 log.error("保存瓦片到缓存失败: {} - ({},{},{})", layerCachePreFix, z, x, y, e);
             }
         }

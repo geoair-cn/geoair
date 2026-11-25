@@ -2,6 +2,7 @@ package cn.geoair.map.tile.forge.core.zip;
 
 import java.io.EOFException;
 import java.io.IOException;
+import cn.geoair.map.tile.forge.core.config.ZipReadOptions;
 
 /**
  * ZIP 中央目录的分块读取器。每次扫描独享固定大小缓冲，跨块条目连续读取，
@@ -31,7 +32,9 @@ final class CentralDirectoryReader {
         int copied = 0;
         while (copied < length) {
             if (position == buffer.length) {
-                int count = (int) Math.min(remaining, AbstractZipCompressionHandler.MAX_CHUNK_SIZE);
+                ZipReadOptions options = ZipReadOptions.getInstance();
+                options.validate();
+                int count = (int) Math.min(remaining, options.getDirectoryBlockBytes());
                 buffer = compressionHandler.readRange(source, nextOffset, nextOffset + count - 1);
                 if (buffer.length != count) throw new EOFException("ZIP中央目录读取不完整");
                 nextOffset += count;

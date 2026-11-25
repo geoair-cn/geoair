@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.ObjectMetadata;
  
 
 import java.io.ByteArrayOutputStream;
@@ -34,6 +35,14 @@ public class S3CompressionHandler extends AbstractZipCompressionHandler {
     private static final int HTTP_STATUS_THROTTLED = 429;
 
     static S3ClientGetter s3ClientGetter;
+
+    @Override
+    public String getSourceVersion(String source) {
+        ObjectMetadata metadata = s3ClientGetter.getClient()
+                .getObjectMetadata(s3ClientGetter.getDefaultBucket(), source);
+        return s3ClientGetter.getDefaultBucket() + ":" + metadata.getContentLength() + ":" + metadata.getVersionId() + ":"
+                + metadata.getETag() + ":" + metadata.getLastModified();
+    }
 
     public S3CompressionHandler() {
         if (s3ClientGetter == null) {

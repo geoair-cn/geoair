@@ -7,6 +7,10 @@ import jakarta.persistence.Transient;
 import cn.geoair.map.tile.forge.fuser.enums.TileRowOrigin;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import cn.geoair.map.tile.forge.fuser.upstream.UpstreamRequestOptions;
+import cn.geoair.map.tile.forge.fuser.upstream.UpstreamRequestCustomizer;
 
 
 
@@ -23,6 +27,13 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class PxyLayerInfo {
+    @GaModelField(text = "上游请求参数")
+    @ToString.Exclude
+    private UpstreamRequestOptions upstreamRequest;
+
+    /** 仅在服务端注册；不通过 JSON 接收可执行策略。 */
+    @JsonIgnore @Transient @ToString.Exclude
+    private UpstreamRequestCustomizer upstreamRequestCustomizer;
 
     /**
      * 图层名称

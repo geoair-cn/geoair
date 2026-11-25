@@ -1,5 +1,13 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.enums.GirMapTileType;
+
+import java.io.InputStream;
+
+import cn.geoair.map.tile.forge.core.zip.ZipPaths;
+
+import cn.geoair.map.tile.forge.core.zip.ZipRootResolver;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
@@ -68,41 +76,23 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
 
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String z, String x, String y) throws Exception {
-        // 初始化瓦片请求对象
-        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
-        try {
-            // 创建缓存访问器，用于构建文件路径
-            String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-
-            LayerPerFileDao layerPerFileDao = contextHelper.getLayerPerFileDao(layerConfigContext);
-            if (!layerPerFileDao.cacheEnableIs(layerConfigContext)) {
-                byZip(layerConfigContext, z, y, x, tempDirAbsolutePath);
-            } else {
-                byPreCache(layerConfigContext, z, y, x, tempDirAbsolutePath);
-            }
-            // 创建本地缓存访问器，从解压后的文件中读取瓦片数据
-            String tilePathPrefix = layerConfigContext.getTilePathPrefix();
-            String rootPath = tempDirAbsolutePath;
-            if (!StrUtil.isEmpty(tilePathPrefix)) {
-                rootPath = rootPath + File.separator + tilePathPrefix;
-            }
-            ArcGISCompactCache localCache = getArcGISCompactCache(rootPath);
-            BundleFileResource bundleFileResource = localCache.getBundleFileResource(Integer.parseInt(z), Integer.parseInt(y), Integer.parseInt(x));
-
-            // 如果找到瓦片资源，设置返回数据
-            if (bundleFileResource != null) {
-                long size = bundleFileResource.getSize();
-                tileRequest.setExists(true);
-                tileRequest.setBytes(IoUtil.readBytes(bundleFileResource.getInputStream()));
-                tileRequest.setSize(size);
-                tileRequest.setLastModified(bundleFileResource.getLastModified());
-            }
-        } catch (Exception e) {
-            log.info("getTileData error:{}", e.getMessage());
+        ZipPaths.number(z); ZipPaths.number(x); ZipPaths.number(y);
+        String root = zipResources.directory(layerConfigContext).toString();
+        ArcGISCompactCache localCache = getArcGISCompactCache(root);
+        String full = localCache.buildBundleFilePath(Integer.parseInt(z), Integer.parseInt(y), Integer.parseInt(x));
+        String relative = new File(root).toPath().relativize(new File(full).toPath()).toString().replace('\\', '/');
+        if (zipResources.extract(layerConfigContext, relative + BUNDLE_EXT) == null)
+            return TileRequest.emptyByContext(layerConfigContext);
+        if (layerConfigContext.getMapTileType() == GirMapTileType.COMPACT_V1
+                && zipResources.extract(layerConfigContext, relative + BUNDLX_EXT) == null)
+            return TileRequest.emptyByContext(layerConfigContext);
+        TileRequest response = TileRequest.emptyByContext(layerConfigContext);
+        BundleFileResource resource = localCache.getBundleFileResource(Integer.parseInt(z), Integer.parseInt(y), Integer.parseInt(x));
+        if (resource != null) {
+            try (InputStream input = resource.getInputStream()) { response.setBytes(IoUtil.readBytes(input)); }
+            response.setExists(true); response.setSize(resource.getSize()); response.setLastModified(resource.getLastModified());
         }
-
-
-        return tileRequest;
+        return response;
     }
 
     ArcGISCompactCache getArcGISCompactCache(String pathToCacheRoot) {
@@ -273,31 +263,7 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
 
     @Override
     public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
-        AtomicReference<String> tileSetPath = new AtomicReference<>("");
-        iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
-            boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
-            if (directoryIs) {
-                return true;
-            }
-            String name = centralDirectoryEntry.getName();
-            String confFileName = "conf.xml";
-            if (name.toLowerCase().contains(confFileName)) {
-                tileSetPath.set(name);
-                return false;
-            }
-            return true;
-        });
-        String tileSetJsonPath = tileSetPath.get();
-
-        if (StrUtil.isEmpty(tileSetJsonPath)) {
-            throw new RuntimeException("arcGis紧凑型缺失conf.xml文件，校验失败！");
-        }else{
-            log.info("zip中找到conf.xml，判断为合法的arcgis紧凑型瓦片文件包：{}", tileSetJsonPath);
-        }
-        String name = FileUtil.getName(tileSetJsonPath);
-        String rootPath = tileSetJsonPath.replace("conf.xml", "")
-                .replace("Conf.xml", "");
-        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath);
+        return ZipRootResolver.resolve(layerConfigContext, iCompressionHandler);
     }
 
     /**
@@ -309,11 +275,11 @@ public class LocalZipCompactV1TileStorageSupport extends AbstractArcgisZipDirect
      */
     @Override
     public String getConfigXml(GirLayerConfigContext layerConfigContext) throws Exception {
-        return ArcgisTileUtils.getConfigXmlByLocal(layerConfigContext);
+        return zipResources.readArcgisMetadata(layerConfigContext, "conf.xml");
     }
 
     @Override
     public String getConfigCdi(GirLayerConfigContext layerConfigContext) throws Exception {
-        return ArcgisTileUtils.getConfigCdiByLocal(layerConfigContext);
+        return zipResources.readArcgisMetadata(layerConfigContext, "conf.cdi");
     }
 }

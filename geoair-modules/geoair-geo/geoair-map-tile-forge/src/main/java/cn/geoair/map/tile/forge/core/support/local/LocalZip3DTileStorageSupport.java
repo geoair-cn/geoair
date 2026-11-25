@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.zip.ZipRootResolver;
+
 import cn.geoair.base.exception.GirException;
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
@@ -70,45 +72,11 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
 
     @Override
     public TileRequest getTileData(GirLayerConfigContext layerConfigContext, String fileName, String x, String y) throws Exception {
-
-        // 3Dtile就Z有用，其他的我全部都不要了。z就是一个web请求路径
-
-        TileRequest tileRequest = TileRequest.emptyByContext(layerConfigContext);
-        String tempDirAbsolutePath = TileTempPathConfig.getInstance().buildLocalTempDirPath(layerConfigContext);
-        Path rootPath = Paths.get(tempDirAbsolutePath).toAbsolutePath().normalize();
-        Path localPath = rootPath.resolve(fileName).normalize();
-        if (!localPath.startsWith(rootPath)) {
-            throw new IOException("瓦片路径越出临时目录");
-        }
-        File localTileFile = localPath.toFile();
-        String inLocalPath = localTileFile.getAbsolutePath();
-        boolean localStatu = localTileFile.exists();
-        if (!localStatu) {
-            localStatu = byPreCache(layerConfigContext, fileName, inLocalPath);
-        }
-        if (localStatu) {
-            tileRequest.setBytes(FileUtil.readBytes(localTileFile));
-            tileRequest.setLastModified(localTileFile.lastModified());
-            tileRequest.setSize(localTileFile.length());
-            tileRequest.setExists(true);
-            tileRequest.setMimeType(GutilMimeType.fromExtension(FileUtil.getSuffix(localTileFile.getName())));
-        }
-        return tileRequest;
+        return zipResources.readTile(layerConfigContext, fileName);
     }
 
     protected boolean byPreCache(GirLayerConfigContext layerConfigContext, String z, String inLocalPath) {
-        try {
-            TileCentralDirectoryModel zipDirectoryByFileName = getZipDirectoryBFileName(layerConfigContext, z);
-            if (zipDirectoryByFileName == null) {
-                return false;
-            }
-            getICompressionHandler().readAndDecompressEntryToLocal(zipDirectoryByFileName, layerConfigContext.getObjectKey(), inLocalPath);
-            return true;
-        } catch (Exception e) {
-            log.error("getTileDataByPreZipCache error:", e);
-            return false;
-        }
-
+        return zipResources.extract(layerConfigContext, z) != null;
     }
 
 
@@ -130,40 +98,7 @@ public class LocalZip3DTileStorageSupport extends AbstractZipDirectoryGetter imp
 
     @Override
     public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
-        GirMapTileType mapTileType = layerConfigContext.getMapTileType();
-        List<String> allTileSetPaths = new ArrayList<>();
-        String finalRootFileNameSuffix = "json";
-        if (mapTileType.equals(GirMapTileType.S3M)) {
-            finalRootFileNameSuffix = "scp";
-        } else {
-            finalRootFileNameSuffix = "json";
-        }
-
-        String finalRootFileNameSuffix1 = finalRootFileNameSuffix;
-        iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
-            // 跳过目录
-            if (centralDirectoryEntry.isDirectoryIs()) {
-                return true;
-            }
-            String entryName = centralDirectoryEntry.getName();
-            String suffix = FileUtil.getSuffix(entryName);
-            if (suffix.equals(finalRootFileNameSuffix1)) {
-                allTileSetPaths.add(entryName);
-            }
-            return true;
-        });
-
-        // 校验是否找到tileset.json
-        if (allTileSetPaths.isEmpty()) {
-            throw new GirException("三维数据中缺失{}关键元素", finalRootFileNameSuffix);
-        }
-        String outerMostTileSetPath = findOuterMostPath(allTileSetPaths);
-        log.info("zip中找到{}，判断为合法的三维数据：{}", outerMostTileSetPath);
-        log.info("选中最外层的路径: {}", outerMostTileSetPath);
-        String name = FileUtil.getName(outerMostTileSetPath);
-        String rootPath = outerMostTileSetPath.replace(name, "");
-        return RootPathInfo.of().setRootFileName(name).setRootPath(rootPath).setRootFilePath(outerMostTileSetPath)
-                .setRootFileStandardName(mapTileType.equals(GirMapTileType.S3M) ? "tilesetS3MB.scp" : "tileset.json");
+        return ZipRootResolver.resolve(layerConfigContext, iCompressionHandler);
     }
 
     /**

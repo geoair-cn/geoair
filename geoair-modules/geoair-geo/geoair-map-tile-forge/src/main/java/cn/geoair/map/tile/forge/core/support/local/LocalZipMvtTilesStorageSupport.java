@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.core.support.local;
 
+import cn.geoair.map.tile.forge.core.zip.ZipRootResolver;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.GirLayerConfigContextHelper;
@@ -66,27 +68,6 @@ public class LocalZipMvtTilesStorageSupport extends LocalZip3DTileStorageSupport
 
     @Override
     public RootPathInfo preCheckZipAndGetRoot(GirLayerConfigContext layerConfigContext, ICompressionHandler iCompressionHandler) throws IOException {
-        AtomicReference<String> tileSetPath = new AtomicReference<>("");
-        iCompressionHandler.scanAllEntries(layerConfigContext.getObjectKey(), (centralDirectoryEntry, allCount, currentCount) -> {
-            boolean directoryIs = centralDirectoryEntry.isDirectoryIs();
-            if (directoryIs) {
-                return true;
-            }
-            String name = centralDirectoryEntry.getName();
-            if (name.toLowerCase().contains("style.json")) {
-                tileSetPath.set(name);
-                return false;
-            }
-            return true;
-        });
-        String tileSetJsonPath = tileSetPath.get();
-
-        if (StrUtil.isEmpty(tileSetJsonPath)) {
-            throw new RuntimeException("MvtTiles中缺失style.json关键元素");
-        } else {
-            log.info("zip中找到style.json，判断为合法的MvtTiles文件：{}", tileSetJsonPath);
-        }
-        String rootPath = tileSetJsonPath.replace("style.json", "");
-        return RootPathInfo.of().setRootFileName("style.json").setRootPath(rootPath);
+        return ZipRootResolver.resolve(layerConfigContext, iCompressionHandler);
     }
 }

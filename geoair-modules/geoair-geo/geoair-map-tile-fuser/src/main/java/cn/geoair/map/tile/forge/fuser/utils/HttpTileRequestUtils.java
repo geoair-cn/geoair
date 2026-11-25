@@ -1,5 +1,7 @@
 package cn.geoair.map.tile.forge.fuser.utils;
 
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationException;
+
 import cn.geoair.base.log.GiLogger;
 import cn.geoair.base.log.GirLoggerFactory;
 import cn.geoair.map.tile.forge.core.bygwc.io.ByteArrayResource;
@@ -26,7 +28,9 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.TreeMap;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationGuard;
+import cn.geoair.map.tile.forge.fuser.execution.TileOperationContext;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -57,6 +61,8 @@ public final class HttpTileRequestUtils {
         HTTP_CLIENT = HttpClients.custom()
                 .setConnectionManager(CONNECTION_MANAGER)
                 .disableContentCompression()
+                .disableCookieManagement()
+                .disableAutomaticRetries()
                 .evictExpiredConnections()
                 .evictIdleConnections(30, TimeUnit.SECONDS)
                 .build();
@@ -105,7 +111,7 @@ public final class HttpTileRequestUtils {
     }
 
     public static Map<String, String> buildDefaultHeaders() {
-        Map<String, String> headers = new HashMap<>();
+        Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         headers.put("User-Agent", resolveUserAgent());
         headers.put("Accept", DEFAULT_ACCEPT);
         headers.put("Accept-Language", DEFAULT_ACCEPT_LANGUAGE);
@@ -161,7 +167,7 @@ public final class HttpTileRequestUtils {
                                                 GiMimeType srcFormat, String logContext,
                                                 Map<String, String> headers) {
         if (!isSupportedHttpUrl(url)) {
-            log.warn("不支持的瓦片 URL: {}", url);
+            log.warn("不支持的瓦片 URL: {}", safeLogUrl(url));
             return null;
         }
         int actualMaxRetries = maxRetries > 0 ? maxRetries : 3;
@@ -176,29 +182,29 @@ public final class HttpTileRequestUtils {
                 if (result.resource != null) {
                     long elapsed = System.currentTimeMillis() - startTime;
                     if (attempt > 1) {
-                        log.info("瓦片请求重试成功: {} - {} 尝试: {} 耗时: {}ms", url, logContext, attempt, elapsed);
+                        log.info("瓦片请求重试成功: {} - {} 尝试: {} 耗时: {}ms", safeLogUrl(url), logContext, attempt, elapsed);
                     } else {
-                        log.info("瓦片请求成功: {} - {} 耗时: {}ms, bodySize: {}", url, logContext,
+                        log.info("瓦片请求成功: {} - {} 耗时: {}ms, bodySize: {}", safeLogUrl(url), logContext,
                                 elapsed, DataSizeUtil.format(result.bodySize));
                     }
                     return result.resource;
                 }
                 if (isNonRetryableClientError(result.statusCode)) {
-                    log.info("瓦片请求返回客户端错误 {}，不重试: {} - {}", result.statusCode, url, logContext);
+                    log.info("瓦片请求返回客户端错误 {}，不重试: {} - {}", result.statusCode, safeLogUrl(url), logContext);
                     return null;
                 }
-                log.warn("瓦片请求失败: {} - {} 状态码: {} 尝试: {}/{}", url, logContext,
+                log.warn("瓦片请求失败: {} - {} 状态码: {} 尝试: {}/{}", safeLogUrl(url), logContext,
                         result.statusCode, attempt, actualMaxRetries);
-            } catch (Exception e) {
-                log.warn("瓦片请求异常: {} - {} 尝试: {}/{}，原因: {}", url, logContext,
-                        attempt, actualMaxRetries, e.getMessage());
+            } catch (TileOperationException e) { throw e; } catch (Exception e) {
+                log.warn("瓦片请求异常: {} - {} 尝试: {}/{}，原因: {}", safeLogUrl(url), logContext,
+                        attempt, actualMaxRetries, e.getClass().getSimpleName());
             }
 
             if (attempt < actualMaxRetries && !sleepBeforeRetry(attempt, actualRetryDelay, actualMaxRetryDelay)) {
                 return null;
             }
         }
-        log.error("所有瓦片请求重试失败: {} - {}", url, logContext);
+        log.error("所有瓦片请求重试失败: {} - {}", safeLogUrl(url), logContext);
         return null;
     }
 
@@ -211,7 +217,7 @@ public final class HttpTileRequestUtils {
                                        GiMimeType srcFormat, String logContext,
                                        Map<String, String> headers) {
         if (!isSupportedHttpUrl(url)) {
-            log.warn("不支持的瓦片 URL: {}", url);
+            log.warn("不支持的瓦片 URL: {}", safeLogUrl(url));
             return null;
         }
         try {
@@ -219,33 +225,42 @@ public final class HttpTileRequestUtils {
             TileFetchResult result = executeTileRequest(url, proxy, timeout, srcFormat,
                     headers != null ? buildHeaders(headers) : buildDefaultHeaders());
             if (result.resource != null) {
-                log.debug("瓦片请求成功: {} - {} 耗时: {}ms", url, logContext,
+                log.debug("瓦片请求成功: {} - {} 耗时: {}ms", safeLogUrl(url), logContext,
                         System.currentTimeMillis() - startTime);
                 return result.resource;
             }
-            log.debug("瓦片请求失败: {} - {} 状态码: {}", url, logContext, result.statusCode);
-        } catch (Exception e) {
-            log.warn("瓦片请求异常: {} - {}，原因: {}", url, logContext, e.getMessage());
+            log.debug("瓦片请求失败: {} - {} 状态码: {}", safeLogUrl(url), logContext, result.statusCode);
+        } catch (TileOperationException e) { throw e; } catch (Exception e) {
+            log.warn("瓦片请求异常: {} - {}，原因: {}", safeLogUrl(url), logContext, e.getClass().getSimpleName());
         }
         return null;
     }
 
     private static TileFetchResult executeTileRequest(String url, Proxy proxy, int timeout,
                                                        GiMimeType srcFormat, Map<String, String> headers) throws IOException {
+        return executeTileRequest(url, proxy, timeout, srcFormat, headers, true);
+    }
+
+    static TileFetchResult executeTileRequest(String url, Proxy proxy, int timeout,
+            GiMimeType srcFormat, Map<String, String> headers, boolean redirects) throws IOException {
+        TileOperationContext context = TileOperationContext.current();
+        if (context != null) timeout = Math.min(normalizeTimeout(timeout), context.remainingMillis());
         HttpGet request = new HttpGet(url);
-        request.setConfig(buildRequestConfig(proxy, timeout));
+        request.setConfig(RequestConfig.copy(buildRequestConfig(proxy, timeout)).setRedirectsEnabled(redirects).build());
         if (headers != null) {
             headers.forEach(request::setHeader);
         }
+        Runnable abort = request::abort;
+        TileOperationGuard deadline = context == null ? null : new TileOperationGuard(context,abort);
         try (CloseableHttpResponse response = HTTP_CLIENT.execute(request)) {
             int statusCode = response.getStatusLine().getStatusCode();
             String blockedReason = getBlockedReason(response);
             if (blockedReason != null) {
-                log.warn("瓦片服务返回访问拦截图，按 HTTP 403 处理: {} - 原因: {}", url, blockedReason);
+                log.warn("瓦片服务返回访问拦截图，按 HTTP 403 处理: {} - 原因: {}", safeLogUrl(url), blockedReason);
                 return TileFetchResult.failure(403);
             }
             if (statusCode < 200 || statusCode >= 300) {
-                return TileFetchResult.failure(statusCode);
+                return TileFetchResult.redirect(statusCode, response.getFirstHeader("Location") == null ? null : response.getFirstHeader("Location").getValue());
             }
             HttpEntity entity = response.getEntity();
             if (entity == null) {
@@ -256,18 +271,25 @@ public final class HttpTileRequestUtils {
                 throw new IOException("瓦片响应超过大小限制: " + contentLength);
             }
             byte[] encodedBytes = TileImageUtils.readAllLimited(entity.getContent());
+            TileOperationContext.checkCurrent();
             BufferedImage image = TileImageUtils.readImage(encodedBytes);
             if (image == null) {
                 return TileFetchResult.failure(statusCode);
             }
             if (isOpenStreetMapTileUrl(url) && (image.getWidth() != 256 || image.getHeight() != 256)) {
                 log.warn("OSM 返回的图片不是 256x256 标准瓦片，按访问拦截图处理: {} - 实际尺寸: {}x{}",
-                        url, image.getWidth(), image.getHeight());
+                        safeLogUrl(url), image.getWidth(), image.getHeight());
                 return TileFetchResult.failure(403);
             }
             String internalName = srcFormat != null ? srcFormat.getInternalName() : "png";
             byte[] normalizedBytes = TileImageUtils.writeImage(image, internalName);
+            TileOperationContext.checkCurrent();
             return TileFetchResult.success(new ByteArrayResource(normalizedBytes), normalizedBytes.length);
+        } catch (IOException e) {
+            if (context != null) context.check();
+            throw e;
+        } finally {
+            if (deadline != null) deadline.close();
         }
     }
 
@@ -282,6 +304,11 @@ public final class HttpTileRequestUtils {
             builder.setProxy(new HttpHost(address.getHostString(), address.getPort()));
         }
         return builder.build();
+    }
+
+    public static String safeLogUrl(String url) {
+        try { URI u = new URI(url); return u.getScheme() + "://" + u.getHost() + (u.getPort() < 0 ? "" : ":" + u.getPort()) + "/[redacted]"; }
+        catch (Exception e) { return "[invalid upstream URL]"; }
     }
 
     private static boolean isSupportedHttpUrl(String url) {
@@ -325,6 +352,7 @@ public final class HttpTileRequestUtils {
 
     private static boolean sleepBeforeRetry(int attempt, long baseDelay, long maxDelay) {
         long delay = calculateRetryDelay(attempt, baseDelay, maxDelay);
+        if (TileOperationContext.current()!=null) { TileOperationContext.current().sleep(delay);return true; }
         try {
             log.debug("等待 {}ms 后重试", delay);
             Thread.sleep(delay);
@@ -341,23 +369,4 @@ public final class HttpTileRequestUtils {
         return (long) (delay * (0.9 + Math.random() * 0.2));
     }
 
-    private static final class TileFetchResult {
-        private final Resource resource;
-        private final int statusCode;
-        private final int bodySize;
-
-        private TileFetchResult(Resource resource, int statusCode, int bodySize) {
-            this.resource = resource;
-            this.statusCode = statusCode;
-            this.bodySize = bodySize;
-        }
-
-        private static TileFetchResult success(Resource resource, int bodySize) {
-            return new TileFetchResult(resource, 200, bodySize);
-        }
-
-        private static TileFetchResult failure(int statusCode) {
-            return new TileFetchResult(null, statusCode, 0);
-        }
-    }
 }

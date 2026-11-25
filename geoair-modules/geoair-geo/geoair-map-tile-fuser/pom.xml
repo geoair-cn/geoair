@@ -43,6 +43,13 @@
     </scm>
 
     <dependencies>
+        <!-- 独立驱动测试需要加载框架的 Spring Bean 适配器，业务应用自行提供 Spring。 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>cn.geoair.devkit</groupId>

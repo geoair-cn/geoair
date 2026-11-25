@@ -77,7 +77,7 @@ public final class ExtractLockUtils {
             throw new RuntimeException("等待文件抽取锁时被中断：" + key, e);
         }
         if (!acquired) {
-            throw new RuntimeException("等待文件抽取锁超时（" + timeoutMillis + "ms）：" + key);
+            throw new ExtractLockTimeoutException(timeoutMillis);
         }
         try {
             return extractor.get();

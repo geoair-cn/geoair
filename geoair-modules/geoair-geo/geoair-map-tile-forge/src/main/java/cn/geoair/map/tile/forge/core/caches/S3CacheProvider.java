@@ -7,6 +7,9 @@ import cn.geoair.map.tile.forge.core.config.GirS3ConfigProperties;
 import cn.geoair.map.tile.forge.core.s3.S3ClientGetter;
 import cn.hutool.core.util.StrUtil;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.amazonaws.services.s3.transfer.Upload;
 import com.amazonaws.services.s3.model.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +20,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -25,7 +31,7 @@ import java.util.concurrent.Callable;
  * 基于S3对象存储的缓存实现
  */
  
-public class S3CacheProvider implements CacheProvider {
+public class S3CacheProvider implements FileCacheProvider {
     public static GiLogger log = GirLoggerFactory.getLogger();
     private final AmazonS3 s3Client;
     private final String bucketName;
@@ -55,9 +61,14 @@ public class S3CacheProvider implements CacheProvider {
      * @param cachePrefix 缓存前缀
      */
     public S3CacheProvider(String bucketName, String cachePrefix) {
-        this.s3Client = S3ClientGetter.getInstance().getClient();
+        this(S3ClientGetter.getInstance().getClient(),bucketName,cachePrefix,GirS3ConfigProperties.getInstance().getDomain());
+    }
+
+    /** 允许复用接入方管理的客户端，也便于在模拟存储环境验证流式传输。 */
+    public S3CacheProvider(AmazonS3 client, String bucketName, String cachePrefix, String domain) {
+        this.s3Client = client;
         this.bucketName = bucketName;
-        this.domain = GirS3ConfigProperties.getInstance().getDomain();
+        this.domain = domain;
         this.cachePrefix = cachePrefix.endsWith("/") ? cachePrefix : cachePrefix + "/";
         this.objectMapper = new ObjectMapper();
         initBucket();
@@ -148,6 +159,46 @@ public class S3CacheProvider implements CacheProvider {
         } catch (Exception e) {
             // 读取失败或异常时返回null
             return null;
+        }
+    }
+
+    /** SDK 直接读取文件流，沿用原有对象键和原始字节格式。 */
+    @Override
+    public void putFile(Object key, Path source, long milliseconds) throws IOException {
+        ObjectMetadata metadata=new ObjectMetadata();
+        metadata.setContentLength(Files.size(source));
+        if(milliseconds!=-1) metadata.addUserMetadata(EXPIRATION_METADATA_KEY,
+                String.valueOf(Math.addExact(System.currentTimeMillis(),milliseconds)));
+        PutObjectRequest request=new PutObjectRequest(bucketName,getObjectKey(key),source.toFile())
+                .withMetadata(metadata).withCannedAcl(CannedAccessControlList.Private);
+        // SDK 按大小选择分片上传，超大索引也不受单次 PutObject 的大小限制。
+        TransferManager transfer=TransferManagerBuilder.standard().withS3Client(s3Client).build();
+        Upload upload=null;
+        try {
+            upload=transfer.upload(request);
+            upload.waitForCompletion();
+        } catch(InterruptedException e) {
+            if(upload!=null) try { upload.abort(); } catch(RuntimeException cleanup) { e.addSuppressed(cleanup); }
+            Thread.currentThread().interrupt();
+            throw new IOException("S3 索引备份已中断",e);
+        } catch(Exception e) {
+            throw new IOException("S3 索引备份失败",e);
+        } finally {
+            transfer.shutdownNow(false);
+        }
+    }
+
+    @Override
+    public boolean copyTo(Object key, Path target) throws IOException {
+        try(S3Object object=s3Client.getObject(bucketName,getObjectKey(key))) {
+            if(isExpired(object.getObjectMetadata())) return false;
+            Files.copy(object.getObjectContent(),target,StandardCopyOption.REPLACE_EXISTING);
+            return true;
+        } catch(AmazonS3Exception e) {
+            if(e.getStatusCode()==404) return false;
+            throw new IOException("S3 索引恢复失败",e);
+        } catch(RuntimeException e) {
+            throw new IOException("S3 索引恢复失败",e);
         }
     }
 
